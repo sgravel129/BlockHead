@@ -33,5 +33,6 @@ int main(int argc, char *argv[])
 
     SDL_UpdateWindowSurface(window);
 
-    SDL_Delay(5000); //delay
+    SDL_Delay(5000);
+
 }
