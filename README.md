@@ -7,3 +7,5 @@ Blockhead is a zombie survival game where the player is stuck in a map with zomb
 - health
 - power-ups
 - leveling 
+
+For more information about the game and its development process, visit us at team-recode.com
