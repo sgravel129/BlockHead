@@ -1,4 +1,5 @@
 # Blockhead
+
 Blockhead is a zombie survival game where the player is stuck in a map with zombies spawning at every level. The difficulty ramps up as more zombies are spawned. The player can obtain different weapons to kill zombies with. There can be different types of zombies and many maps. We can implement the simplest version of the game to ensure we complete the project and then, time permitting to ramp it up, add more:
 
 - weapons
@@ -9,3 +10,14 @@ Blockhead is a zombie survival game where the player is stuck in a map with zomb
 - leveling 
 
 For more information about the game and its development process, visit us at team-recode.com
+
+<!-- language: lang-none -->
+     ____  ____    __    __  __                 
+    (_  _)( ___)  /__\  (  \/  )                
+      )(   )__)  /(__)\  )    (                 
+     (__) (____)(__)(__)(_/\/\_)                
+     ____  ____  ____    ___  _____  ____  ____ 
+    (  _ \( ___)(  _ \  / __)(  _  )(  _ \( ___)
+     )   / )__)  )(_) )( (__  )(_)(  )(_) ))__) 
+    (_)\_)(____)(____/  \___)(_____)(____/(____)
+
