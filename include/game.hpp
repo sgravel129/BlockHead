@@ -6,7 +6,7 @@
 #include "color.hpp"
 
 // Game Objects
-// #include "sprite.hpp"
+#include "player.hpp"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -72,7 +72,7 @@ private:
 	SDL_Event _event;
 
 	// Custom game classes
-	// Sprite _sprite;
+	Player _player;
 	// End of custom classes
 };
 
