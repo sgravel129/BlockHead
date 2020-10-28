@@ -1,38 +1,29 @@
-#include <iostream>
+#include "game.hpp"
+// testing
 #include <SDL2/SDL.h>
-
-using namespace std;
-
-int main(int argc, char *argv[])
+#include <SDL2/SDL_image.h>
+#include <iostream>
+//test
+int main(int argc, char **argv)
 {
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
+    int framerate = 60;
+
+    // Command line arguements
+    if (argc > 2)
     {
-        cout << "Failed to initialize the SDL2 library\n";
-        return -1;
+        framerate = atoi(argv[2]);
     }
 
-    SDL_Window *window = SDL_CreateWindow("SDL2 Window",
-                                          SDL_WINDOWPOS_CENTERED,
-                                          SDL_WINDOWPOS_CENTERED,
-                                          680, 480,
-                                          0);
+    Game game;
 
-    if (!window)
+    game.setFramerate(framerate);
+
+    if (game.init())
     {
-        cout << "Failed to create window\n";
-        return -1;
+        game.run();
     }
 
-    SDL_Surface *window_surface = SDL_GetWindowSurface(window);
+    game.exit();
 
-    if (!window_surface)
-    {
-        cout << "Failed to get the surface from the window\n";
-        return -1;
-    }
-
-    SDL_UpdateWindowSurface(window);
-
-    SDL_Delay(5000);
-
+    return 0;
 }
