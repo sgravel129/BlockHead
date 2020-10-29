@@ -7,6 +7,7 @@
 
 // Game Objects
 #include "player.hpp"
+#include "zombie.hpp"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -73,6 +74,7 @@ private:
 
 	// Custom game classes
 	Player _player;
+	Zombie _zombie;
 	// End of custom classes
 };
 

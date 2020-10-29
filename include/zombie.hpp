@@ -10,14 +10,16 @@ private:
     int _x, _y;
     int _angle;     // for sprite info
     int _health;
-    int _moveSpeed = 1;
+    int _moveSpeed;
 
-//  Path _pathToPlayer;  // tentative Path class, implemented with path finder algorithm
+    // Path _pathToPlayer;  // tentative Path class, implemented with path finder algorithm
 
-    //int _zombieType;    // might implement different zombie types
+    // int _zombieType;    // might implement different zombie types
 
 public:
     Zombie(/* args */);
+    Zombie(Graphics &graphics, const std::string &path,int w, int h, float scale);
     ~Zombie();
     void update();
+    void draw(Graphics &graphics);
 };

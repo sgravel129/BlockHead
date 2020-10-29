@@ -33,6 +33,7 @@ bool Game::init()
 
 	/* Custom class initialization */
 	_player = Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+	_zombie = Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
 
 	/* End of class initialization */
 
@@ -74,6 +75,7 @@ void Game::update()
 {
 	/* Updating of game classes */
 	_player.update(_input);
+	_zombie.update();
 	/* End of updating */
 }
 
@@ -82,6 +84,7 @@ void Game::render()
 	_graphics->fillBackground();
 
 	/* Rendering of different classes */
+	_zombie.draw(*_graphics);
 	_player.draw(*_graphics);
 
 	/* End of rendering */
