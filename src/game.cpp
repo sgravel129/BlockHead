@@ -75,7 +75,7 @@ void Game::update()
 {
 	/* Updating of game classes */
 	_player.update(_input);
-	_zombie.update();
+	_zombie.update(_player.getX(), _player.getY());
 	/* End of updating */
 }
 

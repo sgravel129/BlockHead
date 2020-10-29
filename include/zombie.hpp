@@ -20,6 +20,6 @@ public:
     Zombie(/* args */);
     Zombie(Graphics &graphics, const std::string &path,int w, int h, float scale);
     ~Zombie();
-    void update();
+    void update(int, int);
     void draw(Graphics &graphics);
 };

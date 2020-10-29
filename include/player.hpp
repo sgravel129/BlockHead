@@ -25,4 +25,6 @@ public:
     ~Player();
     void update(Input input);
     void draw(Graphics &graphics);
+    int getX(){return _x;}
+    int getY(){return _y;}
 };

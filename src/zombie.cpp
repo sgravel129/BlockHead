@@ -22,9 +22,7 @@ Zombie::~Zombie()
 {
 }
 
-int target_x = 300;
-int target_y = 200;
-void Zombie::update(){
+void Zombie::update(int target_x, int target_y){
     // Do path finding. Euclidian Distance
     const int DEADBAND = 5;
     if ((_y - target_y) > DEADBAND)
@@ -47,10 +45,8 @@ void Zombie::update(){
         _x -= _moveSpeed;
         _angle = 1;
     }
-
-
-
 }
+
 void Zombie::draw(Graphics &graphics){
     _sprite.change_src(_anims[_angle]);
     _sprite.draw(graphics, _x, _y);
