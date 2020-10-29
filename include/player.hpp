@@ -15,7 +15,7 @@ private:
     int _x, _y;
     int _angle;         // for the sprite sheet and shooting aim -> map to 6 cardinal points (make cardinal direction class)
     int _health;        // will need a numerical value assignmnet within TBD
-    int _moveSpeed = 1;
+    int _moveSpeed;
     //int _weapon;      // will depend on the weapon class
     //int _weaponL;     // list of owned weapons, same as above ^^
     //int _powerUp;     // active powerUp, depends on powerUp class
@@ -25,4 +25,6 @@ public:
     ~Player();
     void update(Input input);
     void draw(Graphics &graphics);
+    int getX(){return _x;}
+    int getY(){return _y;}
 };
