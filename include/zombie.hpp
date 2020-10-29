@@ -1,3 +1,4 @@
+# pragma once
 #include "sprite.hpp"
 #include <vector>
 
