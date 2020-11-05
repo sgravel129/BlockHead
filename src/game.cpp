@@ -2,17 +2,11 @@
 #include "util.hpp"
 #include "log.hpp"
 #include "input.hpp"
+#include "constants.hpp"
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
-
-namespace GameVariables
-{
-	const char *GAME_NAME = "BlockHead";
-	const int SCREEN_WIDTH = 1280;
-	const int SCREEN_HEIGHT = 720;
-}
 
 Game::Game()
 {
@@ -34,11 +28,12 @@ bool Game::init()
 
 	Log::verbose("Game::init | SDL Subsystems initialized");
 
-	_graphics = new Graphics(GameVariables::GAME_NAME, GameVariables::SCREEN_WIDTH, GameVariables::SCREEN_HEIGHT);
+	_graphics = new Graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT);
 	_graphics->setRenderColor(Color::white());
 
 	/* Custom class initialization */
-	// _sprite = Sprite(*_graphics, "assets/flowers.bmp", 100, 100, 2.0F);
+	_player = Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+	_zombie = Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
 
 	/* End of class initialization */
 
@@ -73,20 +68,14 @@ void Game::handleUserInput()
 	}
 }
 
-// int x = 200;
-// int y = 200;
+int x = 200;
+int y = 200;
 
 void Game::update()
 {
 	/* Updating of game classes */
-	// if(_input.isKeyHeld(SDL_SCANCODE_W))
-	// 	y -= 1;
-	// if(_input.isKeyHeld(SDL_SCANCODE_S))
-	// 	y += 1;
-	// if(_input.isKeyHeld(SDL_SCANCODE_D))
-	// 	x += 1;
-	// if(_input.isKeyHeld(SDL_SCANCODE_A))
-	// 	x -= 1;
+	_player.update(_input);
+	_zombie.update(_player.getX(), _player.getY());
 	/* End of updating */
 }
 
@@ -95,7 +84,8 @@ void Game::render()
 	_graphics->fillBackground();
 
 	/* Rendering of different classes */
-	// _sprite.draw(*_graphics, x, y);
+	_zombie.draw(*_graphics);
+	_player.draw(*_graphics);
 
 	/* End of rendering */
 	_graphics->flip();
