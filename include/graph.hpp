@@ -21,6 +21,8 @@ public:
     void addVertex(const Vertex&);
     void addEdge(const Vertex&, const Vertex&);
 
+    int searchForDistance(const Vertex&, const Vertex&);
+
     // Accessors
     Vertex getVertex(const int, const int, const Cluster&);
     Edge getEdge(const Vertex&, const Vertex&);
