@@ -42,7 +42,6 @@ void abstractMap() {
 
     map_hierarchy.buildClusterS();
 
-
     // Adding entrances between clusters for all adjacent clusters
     for(int i = 0; i < CLUSTER_XNUM; i++) {     // checking all vertically adjacent clusters
         for(int j =0; j < CLUSTER_YNUM -1; j++) {
@@ -51,12 +50,10 @@ void abstractMap() {
     }
     
     for(int j = 0; j < CLUSTER_XNUM; j++) {     // checking all laterally adjacent clusters
-        for(int i =0; i < CLUSTER_XNUM -1; i++) {
+        for(int i =0; i < CLUSTER_XNUM - 1; i++) {
             findTransitions(map_hierarchy.get_Cluster(i,j), map_hierarchy.get_Cluster(i+1,j));
         }
     }
-
-
 }
 
 // Function findTransitions
