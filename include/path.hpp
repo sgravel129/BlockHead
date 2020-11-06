@@ -8,6 +8,9 @@
 //#define CLUSTER_WIDTH 120
 //#define CLUSTER_HEIGHT 120
 #define CLUSTER_SLENGTH 120     // side length of cluster (square)
+#define CLUSTER_XNUM X_MAX/CLUSTER_SLENGTH
+#define CLUSTER_YNUM Y_MAX/CLUSTER_SLENGTH
+
 #define X_STEP 30   // x size of tile
 #define Y_STEP 30   // y size of tile
 #define MIN_ENTRANCE_LENGTH 3   // minimum tile lenght for entrance
@@ -19,16 +22,16 @@ public:
     Path_Hierarchy();
     
     void addTransition(std::pair<Tile,Tile> tilePair);
-    void buildClusterS(const int, const int);
+    void buildClusterS();
 
     // Accessors
     std::vector<std::pair<Tile, Tile>> get_transitionS();
-    std::vector<std::vector<Cluster>> get_clusterS();
+    std::vector<Cluster> get_clusterS();
     Cluster get_Cluster(const int, const int);
 
 private:
     std::vector<std::pair<Tile, Tile>> _transitionS;
-    std::vector<std::vector<Cluster>> _clusterS;
+    std::vector<Cluster> _clusterS;
 
 };
 

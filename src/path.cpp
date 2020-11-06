@@ -19,20 +19,18 @@ void Path_Hierarchy::addTransition(std::pair<Tile,Tile> tilePair) {
     _transitionS.push_back(tilePair);
 }
 
-void Path_Hierarchy::buildClusterS(const int cluster_xNum, const int cluster_yNum) {
-    std::vector<Cluster> tempRow;
+void Path_Hierarchy::buildClusterS() {
 
-    for(int i = 0; i < cluster_xNum; i++) {
-        for(int j = 0; j < cluster_yNum; j++)
-            tempRow.push_back(Cluster {i,j, NULL});
-        _clusterS.push_back(tempRow);
+    for(int j = 0; j < CLUSTER_YNUM; j++) {
+        for(int i = 0; i < CLUSTER_XNUM; i++)
+            _clusterS.push_back(Cluster {i,j, NULL});
     }
 }
 
 // Accessors
 std::vector<std::pair<Tile, Tile>> Path_Hierarchy::get_transitionS() {return _transitionS;};
-std::vector<std::vector<Cluster>> Path_Hierarchy::get_clusterS() {return _clusterS;};
-Cluster Path_Hierarchy::get_Cluster(const int x, const int y) {return _clusterS[x][y];};
+std::vector<Cluster> Path_Hierarchy::get_clusterS() {return _clusterS;};
+Cluster Path_Hierarchy::get_Cluster(const int x, const int y) {return _clusterS[y*CLUSTER_YNUM + x];};
 
 
 //////////////////////////////////////////
@@ -41,21 +39,19 @@ Cluster Path_Hierarchy::get_Cluster(const int x, const int y) {return _clusterS[
 // Function abstractMap
 // divides map into clusters and defines transition points between them
 void abstractMap() {
-    
-    const int cluster_xNum = X_MAX/CLUSTER_SLENGTH;
-    const int cluster_yNum = Y_MAX/CLUSTER_SLENGTH;
-    map_hierarchy.buildClusterS(cluster_xNum, cluster_yNum);
+
+    map_hierarchy.buildClusterS();
 
 
     // Adding entrances between clusters for all adjacent clusters
-    for(int i = 0; i < cluster_xNum; i++) {     // checking all vertically adjacent clusters
-        for(int j =0; j <cluster_yNum-1; j++) {
+    for(int i = 0; i < CLUSTER_XNUM; i++) {     // checking all vertically adjacent clusters
+        for(int j =0; j < CLUSTER_YNUM -1; j++) {
             findTransitions(map_hierarchy.get_Cluster(i,j), map_hierarchy.get_Cluster(i,j+1));
         }
     }
     
-    for(int j = 0; j < cluster_yNum; j++) {     // checking all laterally adjacent clusters
-        for(int i =0; i <cluster_xNum-1; i++) {
+    for(int j = 0; j < CLUSTER_XNUM; j++) {     // checking all laterally adjacent clusters
+        for(int i =0; i < CLUSTER_XNUM -1; i++) {
             findTransitions(map_hierarchy.get_Cluster(i,j), map_hierarchy.get_Cluster(i+1,j));
         }
     }
