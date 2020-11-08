@@ -34,6 +34,8 @@ bool Game::init()
 	/* Custom class initialization */
 	_player = Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
 	_zombie = Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+	_map = Map(Point{10,10});
+	_map.loadMapFile(*_graphics, "res/maps/test.map", "res/maps/graveyard/graveyard.png");
 
 	/* End of class initialization */
 
@@ -83,6 +85,7 @@ void Game::render()
 {
 	_graphics->fillBackground();
 
+	_map.draw(*_graphics);
 	/* Rendering of different classes */
 	_zombie.draw(*_graphics);
 	_player.draw(*_graphics);
