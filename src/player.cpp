@@ -18,7 +18,7 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
 
 Player::~Player()
 {
-    Log::debug("~Player() | Called");
+    Log::debug("~Player\t| Called");
     _sprite->~Sprite();
 }
 

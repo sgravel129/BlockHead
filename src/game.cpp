@@ -14,7 +14,7 @@ Game::Game()
 
 Game::~Game()
 {
-	Log::debug("~Game() | Called ");
+	Log::debug("~Game\t| Called ");
 	_player->~Player();
 	_graphics->~Graphics();
 }
