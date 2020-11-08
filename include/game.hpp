@@ -74,7 +74,7 @@ private:
 
 	// Custom game classes
 	Player *_player;
-	Zombie _zombie;
+	Zombie *_zombie;
 	// End of custom classes
 };
 

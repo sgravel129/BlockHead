@@ -8,8 +8,8 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
 {
     _x = 200;
     _y = 200;
-    _angle = 0; // starting direction
     _moveSpeed = 2;
+    _angle = 0; // starting direction
     _sprite = new Sprite(graphics, path, 0, 0, w, h, scale);
     for (int i = 0; i < 4; i++)
     {

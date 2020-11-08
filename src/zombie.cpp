@@ -1,7 +1,14 @@
 #include "zombie.hpp"
+#include "log.hpp"
 
 Zombie::Zombie()
 {
+}
+
+Zombie::~Zombie()
+{
+    Log::debug("~Zombie\t| Called");
+    _sprite->~Sprite();
 }
 
 Zombie::Zombie(Graphics &graphics, const std::string &path,int w, int h, float scale)
@@ -11,15 +18,11 @@ Zombie::Zombie(Graphics &graphics, const std::string &path,int w, int h, float s
     _angle = 0; // starting direction
     _moveSpeed = 1;
 
-    _sprite = Sprite(graphics, path, w, h, scale);
+    _sprite = new Sprite(graphics, path, w, h, scale);
     for (int i = 0; i < 4; i++)
     {
         _anims.emplace_back(SDL_Rect{96, h*i, w, h});
     }
-}
-
-Zombie::~Zombie()
-{
 }
 
 void Zombie::update(int target_x, int target_y){
@@ -48,7 +51,7 @@ void Zombie::update(int target_x, int target_y){
 }
 
 void Zombie::draw(Graphics &graphics){
-    _sprite.change_src(_anims[_angle]);
-    _sprite.draw(graphics, _x, _y);
+    _sprite->change_src(_anims[_angle]);
+    _sprite->draw(graphics, _x, _y);
 }
 

@@ -16,6 +16,7 @@ Game::~Game()
 {
 	Log::debug("~Game\t| Called ");
 	_player->~Player();
+	_zombie->~Zombie();
 	_graphics->~Graphics();
 }
 
@@ -36,7 +37,7 @@ bool Game::init()
 
 	/* Custom class initialization */
 	_player = new Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-	_zombie = Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
 
 	/* End of class initialization */
 
@@ -78,7 +79,7 @@ void Game::update()
 {
 	/* Updating of game classes */
 	_player->update(_input);
-	_zombie.update(_player.getX(), _player.getY());
+	_zombie->update(_player->getX(), _player->getY());
 	/* End of updating */
 }
 
@@ -88,7 +89,7 @@ void Game::render()
 
 	/* Rendering of different classes */
 	_player->draw(*_graphics);
-	_zombie.draw(*_graphics);
+	_zombie->draw(*_graphics);
 
 	/* End of rendering */
 	_graphics->flip();

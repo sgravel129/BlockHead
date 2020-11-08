@@ -4,7 +4,7 @@
 class Zombie
 {
 private:
-    Sprite _sprite;
+    Sprite *_sprite;
     std::vector<SDL_Rect> _anims;
     int _currAnim;
     int _x, _y;
