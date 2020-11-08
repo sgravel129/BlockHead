@@ -29,7 +29,7 @@ bool Game::init()
 	Log::verbose("Game::init | SDL Subsystems initialized");
 
 	_graphics = new Graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT);
-	_graphics->setRenderColor(Color::white());
+	_graphics->setRenderColor(Color("65846c"));
 
 	/* Custom class initialization */
 	_player = Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
