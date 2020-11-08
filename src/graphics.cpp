@@ -1,5 +1,5 @@
 #include "graphics.hpp"
-
+#include "log.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
@@ -12,8 +12,15 @@ Graphics::Graphics(const char *windowTitle, int screenWidth, int screenHeight)
 
 Graphics::~Graphics()
 {
+	Log::debug("~Graphics | Called");
 	SDL_DestroyWindow(_window);
 	SDL_DestroyRenderer(_renderer);
+	for (auto &surf : _spriteSheets)
+	{
+		Log::debug("~Graphics | Destroy: " + surf.first);
+		SDL_FreeSurface(surf.second);
+	}
+
 }
 
 SDL_Surface *Graphics::loadImage(const std::string &path)
