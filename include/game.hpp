@@ -73,7 +73,7 @@ private:
 	SDL_Event _event;
 
 	// Custom game classes
-	Player _player;
+	Player *_player;
 	Zombie _zombie;
 	// End of custom classes
 };

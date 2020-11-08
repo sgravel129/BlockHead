@@ -28,13 +28,10 @@ public:
 	 */
 	void draw(Graphics &graphics, int x, int y);
 
-protected:
-
-	SDL_Rect _srcRect;
-	SDL_Texture *_spriteSheet;
-
 private:
 	float _scale;
+	SDL_Rect _srcRect;
+	SDL_Texture *_spriteSheet;
 
 };
 

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-bool Log::_isDebugMode     = false;
+bool Log::_isDebugMode     = true;
 bool Log::_isVerboseMode   = true;
 
 

@@ -1,5 +1,5 @@
 #include "player.hpp"
-
+#include "log.hpp"
 Player::Player()
 {
 }
@@ -10,8 +10,7 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
     _y = 200;
     _angle = 0; // starting direction
     _moveSpeed = 2;
-
-    _sprite = Sprite(graphics, path, w, h, scale);
+    _sprite = new Sprite(graphics, path, 0, 0, w, h, scale);
     for (int i = 0; i < 4; i++)
     {
         _anims.emplace_back(SDL_Rect{0, h*i, w, h});
@@ -20,6 +19,8 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
 
 Player::~Player()
 {
+    Log::debug("~Player\t| Called");
+    _sprite->~Sprite();
 }
 
 
@@ -42,7 +43,7 @@ void Player::update(Input input){
     }
 }
 void Player::draw(Graphics &graphics){
-    _sprite.change_src(_anims[_angle]);
-    _sprite.draw(graphics, _x, _y);
+    _sprite->change_src(_anims[_angle]);
+    _sprite->draw(graphics, _x, _y);
 }
 

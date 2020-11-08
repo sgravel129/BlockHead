@@ -12,8 +12,9 @@ Sprite::Sprite()
 
 Sprite::~Sprite()
 {
-	// SDL_destRectroyTexture(_spriteSheet);
-	Log::debug("~Sprite() | destroyed sprite");
+	// Log::debug("~Sprite\t| Called");
+	Log::debug("~Sprite\t| Destroy Texture");
+	SDL_DestroyTexture(_spriteSheet);
 }
 
 // we will use a sprite sheet and then crop out the angle we want with a top
