@@ -1,19 +1,25 @@
 # pragma once
-#include "sprite.hpp"
+
 #include <vector>
+#include <fstream>
+#include <string>
+
+#include "util.hpp"
+#include "maptile.hpp"
 
 class Map
 {
 private:
-    Sprite _sprite;
-    std::vector<SDL_Rect> _tiles;
-    FILE _mapfile;
-    // int _sizeX, _sizeY;
+    std::vector<MapTile> _tiles;
+    std::vector<SDL_Rect> _tileProps;
+    Point _size;
     // TODO: Create a struct of coords: (int, int)
 
 public:
     Map(/* args */);
-    Map(Graphics &graphics, const std::string &path,int w, int h, float scale);
+    Map(Point size);
     ~Map();
+    void loadTileProps(const std::string &propfile);
+    void loadMapFile(Graphics &graphics, const std::string &mapfile, const std::string &spriteSheet);
     void draw(Graphics &graphics);
 };
