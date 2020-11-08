@@ -2,6 +2,7 @@
 #define COLOR_HPP
 
 #include <string>
+
 class Color
 {
 public:
