@@ -1,4 +1,5 @@
 #include "color.hpp"
+
 #include <stdlib.h>
 
 Color::Color(const std::string &hexcode){

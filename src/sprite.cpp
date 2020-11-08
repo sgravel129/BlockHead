@@ -12,8 +12,9 @@ Sprite::Sprite()
 
 Sprite::~Sprite()
 {
-	// SDL_destRectroyTexture(_spriteSheet);
-	Log::debug("~Sprite() | destroyed sprite");
+
+	// Log::debug("~Sprite() | destroyed sprite");
+	// SDL_DestroyTexture(_spriteSheet);
 }
 
 // we will use a sprite sheet and then crop out the angle we want with a top
@@ -26,11 +27,7 @@ Sprite::Sprite(Graphics &graphics, const std::string &path, int x, int y, int w,
 	}
 
 	_scale = scale;
-
-	_srcRect.x = x;
-	_srcRect.y = y;
-	_srcRect.w = w;
-	_srcRect.h = h;
+	_srcRect = SDL_Rect{x, y , w, h};
 
 	_spriteSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage(path));
 	if (_spriteSheet == NULL)
@@ -39,13 +36,28 @@ Sprite::Sprite(Graphics &graphics, const std::string &path, int x, int y, int w,
 	}
 }
 
-Sprite::Sprite(Graphics &graphics, const std::string &path, int w, int h, float scale)
+Sprite::Sprite(Graphics &graphics, const std::string &path, SDL_Rect src, float scale)
 {
-	new (this) Sprite(graphics, path, 0, 0, w, h, scale);
+	if(!Util::fileExists(path)){
+		Log::error("Sprite() | Resource does not exist: " + path);
+		return;
+	}
+
+	_scale = scale;
+	_srcRect = src;
+
+	_spriteSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage(path));
+	if (_spriteSheet == NULL)
+	{
+		Log::error("Sprite() | Failed at creating surface texture from path");
+	}
 }
 
 void Sprite::change_src(SDL_Rect src){
     _srcRect = src;
+}
+void Sprite::change_scale(float scale){
+    _scale = scale;
 }
 
 void Sprite::draw(Graphics &graphics, int x, int y)
