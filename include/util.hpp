@@ -4,6 +4,11 @@
 #include <string>
 #include <vector>
 
+struct Point{
+	int x;
+	int y;
+};
+
 class Util
 {
 public:

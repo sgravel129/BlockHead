@@ -33,11 +33,13 @@ bool Game::init()
 	Log::verbose("Game::init | SDL Subsystems initialized");
 
 	_graphics = new Graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT);
-	_graphics->setRenderColor(Color::white());
+	_graphics->setRenderColor(Color("65846c"));
 
 	/* Custom class initialization */
 	_player = new Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
 	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+	_map = Map(Point{10,10});
+	_map.loadMapFile(*_graphics, "res/maps/test.map", "res/maps/graveyard/graveyard.png");
 
 	/* End of class initialization */
 
@@ -87,6 +89,7 @@ void Game::render()
 {
 	_graphics->fillBackground();
 
+	_map.draw(*_graphics);
 	/* Rendering of different classes */
 	_player->draw(*_graphics);
 	_zombie->draw(*_graphics);

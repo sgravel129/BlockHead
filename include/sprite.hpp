@@ -14,14 +14,15 @@ public:
 	Sprite();
 	~Sprite();
 
-    Sprite(Graphics &graphics, const std::string &path, int srcX, int srcY, int srcWidth, int srcHeight, float scale);
-	Sprite(Graphics &graphics, const std::string &path, int srcWidth, int srcHeight, float scale);
+    Sprite(Graphics &graphics, const std::string &path, SDL_Rect src, float scale);
+	Sprite(Graphics &graphics, const std::string &path, int srcX, int srcY, int srcWidth, int srcHeight, float scale);
 
 
     /*
         Changes current _srcRect
 	 */
     void change_src(SDL_Rect src);
+	void change_scale(float scale);
 
     /*
 		Renders the sprite to screen
