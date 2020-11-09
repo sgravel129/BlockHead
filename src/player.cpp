@@ -1,5 +1,8 @@
 #include "player.hpp"
 #include "log.hpp"
+
+// TODO: Migrate to point system.
+
 Player::Player()
 {
 }

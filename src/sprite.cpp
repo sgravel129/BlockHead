@@ -22,7 +22,8 @@ Sprite::~Sprite()
 
 Sprite::Sprite(Graphics &graphics, const std::string &path, SDL_Rect src, float scale)
 {
-	if(!Util::fileExists(path)){
+	if (!Util::fileExists(path))
+	{
 		Log::error("Sprite() | Resource does not exist: " + path);
 		return;
 	}
@@ -37,11 +38,13 @@ Sprite::Sprite(Graphics &graphics, const std::string &path, SDL_Rect src, float 
 	}
 }
 
-void Sprite::change_src(SDL_Rect src){
-    _srcRect = src;
+void Sprite::change_src(SDL_Rect src)
+{
+	_srcRect = src;
 }
-void Sprite::change_scale(float scale){
-    _scale = scale;
+void Sprite::change_scale(float scale)
+{
+	_scale = scale;
 }
 
 void Sprite::draw(Graphics &graphics, int x, int y)

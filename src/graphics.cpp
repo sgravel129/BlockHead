@@ -23,7 +23,6 @@ Graphics::~Graphics()
 	SDL_DestroyRenderer(_renderer);
 	Log::debug("~Graphics\t| Destroy Window");
 	SDL_DestroyWindow(_window);
-
 }
 
 SDL_Surface *Graphics::loadImage(const std::string &path)
@@ -58,9 +57,9 @@ SDL_Renderer *Graphics::getRenderer() const
 void Graphics::setRenderColor(Color color)
 {
 	SDL_SetRenderDrawColor(
-			_renderer,
-			color.getRed(),
-			color.getGreen(),
-			color.getBlue(),
-			color.getAlpha());
+		_renderer,
+		color.getRed(),
+		color.getGreen(),
+		color.getBlue(),
+		color.getAlpha());
 }

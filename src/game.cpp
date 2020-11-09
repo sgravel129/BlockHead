@@ -8,6 +8,10 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
 
+// TODO: Framerate bug
+// TODO: Removed default constructors?
+// TODO: Log option just for destructors.
+
 Game::Game()
 {
 }
@@ -39,7 +43,7 @@ bool Game::init()
 	/* Custom class initialization */
 	_player = new Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
 	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-	_map = new Map(Point{10,10});
+	_map = new Map(Point{10, 10});
 	_map->loadMapFile(*_graphics, "res/maps/test.map", "res/maps/graveyard/graveyard.png");
 
 	/* End of class initialization */

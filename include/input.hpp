@@ -7,7 +7,6 @@
 class Input
 {
 public:
-
 	// Clears key press and release data
 	void beginNewFrame();
 
@@ -22,7 +21,6 @@ public:
 
 	// Returns true if key was just released
 	bool wasKeyReleased(SDL_Scancode key);
-
 
 	// Returns true if key is currently being pressed
 	bool isKeyHeld(SDL_Scancode key);

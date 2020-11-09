@@ -10,7 +10,6 @@
 class Graphics
 {
 public:
-
 	Graphics(const char *windowTitle, int screenWidth, int screenHeight);
 	~Graphics();
 

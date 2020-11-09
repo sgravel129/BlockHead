@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 
-struct Point{
+struct Point
+{
 	int x;
 	int y;
 };
@@ -41,7 +42,6 @@ public:
 	 */
 	template <typename T>
 	static void permute(std::vector<T> &vector);
-
 };
 
 #endif

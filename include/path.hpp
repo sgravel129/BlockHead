@@ -8,16 +8,15 @@
 #define X_STEP 30
 #define Y_STEP 30
 
-struct Node {
+struct Node
+{
 
     int x;
     int y;
-    bool nonObst;   // True if zombie/player can walk across node, False if obstacle
-
+    bool nonObst; // True if zombie/player can walk across node, False if obstacle
 };
 
 void abstractMap();
 void buildGraph();
 void addLevelToGraph(int l);
 void preprocessing(int maxLevel);
-

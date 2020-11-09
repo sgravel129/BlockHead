@@ -1,4 +1,4 @@
-# pragma once
+#pragma once
 
 #include <vector>
 #include <fstream>
@@ -10,12 +10,12 @@
 class Map
 {
 private:
-    std::vector<MapTile*> _tiles;
+    std::vector<MapTile *> _tiles;
     std::vector<SDL_Rect> _tileProps;
     Point _size;
 
 public:
-    Map(/* args */);
+    Map();
     Map(Point size);
     ~Map();
     void loadTileProps(const std::string &propfile);

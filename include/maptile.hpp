@@ -1,4 +1,4 @@
-# pragma once
+#pragma once
 
 #include "util.hpp"
 #include "sprite.hpp"
@@ -11,7 +11,7 @@ private:
     Point _location;
 
 public:
-    MapTile(/* args */);
+    MapTile();
     MapTile(Graphics &graphics, const std::string &path, SDL_Rect src, float scale, bool hasCollision, Point location);
 
     ~MapTile();
