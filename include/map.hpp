@@ -10,10 +10,9 @@
 class Map
 {
 private:
-    std::vector<MapTile> _tiles;
+    std::vector<MapTile*> _tiles;
     std::vector<SDL_Rect> _tileProps;
     Point _size;
-    // TODO: Create a struct of coords: (int, int)
 
 public:
     Map(/* args */);

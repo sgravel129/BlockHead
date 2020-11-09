@@ -13,6 +13,11 @@ Map::Map()
 
 Map::~Map()
 {
+    Log::debug("~Map\t| Destroy MapTiles:");
+    for (auto &tile : _tiles)
+    {
+        tile->~MapTile();
+    }
 }
 
 Map::Map(Point size)
@@ -35,15 +40,13 @@ void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath, const 
     if (mapfile.is_open()){   //checking whether the file is open
         std::string line = "";
         while(getline(mapfile, line)){  //read data from file object and put it into string.
-            // construct SDL_Rect
-            std::vector<std::string> vec;
-            boost::algorithm::split(vec, line, boost::is_any_of(","));
-            for (auto str : vec) // access by reference to avoid copying
+            std::vector<std::string> srcVec;
+            boost::algorithm::split(srcVec, line, boost::is_any_of(","));
+            for (auto &idxSrc : srcVec)
             {
                 location.x += 200;
-                // Log::verbose(str);
-                Log::debug(std::to_string(_tileProps[stoi(str)].w));
-                _tiles.push_back( MapTile(Sprite(graphics, spriteSheet, _tileProps[stoi(str)], 5.0), false, location) );
+                Log::debug("map | Created MapTile: " + idxSrc + " @ " + std::to_string(location.x) + " " + std::to_string(location.y));
+                _tiles.push_back( new MapTile(graphics, spriteSheet, _tileProps[stoi(idxSrc)], 5.0, false, location) );
             }
             location.y += 30;
         }
@@ -52,9 +55,9 @@ void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath, const 
 
 void Map::draw(Graphics &graphics)
 {
-    for (auto tile : _tiles) // access by reference to avoid copying
+    for (auto &tile : _tiles)
     {
-        tile.draw(graphics);
+        tile->draw(graphics);
     }
 }
 
