@@ -1,9 +1,10 @@
+#pragma once
+
+//#include "../include/constants.hpp"
+#include "constants.hpp"
 
 #include <vector>
-#include "constants.hpp"
 #include <cmath>
-
-#define HUGE_VAL
 
 #define X_MAX SCREEN_WIDTH
 #define Y_MAX SCREEN_HEIGHT
@@ -21,11 +22,25 @@
 #define TRANSITION_INTERVAL 3   // number of tiles between transitions in single entrance
 
 
+typedef struct Cluster {
+    int x;
+    int y;
+    Cluster* parent;
+} Cluster;
+
+typedef struct Tile {
+
+    int x;
+    int y;
+    Cluster* parent;
+    bool traversable;   // True if no obstacle on tile, False o/w
+} Tile;
+
 class Path_Hierarchy {
 public:
     Path_Hierarchy(const int numClusters);
     
-    void addTransition(std::pair<Tile,Tile> tilePair);
+    void addTransition(const std::pair<Tile,Tile>& tilePair);
     void buildClusterS();
 
     // Accessors
@@ -44,20 +59,13 @@ private:
 
 };
 
+int getClusterNum(const Cluster& c);
+void findTransitions(const Cluster& c1, const Cluster& c2);
+std::pair<Tile, Tile> getAdjTiles(const int c1TileX, const int c2TileY, const int k, const bool adjOrientation);
+Tile getTileFromTPos(const int x, const int y);
 
-typedef struct Tile {
 
-    int x;
-    int y;
-    Cluster* parent;
-    bool traversable;   // True if no obstacle on tile, False o/w
-} Tile;
 
-typedef struct Cluster {
-    int x;
-    int y;
-    Cluster* parent;
-} Cluster;
 
 void abstractMap();
 void buildGraph();

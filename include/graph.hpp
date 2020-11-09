@@ -1,10 +1,14 @@
+#pragma once
+
+//#include "../include/path.hpp"
 #include "path.hpp"
-#include <set>
 
 enum edgeType {
     INTER,
     INTRA
 };
+
+struct Edge;
 
 typedef struct Vertex {
     int key;
@@ -31,8 +35,8 @@ public:
 
     // Accessors
     
-    Vertex getVertexCopy(const int, const int cNum);    // returns copy of Vertex with supplied key in supplied cluster
-    Edge getEdge(const Vertex&, const Vertex&);
+    bool getVertexCopy(const int, const int cNum, Vertex&);    // returns copy of Vertex with supplied key in supplied cluster
+    bool getEdge(const Vertex&, const Vertex&, Edge&);
     int getVCNum(const int);
 
     // Destructor

@@ -1,6 +1,10 @@
+//#include "../include/path.hpp"
+//#include "../include/constants.hpp"
+//#include "../include/graph.hpp"
 #include "path.hpp"
 #include "constants.hpp"
 #include "graph.hpp"
+
 #include <vector>
 
 // dummy global variable: might want to declare this in separate file, which is run when we load a map
@@ -16,7 +20,7 @@ Path_Hierarchy::Path_Hierarchy(const int numClusters) {
     _numClusters = numClusters;
 }
 
-void Path_Hierarchy::addTransition(std::pair<Tile,Tile> tilePair) {
+void Path_Hierarchy::addTransition(const std::pair<Tile,Tile>& tilePair) {
     _transitionS.push_back(tilePair);
     _numTrans++;
 }
@@ -30,12 +34,12 @@ void Path_Hierarchy::buildClusterS() {
 }
 
 // Accessors
-std::vector<std::pair<Tile, Tile>> Path_Hierarchy::get_transitionS() {return _transitionS;}
-std::pair<Tile, Tile> Path_Hierarchy::get_transition(const int transNum) { return _transitionS[transNum] };
+std::vector<std::pair<Tile, Tile>> Path_Hierarchy::get_transitionS() { return _transitionS; }
+std::pair<Tile, Tile> Path_Hierarchy::get_transition(const int transNum) { return _transitionS[transNum]; }
 std::vector<Cluster> Path_Hierarchy::get_clusterS() {return _clusterS;}
 Cluster Path_Hierarchy::get_Cluster(const int x, const int y) {return _clusterS[y*CLUSTER_YNUM + x];}
 int Path_Hierarchy::getNumTrans() { return _numTrans; }
-int Path_Hierarchy::getNumClusters() { return _numClusters; };
+int Path_Hierarchy::getNumClusters() { return _numClusters; }
 
 //////////////////////////////////////////
 
@@ -65,7 +69,7 @@ void abstractMap() {
 
 // Function findTransitions
 // takes two adjacent clusters and finds transition points between them
-void findTransitions(Cluster c1, Cluster c2) {
+void findTransitions(const Cluster& c1, const Cluster& c2) {
     int c1TileX = c1.x*CLUSTER_TLENGTH;
     int c2TileY = c2.y*CLUSTER_TLENGTH;
 
@@ -104,7 +108,7 @@ void findTransitions(Cluster c1, Cluster c2) {
 }
 
 // returns pair of adjacent tiles from cluster pos and tile displacement
-std::pair<Tile, Tile> getAdjTiles(int c1TileX, int c2TileY, int k, bool adjOrientation) {
+std::pair<Tile, Tile> getAdjTiles(const int c1TileX, const int c2TileY, const int k, const bool adjOrientation) {
     if(adjOrientation)
         return std::make_pair (getTileFromTPos(k+c1TileX, c2TileY-1), getTileFromTPos(k+c1TileX, c2TileY));
     else
@@ -115,7 +119,7 @@ std::pair<Tile, Tile> getAdjTiles(int c1TileX, int c2TileY, int k, bool adjOrien
 
 
 // DUMMY FUNCTION, NEEDS TO GET INFO FROM MAP
-Tile getTileFromTPos(int x, int y) {
+Tile getTileFromTPos(const int x, const int y) {
     // CODE HERE GETS TILE INFO FROM MAP
     return Tile {x, y, NULL, true};
 }
@@ -133,13 +137,13 @@ void buildGraph() {
         transition = map_hierarchy.get_transition(i);
         cNum1 = getClusterNum(*transition.first.parent);
         cNum2 = getClusterNum(*transition.second.parent);
-        v1 = Vertex(map_graph.getVCNum(c1), transition.first&, dummyV, dummyE);
-        v2 = Vertex(map_graph.getVCNum(c2), transition.second&, dummyV, dummyE);
-        map_graph.addVertex(v1, c1);
-        map_graph.addVertex(v2, c2);
+        v1 = { map_graph.getVCNum(cNum1), &transition.first, dummyV, dummyE };
+        v2 = { map_graph.getVCNum(cNum2), &transition.second, dummyV, dummyE };
+        map_graph.addVertex(v1, cNum1);
+        map_graph.addVertex(v2, cNum2);
         map_graph.addEdge(v1.key, v2.key, cNum1, cNum2, 1, INTER);
     }
-    int vNum;
+    int numVC;
     double distance;
     for (int cNum = 0; cNum < numClusters; cNum++) {
         numVC = map_graph.getVCNum(cNum);
@@ -147,9 +151,9 @@ void buildGraph() {
             for (int j = 0; j < numVC; j++) {
                 if (i == j)
                     continue;
-                v1 = map_graph.getVertexCopy(i, cNum);
-                v2 = map_graph.getVertexCopy(j, cNum);
-                distance = map_graph.searchForDistance(v1, v2);
+                map_graph.getVertexCopy(i, cNum, v1);
+                map_graph.getVertexCopy(j, cNum, v2);
+                distance = map_graph.searchForDistance(v1, v2, cNum);
                 if (distance != HUGE_VAL)
                     map_graph.addEdge(v1.key, v2.key, cNum, cNum, distance, INTRA);
             }
