@@ -8,7 +8,7 @@ enum edgeType {
 
 typedef struct Vertex {
     int key;
-    Tile * _tile;
+    Tile * t;
     std::vector<Vertex *> adjList;
     std::vector<Edge *> adjEdges;
 } Vertex;
@@ -20,25 +20,29 @@ typedef struct Edge {
 } Edge;
 
 
-class Map_Path_Graph {
+class Abstract_Graph {
 public:
-    Map_Path_Graph();
-    void addVertex(const Vertex&);
-    void addEdge(const Vertex&, const Vertex&, const int, const edgeType);
+    Abstract_Graph(const int numClusters);
+    void addVertex(const Vertex&, const int cNum);
+    void addEdge(const int, const int, const int, const int, const int, const edgeType);
 
-    int searchForDistance(const Vertex&, const Vertex&, const Cluster&);
+    double searchForDistance(const Vertex&, const Vertex&, const int cNum);
     std::vector<Vertex> searchForPath(const Vertex&, const Vertex&);
 
     // Accessors
-    Vertex getVertex(const int, const int, const Cluster&);
+    
+    Vertex getVertexCopy(const int, const int cNum);    // returns copy of Vertex with supplied key in supplied cluster
     Edge getEdge(const Vertex&, const Vertex&);
-    int getAdjInfo(const int&, const int&, const Cluster&);
+    int getVCNum(const int);
 
     // Destructor
-    ~Map_Path_Graph();
+    ~Abstract_Graph();
 
 private:
-    std::vector<std::vector<Vertex>> vertexS;   // set of vertices, organized by Cluster
-    std::vector<Edge> edgeL;                    // set of edges
-    std::vector<std::vector<int>> adjMatrix;     // adjacency matrix
+    Vertex* getVertex(const int, const int);    // returns pointer to encapsulated vertex
+
+    std::vector<std::vector<Vertex>> _vertexS;   // set of vertices, organized by Cluster
+    std::vector<Edge> _edgeL;                    // set of edges
+    std::vector<int> _vNums;    // number of vertices per cluster
+    int _eNum;       // number of edges
 };

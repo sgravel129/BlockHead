@@ -1,22 +1,24 @@
 #include "path.hpp"
 #include "constants.hpp"
+#include "graph.hpp"
 #include <vector>
 
 // dummy global variable: might want to declare this in separate file, which is run when we load a map
-Path_Hierarchy map_hierarchy;
-
+Path_Hierarchy map_hierarchy = Path_Hierarchy(CLUSTER_XNUM * CLUSTER_YNUM);
+Abstract_Graph map_graph = Abstract_Graph( CLUSTER_XNUM * CLUSTER_YNUM );
 
 ///////////////
 // Path_Hierarchy class implementation
 ////////////////////////////////////////
 //
-Path_Hierarchy::Path_Hierarchy() {
-    std::vector<std::pair<Tile, Tile>> _transitionS;
-    std::vector<std::vector<Cluster>> _clusterS;
+Path_Hierarchy::Path_Hierarchy(const int numClusters) {
+    _numTrans = 0;
+    _numClusters = numClusters;
 }
 
 void Path_Hierarchy::addTransition(std::pair<Tile,Tile> tilePair) {
     _transitionS.push_back(tilePair);
+    _numTrans++;
 }
 
 void Path_Hierarchy::buildClusterS() {
@@ -28,13 +30,18 @@ void Path_Hierarchy::buildClusterS() {
 }
 
 // Accessors
-std::vector<std::pair<Tile, Tile>> Path_Hierarchy::get_transitionS() {return _transitionS;};
-std::vector<Cluster> Path_Hierarchy::get_clusterS() {return _clusterS;};
-Cluster Path_Hierarchy::get_Cluster(const int x, const int y) {return _clusterS[y*CLUSTER_YNUM + x];};
-
+std::vector<std::pair<Tile, Tile>> Path_Hierarchy::get_transitionS() {return _transitionS;}
+std::pair<Tile, Tile> Path_Hierarchy::get_transition(const int transNum) { return _transitionS[transNum] };
+std::vector<Cluster> Path_Hierarchy::get_clusterS() {return _clusterS;}
+Cluster Path_Hierarchy::get_Cluster(const int x, const int y) {return _clusterS[y*CLUSTER_YNUM + x];}
+int Path_Hierarchy::getNumTrans() { return _numTrans; }
+int Path_Hierarchy::getNumClusters() { return _numClusters; };
 
 //////////////////////////////////////////
 
+int getClusterNum(const Cluster& c) {
+    return(c.y*CLUSTER_YNUM + c.x);
+}
 
 // Function abstractMap
 // divides map into clusters and defines transition points between them
@@ -59,8 +66,8 @@ void abstractMap() {
 // Function findTransitions
 // takes two adjacent clusters and finds transition points between them
 void findTransitions(Cluster c1, Cluster c2) {
-    int c1TileX = c1.x*CLUSTER_SLENGTH;
-    int c2TileY = c2.y*CLUSTER_SLENGTH;
+    int c1TileX = c1.x*CLUSTER_TLENGTH;
+    int c2TileY = c2.y*CLUSTER_TLENGTH;
 
     std::pair<Tile, Tile> adjTiles;
     Tile l1, l2;
@@ -71,7 +78,7 @@ void findTransitions(Cluster c1, Cluster c2) {
     int entStart(0), entEnd(0);
     
 
-    for(int i= 0; i <  CLUSTER_SLENGTH; i++) {
+    for(int i= 0; i <  CLUSTER_TLENGTH; i++) {
         adjTiles = getAdjTiles(c1TileX, c2TileY, i, adjOrientation);
         l1 = adjTiles.first;
         l2 = adjTiles.second;
@@ -81,7 +88,7 @@ void findTransitions(Cluster c1, Cluster c2) {
             entStart = i;
             validEnt = true;
         }
-        else if((!currEnt && validEnt) || (currEnt && validEnt && i == CLUSTER_SLENGTH-1)) {  // end of entrance
+        else if((!currEnt && validEnt) || (currEnt && validEnt && i == CLUSTER_TLENGTH-1)) {  // end of entrance
             entEnd = i-1;
             if(entStart == entEnd)  // if single-tile entrance, define one transition point
                 map_hierarchy.addTransition(getAdjTiles(c1TileX, c2TileY, entStart, adjOrientation));
@@ -113,13 +120,40 @@ Tile getTileFromTPos(int x, int y) {
     return Tile {x, y, NULL, true};
 }
 
-// INCOMPLETE FUNCTION
+// Inserts Cluster Transition Tiles into Abstract Graph and sets distances between them as edges
 void buildGraph() {
-    Cluster c1, c2;
-    for(auto transition : map_hierarchy.get_transitionS()) {
-        c1 = *transition.first.parent;
-        c2 = *transition.second.parent;
-        
+    int cNum1, cNum2;
+    Vertex v1, v2;
+    std::vector<Vertex*> dummyV;
+    std::vector<Edge*> dummyE;
+    std::pair<Tile,Tile> transition;
+    int numTrans = map_hierarchy.getNumTrans();
+    int numClusters = map_hierarchy.getNumClusters();
+    for (int i = 0; i < numTrans; i++) {
+        transition = map_hierarchy.get_transition(i);
+        cNum1 = getClusterNum(*transition.first.parent);
+        cNum2 = getClusterNum(*transition.second.parent);
+        v1 = Vertex(map_graph.getVCNum(c1), transition.first&, dummyV, dummyE);
+        v2 = Vertex(map_graph.getVCNum(c2), transition.second&, dummyV, dummyE);
+        map_graph.addVertex(v1, c1);
+        map_graph.addVertex(v2, c2);
+        map_graph.addEdge(v1.key, v2.key, cNum1, cNum2, 1, INTER);
+    }
+    int vNum;
+    double distance;
+    for (int cNum = 0; cNum < numClusters; cNum++) {
+        numVC = map_graph.getVCNum(cNum);
+        for (int i = 0; i < numVC; i++) {
+            for (int j = 0; j < numVC; j++) {
+                if (i == j)
+                    continue;
+                v1 = map_graph.getVertexCopy(i, cNum);
+                v2 = map_graph.getVertexCopy(j, cNum);
+                distance = map_graph.searchForDistance(v1, v2);
+                if (distance != HUGE_VAL)
+                    map_graph.addEdge(v1.key, v2.key, cNum, cNum, distance, INTRA);
+            }
+        }
     }
 }
 
