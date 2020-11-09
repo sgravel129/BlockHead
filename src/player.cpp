@@ -10,7 +10,7 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
     _y = 200;
     _moveSpeed = 2;
     _angle = 0; // starting direction
-    _sprite = new Sprite(graphics, path, 0, 0, w, h, scale);
+    _sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
     for (int i = 0; i < 4; i++)
     {
         _anims.emplace_back(SDL_Rect{0, h*i, w, h});

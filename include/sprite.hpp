@@ -15,7 +15,6 @@ public:
 	~Sprite();
 
     Sprite(Graphics &graphics, const std::string &path, SDL_Rect src, float scale);
-	Sprite(Graphics &graphics, const std::string &path, int srcX, int srcY, int srcWidth, int srcHeight, float scale);
 
 
     /*
