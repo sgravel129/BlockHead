@@ -19,22 +19,6 @@ Sprite::~Sprite()
 
 // we will use a sprite sheet and then crop out the angle we want with a top
 // left corner start of x and y values that will need to be determined
-Sprite::Sprite(Graphics &graphics, const std::string &path, int x, int y, int w, int h, float scale)
-{
-	if(!Util::fileExists(path)){
-		Log::error("Sprite() | Resource does not exist: " + path);
-		return;
-	}
-
-	_scale = scale;
-	_srcRect = SDL_Rect{x, y , w, h};
-
-	_spriteSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage(path));
-	if (_spriteSheet == NULL)
-	{
-		Log::error("Sprite() | Failed at creating surface texture from path");
-	}
-}
 
 Sprite::Sprite(Graphics &graphics, const std::string &path, SDL_Rect src, float scale)
 {

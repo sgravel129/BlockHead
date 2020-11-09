@@ -1,16 +1,17 @@
 #include "maptile.hpp"
-
+#include "log.hpp"
 
 MapTile::MapTile(){}
-MapTile::~MapTile(){}
-// MapTile::MapTile(Graphics &graphics, const std::string &path, Point location){
+MapTile::~MapTile(){
+    Log::debug("~MapTile\t| Destroy: " + std::to_string(_location.x) + " " + std::to_string(_location.y));
+    _sprite->~Sprite();
+}
 
-// }
-MapTile::MapTile(Sprite sprite, bool hasCollision, Point location){
-    _sprite = sprite;
+MapTile::MapTile(Graphics &graphics, const std::string &path, SDL_Rect src, float scale, bool hasCollision, Point location){
+    _sprite = new Sprite(graphics, path, src, scale);
     _hasCollision = hasCollision;
     _location = location;
 }
 void MapTile::draw(Graphics &graphics){
-    _sprite.draw(graphics, _location.x, _location.y);
+    _sprite->draw(graphics, _location.x, _location.y);
 }
