@@ -28,14 +28,29 @@ typedef struct Cluster {
     Cluster* parent;
 } Cluster;
 
-typedef struct Tile {
+class Tile {
+public:
+    Tile(const int, const int);
 
-    int x;
-    int y;
-    Cluster* parent;
-    bool traversable;   // True if no obstacle on tile, False o/w
-} Tile;
+    
+    
+    
+    
+    
+private:    
+    int _xPos;
+    int _yPos;
+    Cluster* _parentC;
+    bool _traversable;   // True if no obstacle on tile, False o/w
+};
 
+
+
+
+
+
+
+// NEED TO ADD PRIVATE ACCESSORS TO RETURN MEMORY ADRESSES AND NOT COPIES
 class Path_Hierarchy {
 public:
     Path_Hierarchy(const int numClusters);

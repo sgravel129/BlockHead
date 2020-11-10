@@ -11,6 +11,30 @@
 Path_Hierarchy map_hierarchy = Path_Hierarchy(CLUSTER_XNUM * CLUSTER_YNUM);
 Abstract_Graph map_graph = Abstract_Graph( CLUSTER_XNUM * CLUSTER_YNUM );
 
+
+
+
+/////////////////////
+// Tile class implementation
+///////////////////////////////////////
+//
+Tile::Tile(const int xPos, const int yPos) {
+    // DUMMY FUNCTION, NEEDS TO GET INFO FROM MAP
+    // CODE HERE GETS TILE INFO FROM MAP
+    _xPos = xPos;
+    _yPos = yPos;
+
+}
+
+
+
+
+
+
+
+
+
+
 ///////////////
 // Path_Hierarchy class implementation
 ////////////////////////////////////////
@@ -67,6 +91,7 @@ void abstractMap() {
     }
 }
 
+//////// TO FIX !!!!! POINTERS ARE NOT PROPERLY ENCAPSULATED HERE
 // Function findTransitions
 // takes two adjacent clusters and finds transition points between them
 void findTransitions(const Cluster& c1, const Cluster& c2) {
@@ -110,19 +135,11 @@ void findTransitions(const Cluster& c1, const Cluster& c2) {
 // returns pair of adjacent tiles from cluster pos and tile displacement
 std::pair<Tile, Tile> getAdjTiles(const int c1TileX, const int c2TileY, const int k, const bool adjOrientation) {
     if(adjOrientation)
-        return std::make_pair (getTileFromTPos(k+c1TileX, c2TileY-1), getTileFromTPos(k+c1TileX, c2TileY));
+        return std::make_pair (Tile(k+c1TileX, c2TileY-1), getTileFromTPos(k+c1TileX, c2TileY));
     else
-        return std::make_pair (getTileFromTPos(c1TileX-1, k+c2TileY), getTileFromTPos(c1TileX, k+c2TileY));
+        return std::make_pair (Tile(c1TileX-1, k+c2TileY), getTileFromTPos(c1TileX, k+c2TileY));
 }
 
-
-
-
-// DUMMY FUNCTION, NEEDS TO GET INFO FROM MAP
-Tile getTileFromTPos(const int x, const int y) {
-    // CODE HERE GETS TILE INFO FROM MAP
-    return Tile {x, y, NULL, true};
-}
 
 // Inserts Cluster Transition Tiles into Abstract Graph and sets distances between them as edges
 void buildGraph() {
