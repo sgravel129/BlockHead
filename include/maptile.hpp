@@ -16,4 +16,8 @@ public:
 
     ~MapTile();
     void draw(Graphics &graphics);
+
+    // Accessors
+    Point getPos();
+    bool getCollision();
 };
