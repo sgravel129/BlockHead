@@ -1,15 +1,16 @@
-#ifndef COLOR_HPP
-#define COLOR_HPP
+#pragma once
+
+#include <string>
 
 class Color
 {
 public:
+	Color(const std::string &hexcode);
+
 	Color(int red, int green, int blue, int alpha) : _red(red),
 													 _green(green),
 													 _blue(blue),
-													 _alpha(alpha)
-	{
-	}
+													 _alpha(alpha) {}
 
 	const int getRed() { return _red; }
 	const int getGreen() { return _green; }
@@ -32,5 +33,3 @@ private:
 	int _blue;
 	int _alpha;
 };
-
-#endif

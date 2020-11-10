@@ -1,16 +1,19 @@
-#ifndef GRAPHICS_HPP
-#define GRAPHICS_HPP
+#pragma once
 
 #include "color.hpp"
 
-#include <SDL2/SDL.h>
 #include <map>
 #include <string>
+
+#if defined(_WIN32)
+	#include <SDL.h>
+#else
+	#include <SDL2/SDL.h>
+#endif
 
 class Graphics
 {
 public:
-
 	Graphics(const char *windowTitle, int screenWidth, int screenHeight);
 	~Graphics();
 
@@ -43,5 +46,3 @@ private:
 
 	std::map<std::string, SDL_Surface *> _spriteSheets;
 };
-
-#endif
