@@ -1,3 +1,6 @@
 bin/
 obj/
+out/
+lib/
 .vscode
+.vs
