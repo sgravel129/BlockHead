@@ -1,7 +1,11 @@
 #include "graphics.hpp"
 #include "log.hpp"
-#include <SDL.h>
-#include <SDL_image.h>
+
+#if defined(_WIN32)
+	#include <SDL_image.h>
+#else
+	#include <SDL2/SDL_image.h>
+#endif
 
 Graphics::Graphics(const char *windowTitle, int screenWidth, int screenHeight)
 {

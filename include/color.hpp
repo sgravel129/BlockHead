@@ -1,5 +1,4 @@
-#ifndef COLOR_HPP
-#define COLOR_HPP
+#pragma once
 
 #include <string>
 
@@ -34,5 +33,3 @@ private:
 	int _blue;
 	int _alpha;
 };
-
-#endif
