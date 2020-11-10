@@ -15,14 +15,11 @@ Abstract_Graph map_graph = Abstract_Graph( CLUSTER_XNUM * CLUSTER_YNUM );
 
 
 /////////////////////
-// Tile class implementation
+// PathTile class implementation
 ///////////////////////////////////////
 //
-Tile::Tile(const int xPos, const int yPos) {
-    // DUMMY FUNCTION, NEEDS TO GET INFO FROM MAP
-    // CODE HERE GETS TILE INFO FROM MAP
-    _xPos = xPos;
-    _yPos = yPos;
+PathTile::PathTile(const MapTile& refTile ) {
+    _xPos = refTile.
 
 }
 
