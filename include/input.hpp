@@ -1,8 +1,12 @@
-#ifndef INPUT_HPP
-#define INPUT_HPP
+#pragma once
 
-#include <SDL.h>
 #include <map>
+
+#if defined(_WIN32)
+	#include <SDL.h>
+#else
+	#include <SDL2/SDL.h>
+#endif
 
 class Input
 {
@@ -30,5 +34,3 @@ private:
 	std::map<SDL_Scancode, bool> _pressedKeys;
 	std::map<SDL_Scancode, bool> _releasedKeys;
 };
-
-#endif

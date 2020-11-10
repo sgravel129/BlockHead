@@ -8,17 +8,12 @@
 #include <SDL_image.h>
 #include <SDL_mixer.h>
 
-#include <cstdlib>
-
 // TODO: Framerate bug
 // TODO: Removed default constructors?
 // TODO: Log option just for destructors.
 
 Game::Game()
 {
-	if (strcmp(getenv("OS"), "Windows_NT") == 0) {
-		Log::colors(false);
-	}
 }
 
 Game::~Game()

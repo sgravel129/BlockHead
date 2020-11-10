@@ -1,6 +1,9 @@
 
-#include <vector>
+# pragma once
+
 #include "constants.hpp"
+
+#include <vector>
 
 #define X_MAX SCREEN_WIDTH
 #define Y_MAX SCREEN_HEIGHT

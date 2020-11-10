@@ -1,9 +1,7 @@
-#ifndef SPRITE_HPP
-#define SPRITE_HPP
+#pragma once
 
 #include "graphics.hpp"
 
-#include <SDL.h>
 #include <string>
 
 class Graphics;
@@ -32,5 +30,3 @@ private:
 	SDL_Rect _srcRect;
 	SDL_Texture *_spriteSheet;
 };
-
-#endif

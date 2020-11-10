@@ -1,11 +1,11 @@
 #pragma once
 
+#include "util.hpp"
+#include "maptile.hpp"
+
 #include <vector>
 #include <fstream>
 #include <string>
-
-#include "util.hpp"
-#include "maptile.hpp"
 
 class Map
 {

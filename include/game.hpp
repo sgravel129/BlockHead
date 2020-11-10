@@ -1,5 +1,4 @@
-#ifndef GAME_HPP
-#define GAME_HPP
+#pragma once
 
 #include "graphics.hpp"
 #include "input.hpp"
@@ -79,5 +78,3 @@ private:
 	Map *_map;
 	// End of custom classes
 };
-
-#endif
