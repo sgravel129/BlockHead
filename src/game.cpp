@@ -4,9 +4,11 @@
 #include "input.hpp"
 #include "constants.hpp"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_mixer.h>
+
+#include <cstdlib>
 
 // TODO: Framerate bug
 // TODO: Removed default constructors?
@@ -14,6 +16,9 @@
 
 Game::Game()
 {
+	if (strcmp(getenv("OS"), "Windows_NT") == 0) {
+		Log::colors(false);
+	}
 }
 
 Game::~Game()

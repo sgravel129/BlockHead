@@ -1,7 +1,7 @@
 #include "graphics.hpp"
 #include "log.hpp"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include <SDL.h>
+#include <SDL_image.h>
 
 Graphics::Graphics(const char *windowTitle, int screenWidth, int screenHeight)
 {
