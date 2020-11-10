@@ -7,6 +7,8 @@
 
 // Game Objects
 #include "player.hpp"
+#include "zombie.hpp"
+#include "map.hpp"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -72,7 +74,9 @@ private:
 	SDL_Event _event;
 
 	// Custom game classes
-	Player _player;
+	Player *_player;
+	Zombie *_zombie;
+	Map *_map;
 	// End of custom classes
 };
 

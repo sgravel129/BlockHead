@@ -21,7 +21,6 @@
 #define MIN_ENTRANCE_LENGTH 3   // minimum tile lenght for entrance
 #define TRANSITION_INTERVAL 3   // number of tiles between transitions in single entrance
 
-
 typedef struct Cluster {
     int x;
     int y;
@@ -86,4 +85,3 @@ void abstractMap();
 void buildGraph();
 void preprocessing(int maxLevel);
 
-int getClusterNum(const Cluster& c);

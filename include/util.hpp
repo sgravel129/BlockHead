@@ -4,6 +4,12 @@
 #include <string>
 #include <vector>
 
+struct Point
+{
+	int x;
+	int y;
+};
+
 class Util
 {
 public:
@@ -36,7 +42,6 @@ public:
 	 */
 	template <typename T>
 	static void permute(std::vector<T> &vector);
-
 };
 
 #endif
