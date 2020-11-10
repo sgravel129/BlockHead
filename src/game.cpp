@@ -4,9 +4,9 @@
 #include "input.hpp"
 #include "constants.hpp"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
+// TODO: Framerate bug
+// TODO: Removed default constructors?
+// TODO: Log option just for destructors.
 
 Game::Game()
 {
@@ -14,6 +14,11 @@ Game::Game()
 
 Game::~Game()
 {
+	Log::debug("~Game\t| Called ");
+	_player->~Player();
+	_zombie->~Zombie();
+	_map->~Map();
+	_graphics->~Graphics();
 }
 
 bool Game::init()
@@ -29,11 +34,13 @@ bool Game::init()
 	Log::verbose("Game::init | SDL Subsystems initialized");
 
 	_graphics = new Graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT);
-	_graphics->setRenderColor(Color::white());
+	_graphics->setRenderColor(Color("65846c"));
 
 	/* Custom class initialization */
-	_player = Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-	_zombie = Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+	_player = new Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+	_map = new Map(Point{10, 10});
+	_map->loadMapFile(*_graphics, "res/maps/test.map", "res/maps/graveyard/graveyard.png");
 
 	/* End of class initialization */
 
@@ -74,8 +81,8 @@ int y = 200;
 void Game::update()
 {
 	/* Updating of game classes */
-	_player.update(_input);
-	_zombie.update(_player.getX(), _player.getY());
+	_player->update(_input);
+	_zombie->update(_player->getX(), _player->getY());
 	/* End of updating */
 }
 
@@ -83,9 +90,10 @@ void Game::render()
 {
 	_graphics->fillBackground();
 
+	_map->draw(*_graphics);
 	/* Rendering of different classes */
-	_zombie.draw(*_graphics);
-	_player.draw(*_graphics);
+	_player->draw(*_graphics);
+	_zombie->draw(*_graphics);
 
 	/* End of rendering */
 	_graphics->flip();

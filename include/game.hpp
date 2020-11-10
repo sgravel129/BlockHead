@@ -1,5 +1,4 @@
-#ifndef GAME_HPP
-#define GAME_HPP
+#pragma once
 
 #include "graphics.hpp"
 #include "input.hpp"
@@ -8,6 +7,7 @@
 // Game Objects
 #include "player.hpp"
 #include "zombie.hpp"
+#include "map.hpp"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -73,9 +73,8 @@ private:
 	SDL_Event _event;
 
 	// Custom game classes
-	Player _player;
-	Zombie _zombie;
+	Player *_player;
+	Zombie *_zombie;
+	Map *_map;
 	// End of custom classes
 };
-
-#endif

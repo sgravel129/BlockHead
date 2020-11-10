@@ -1,5 +1,4 @@
-#ifndef LOG_H_DEFINED
-#define LOG_H_DEFINED
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -40,5 +39,3 @@ private:
 	static bool _isDebugMode;
 	static bool _isVerboseMode;
 };
-
-#endif /* LOG_H_DEFINED */

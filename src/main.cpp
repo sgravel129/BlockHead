@@ -1,9 +1,7 @@
 #include "game.hpp"
-// testing
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+
 #include <iostream>
-//test
+
 int main(int argc, char **argv)
 {
     int framerate = 60;
