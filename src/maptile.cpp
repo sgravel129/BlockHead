@@ -4,19 +4,21 @@
 // TODO: Support multiple lines for mapfiles. fix commas.
 
 MapTile::MapTile() {}
-MapTile::~MapTile()
-{
+MapTile::~MapTile() {
     Log::debug("~MapTile\t| Destroy: " + std::to_string(_location.x) + " " + std::to_string(_location.y));
     _sprite->~Sprite();
 }
 
-MapTile::MapTile(Graphics &graphics, const std::string &path, SDL_Rect src, float scale, bool hasCollision, Point location)
-{
+MapTile::MapTile(Graphics &graphics, const std::string &path, SDL_Rect src, float scale, bool hasCollision, Point location){
     _sprite = new Sprite(graphics, path, src, scale);
     _hasCollision = hasCollision;
     _location = location;
 }
-void MapTile::draw(Graphics &graphics)
-{
+
+// Accessors
+Point MapTile::getPos() { return _location; }
+bool MapTile::getCollision() { return _hasCollision; }
+
+void MapTile::draw(Graphics &graphics) {
     _sprite->draw(graphics, _location.x, _location.y);
 }

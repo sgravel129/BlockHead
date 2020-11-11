@@ -1,11 +1,10 @@
 #include "map.hpp"
+#include "log.hpp"
 
 #include <stdexcept>
 #include <iterator>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
-
-#include "log.hpp"
 
 // TODO: Ignore srcRectStr for 0. Index starting at 1.
 

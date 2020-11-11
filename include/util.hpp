@@ -1,5 +1,4 @@
-#ifndef UTIL_HPP
-#define UTIL_HPP
+#pragma once
 
 #include <string>
 #include <vector>
@@ -43,5 +42,3 @@ public:
 	template <typename T>
 	static void permute(std::vector<T> &vector);
 };
-
-#endif

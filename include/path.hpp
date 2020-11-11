@@ -1,10 +1,10 @@
 #pragma once
 
-//#include "../include/constants.hpp"
 #include "constants.hpp"
 
 #include <vector>
 #include <cmath>
+
 
 #define X_MAX SCREEN_WIDTH
 #define Y_MAX SCREEN_HEIGHT
@@ -79,9 +79,6 @@ std::pair<Tile, Tile> getAdjTiles(const int c1TileX, const int c2TileY, const in
 Tile getTileFromTPos(const int x, const int y);
 
 
-
-
 void abstractMap();
 void buildGraph();
 void preprocessing(int maxLevel);
-

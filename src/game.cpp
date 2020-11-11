@@ -4,10 +4,6 @@
 #include "input.hpp"
 #include "constants.hpp"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_mixer.h>
-
 // TODO: Framerate bug
 // TODO: Removed default constructors?
 // TODO: Log option just for destructors.

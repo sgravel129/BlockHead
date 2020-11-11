@@ -49,4 +49,3 @@ void Player::draw(Graphics &graphics){
     _sprite->change_src(_anims[_angle]);
     _sprite->draw(graphics, _x, _y);
 }
-
