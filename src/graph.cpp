@@ -1,5 +1,7 @@
-//#include "../include/path.hpp"
-//#include "../include/graph.hpp"
+/*
+#include "../include/path.hpp"
+#include "../include/graph.hpp"
+*/
 #include "path.hpp"
 #include "graph.hpp"
 
@@ -20,9 +22,11 @@ void Abstract_Graph::addVertex(const Vertex& v, const int cNum) {
 
 // Adds edge to graph connecting to vertices, with supplied distance as weight
 // IMPORTANT THAT POINTERS STORED POINT TO APPROPRIATE ENCAPSULATED ADDRESSES
-void Abstract_Graph::addEdge(const int key1, const int key2, const int cNum1, const int cNum2, const int d, const edgeType eT) {
-    Vertex* v1 = getVertex(key1, cNum1);
-    Vertex* v2 = getVertex(key2, cNum2);
+bool Abstract_Graph::addEdge(const int key1, const int key2, const int cNum1, const int cNum2, const int d, const edgeType eT) {
+    Vertex* v1 = getVertexAddress(key1, cNum1);
+    Vertex* v2 = getVertexAddress(key2, cNum2);
+    if (v1 == NULL || v2 == NULL)
+        return false;
     Edge e = {{ v1, v2 }, eT, d};
     _edgeL.push_back(e);
     
@@ -33,6 +37,7 @@ void Abstract_Graph::addEdge(const int key1, const int key2, const int cNum1, co
     v2->adjEdges.push_back(&_edgeL.back());
     
     _eNum++;
+    return true;
 }
 
 // Algorithms
@@ -68,18 +73,18 @@ bool Abstract_Graph::getVertexCopy(const int k, const int cNum, Vertex& v) {
 bool Abstract_Graph::getEdge(const Vertex& v1, const Vertex& v2, Edge& e) {
     int tempCNum;
     Vertex tempV;
-    int v1CNum = getClusterNum(*v1.t->parent);
-    int v2CNum = getClusterNum(*v2.t->parent);
+    int v1CNum = getClusterNum(v1.t->getParentCCopy());
+    int v2CNum = getClusterNum(v2.t->getParentCCopy());
 
     for (auto tempE : v1.adjEdges) {
         tempV = *(tempE->vPair.first);
-        tempCNum = getClusterNum(*tempV.t->parent);
+        tempCNum = getClusterNum(tempV.t->getParentCCopy());
         if (tempV.key == v1.key && tempCNum == v1CNum || tempV.key == v2.key && tempCNum == v2CNum) {
             e = *tempE;
             return true;
         }   
         tempV = *(tempE->vPair.second);
-        tempCNum = getClusterNum(*tempV.t->parent);
+        tempCNum = getClusterNum(tempV.t->getParentCCopy());
         if (tempV.key == v1.key && tempCNum == v1CNum || tempV.key == v2.key && tempCNum == v2CNum) {
             e = *tempE;
             return true;
@@ -93,9 +98,9 @@ int Abstract_Graph::getVCNum(const int cNum) {
 }
 
 
-// Private Accessor
+// Memory Accessor
 
-Vertex* Abstract_Graph::getVertex(const int k, const int cNum) {
+Vertex* Abstract_Graph::getVertexAddress(const int k, const int cNum) {
     for (int i = k; i < _vNums[cNum]; i++) {
         if (_vertexS[cNum][k].key == k)
             return &_vertexS[cNum][k];

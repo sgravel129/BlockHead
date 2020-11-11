@@ -12,7 +12,7 @@ struct Edge;
 
 typedef struct Vertex {
     int key;
-    Tile * t;
+    PathTile * t;
     std::vector<Vertex *> adjList;
     std::vector<Edge *> adjEdges;
 } Vertex;
@@ -28,22 +28,22 @@ class Abstract_Graph {
 public:
     Abstract_Graph(const int numClusters);
     void addVertex(const Vertex&, const int cNum);
-    void addEdge(const int, const int, const int, const int, const int, const edgeType);
+    bool addEdge(const int, const int, const int, const int, const int, const edgeType);
 
-    double searchForDistance(const Vertex&, const Vertex&, const int cNum);
+    double searchForDistance(consst Vertex&, const Vertex&, const int cNum);
     std::vector<Vertex> searchForPath(const Vertex&, const Vertex&);
 
     // Accessors
     
     bool getVertexCopy(const int, const int cNum, Vertex&);    // returns copy of Vertex with supplied key in supplied cluster
-    bool getEdge(const Vertex&, const Vertex&, Edge&);
-    int getVCNum(const int);
+    bool getEdge(const Vertex&, const Vertex&, Edge&);          // returns copy of Edge between supplied vertices
+    int getVCNum(const int);        // return number of vertices in supplied cluster
 
     // Destructor
     ~Abstract_Graph();
 
 private:
-    Vertex* getVertex(const int, const int);    // returns pointer to encapsulated vertex
+    Vertex* getVertexAddress(const int, const int);    // returns pointer to encapsulated vertex
 
     std::vector<std::vector<Vertex>> _vertexS;   // set of vertices, organized by Cluster
     std::vector<Edge> _edgeL;                    // set of edges

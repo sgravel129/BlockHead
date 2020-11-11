@@ -18,6 +18,6 @@ public:
     void draw(Graphics &graphics);
 
     // Accessors
-    Point getPos();
-    bool getCollision();
+    Point getPos() const;
+    bool getCollision() const;
 };

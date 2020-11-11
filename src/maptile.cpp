@@ -16,8 +16,8 @@ MapTile::MapTile(Graphics &graphics, const std::string &path, SDL_Rect src, floa
 }
 
 // Accessors
-Point MapTile::getPos() { return _location; }
-bool MapTile::getCollision() { return _hasCollision; }
+Point MapTile::getPos() const { return _location; }
+bool MapTile::getCollision() const { return _hasCollision; }
 
 void MapTile::draw(Graphics &graphics) {
     _sprite->draw(graphics, _location.x, _location.y);
