@@ -2,5 +2,10 @@ bin/
 obj/
 out/
 lib/
+<<<<<<< Updated upstream
 .vscode
 .vs
+=======
+build/
+.vscode
+>>>>>>> Stashed changes
