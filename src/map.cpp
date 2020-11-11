@@ -24,15 +24,56 @@ Map::~Map()
 Map::Map(Point size)
 {
     _size = size;
-    _tileProps.push_back(SDL_Rect{0, 0, 15, 15});
-    _tileProps.push_back(SDL_Rect{15, 15, 31, 31});
     Log::verbose("map | Loaded Map");
 }
 
-void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath, const std::string &spriteSheet)
+void Map::loadTextures(const std::string &spriteSheet, const std::string &spritesProps)
+{
+    if (!Util::fileExists(spriteSheet))
+    {
+        Log::error("map | Could not find spriteSheet: " + spriteSheet);
+        throw std::runtime_error("Map file does not exist: " + spriteSheet);
+    }
+    if (!Util::fileExists(spritesProps))
+    {
+        Log::error("map | Could not find spriteProps: " + spritesProps);
+        throw std::runtime_error("Map file does not exist: " + spritesProps);
+    }
+    _spriteSheet = spriteSheet;
+
+    std::ifstream spritefile;
+    spritefile.open(spritesProps, std::ios::in);
+    int tile = 0;
+    Point location = Point{0, 0};
+    if (spritefile.is_open())
+    { //checking whether the file is open
+        std::string line = "";
+        while (getline(spritefile, line))
+        { //read data from file object and put it into string.
+            std::vector<std::string> srcVec;
+            boost::algorithm::split(srcVec, line, boost::is_any_of(", \t\n\0"),
+                                    boost::token_compress_on);
+            try
+            {
+                Log::debug("map | Adding: " + line);
+                _tileProps.push_back(SDL_Rect{  stoi(srcVec[0]),
+                                                stoi(srcVec[1]),
+                                                stoi(srcVec[2]),
+                                                stoi(srcVec[3])});
+            }
+            catch (const std::exception &e)
+            {
+                Log::error("map | Could not create spriteProp: " + line);
+            }
+        }
+    }
+}
+
+void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath)
 {
     if (!Util::fileExists(mapfilePath))
     {
+        Log::error("map | Could not find mapFile: " + mapfilePath);
         throw std::runtime_error("Map file does not exist: " + mapfilePath);
     }
     std::ifstream mapfile;
@@ -45,14 +86,44 @@ void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath, const 
         while (getline(mapfile, line))
         { //read data from file object and put it into string.
             std::vector<std::string> srcVec;
-            boost::algorithm::split(srcVec, line, boost::is_any_of(","));
+            boost::algorithm::split(srcVec, line, boost::is_any_of(", \t\n\0"),
+                                    boost::token_compress_on);
             for (auto &idxSrc : srcVec)
             {
+                if (idxSrc.empty())
+                {
+                    continue; // ignore empty and null strings
+                }
+                if (stoi(idxSrc) <=0)
+                {
+                    location.x += 200;
+                    continue;
+                }
+
+                try
+                {
+                    _tiles.push_back(
+                        new MapTile(graphics,
+                                    _spriteSheet,
+                                    _tileProps[stoi(idxSrc)-1],
+                                    5.0,
+                                    false,
+                                    location));
+
+                    Log::debug("map | Created MapTile: " + idxSrc +
+                               " @ " + std::to_string(location.x) + " " +
+                               std::to_string(location.y));
+                }
+                catch (const std::exception &e)
+                {
+                    // TODO: Handle undefined spriteSheet by not calling
+                    // loadTexture first
+                    Log::error("map | Could not create tile: " + idxSrc);
+                }
                 location.x += 200;
-                Log::debug("map | Created MapTile: " + idxSrc + " @ " + std::to_string(location.x) + " " + std::to_string(location.y));
-                _tiles.push_back(new MapTile(graphics, spriteSheet, _tileProps[stoi(idxSrc)], 5.0, false, location));
             }
-            location.y += 30;
+            location.x = 0;
+            location.y += 200;
         }
     }
 }
