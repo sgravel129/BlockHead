@@ -7,6 +7,8 @@
 #include <fstream>
 #include <string>
 
+//TODO add accessors;
+
 class Map
 {
 private:
