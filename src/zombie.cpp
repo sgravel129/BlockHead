@@ -23,7 +23,7 @@ Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float 
     _sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
     for (int i = 0; i < 4; i++)
     {
-        _anims.emplace_back(SDL_Rect{96, h * i, w, h});
+        _anims.push_back(SDL_Rect{96, h * i, w, h});
     }
 }
 
