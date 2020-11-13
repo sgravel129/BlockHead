@@ -14,7 +14,7 @@ Game::Game()
 
 Game::~Game()
 {
-	Log::debug("~Game\t| Called ");
+	Log::destruct("Game\t| Called ");
 	_player->~Player();
 	_zombie->~Zombie();
 	_map->~Map();

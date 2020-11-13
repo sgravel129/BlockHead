@@ -6,7 +6,7 @@
 MapTile::MapTile() {}
 MapTile::~MapTile()
 {
-    Log::debug("~MapTile\t| Destroy: " + std::to_string(_location.x) + " " + std::to_string(_location.y));
+    Log::destruct("MapTile\t| Destroy: " + std::to_string(_location.x) + " " + std::to_string(_location.y));
     _sprite->~Sprite();
 }
 

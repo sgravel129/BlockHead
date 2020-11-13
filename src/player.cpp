@@ -29,7 +29,7 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
 
 Player::~Player()
 {
-    Log::debug("~Player\t| Called");
+    Log::destruct("Player\t| Called");
     _sprite->~Sprite();
 }
 
@@ -37,7 +37,7 @@ int counter = 0;
 void Player::update(Input input){
     if(input.isKeyHeld(SDL_SCANCODE_W)){
 		_y -= _moveSpeed;
-        _angle = 3;       
+        _angle = 3;
     }
 	if(input.isKeyHeld(SDL_SCANCODE_S)){
 		_y += _moveSpeed;

@@ -13,6 +13,8 @@ public:
 	// Logs msg with prefix "Warning: ".
 	static void warning(std::string msg);
 
+	static void destruct(std::string msg);
+
 	// Logs msg.
 	static void log(std::string msg);
 
@@ -38,4 +40,5 @@ public:
 private:
 	static bool _isDebugMode;
 	static bool _isVerboseMode;
+	static bool _showDestructors;
 };

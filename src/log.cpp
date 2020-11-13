@@ -4,38 +4,40 @@ using namespace std;
 
 bool Log::_isDebugMode = true;
 bool Log::_isVerboseMode = true;
+bool Log::_showDestructors = true;
 
 #if defined(_WIN32)
-	string bold_red = "";
-	string red = "";
-	string bold_cyan = "";
-	string cyan = "";
-	string bold_green = "";
-	string green = "";
-	string bold_yellow = "";
-	string yellow = "";
-	string reset_color = "";
-	string clear_screen = "";
-	string clear_line = "";
+	string bold_red = 		"";
+	string red = 			"";
+	string bold_cyan = 		"";
+	string cyan = 			"";
+	string bold_green = 	"";
+	string green = 			"";
+	string bold_yellow = 	"";
+	string yellow = 		"";
+	string reset_color = 	"";
+	string clear_screen = 	"";
+	string clear_line = 	"";
 #else
-	string bold_red = "\e[1;31m";
-	string red = "\e[0;31m";
-	string bold_cyan = "\e[1;36m";
-	string cyan = "\e[0;36m";
-	string bold_green = "\e[1;32m";
-	string green = "\e[0;32m";
-	string bold_yellow = "\e[1;33m";
-	string yellow = "\e[0;33m";
-	string reset_color = "\e[0m";
-	string clear_screen = "[H[2J";
-	string clear_line = "\r\e[0K";
+	string bold_red = 		"\e[1;31m";
+	string red = 			"\e[0;31m";
+	string bold_cyan = 		"\e[1;36m";
+	string cyan = 			"\e[0;36m";
+	string bold_green = 	"\e[1;32m";
+	string green = 			"\e[0;32m";
+	string bold_yellow =	"\e[1;33m";
+	string yellow = 		"\e[0;33m";
+	string reset_color =	"\e[0m";
+	string clear_screen = 	"[H[2J";
+	string clear_line = 	"\r\e[0K";
 #endif
 
 // Prefixes
-string errorPrefix = "[  ERROR  ]  ";
-string warningPrefix = "[ Warning ]  ";
-string debugPrefix = "[  Debug  ]  ";
-string verbosePrefix = "[ Verbose ]  ";
+string errorPrefix = 	"[  ERROR  ]  ";
+string warningPrefix = 	"[ Warning ]  ";
+string debugPrefix = 	"[  Debug  ]  ";
+string verbosePrefix = 	"[ Verbose ]  ";
+string destructPrefix = "[ Destroy ]  ";
 
 void Log::error(string msg)
 {
@@ -45,6 +47,10 @@ void Log::error(string msg)
 void Log::warning(string msg)
 {
 	cerr << bold_yellow << warningPrefix << msg << reset_color << endl;
+}
+void Log::destruct(string msg)
+{
+	cerr << yellow << destructPrefix << msg << reset_color << endl;
 }
 void Log::log(string msg)
 {

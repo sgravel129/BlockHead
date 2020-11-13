@@ -9,7 +9,7 @@ Zombie::Zombie()
 
 Zombie::~Zombie()
 {
-    Log::debug("~Zombie\t| Called");
+    Log::destruct("Zombie\t| Called");
     _sprite->~Sprite();
 }
 
