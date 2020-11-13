@@ -23,6 +23,7 @@ public:
 
 	// Logs msg with prefix "Debug: ".
 	static void debug(std::string msg);
+	static void debug(std::string file, std::string msg);
 
 	static void verbose(std::string msg);
 
@@ -41,4 +42,5 @@ private:
 	static bool _isDebugMode;
 	static bool _isVerboseMode;
 	static bool _showDestructors;
+	static std::string _debugClasses[];
 };

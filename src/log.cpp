@@ -3,8 +3,9 @@
 using namespace std;
 
 bool Log::_isDebugMode = true;
+string Log::_debugClasses[] = {};
 bool Log::_isVerboseMode = true;
-bool Log::_showDestructors = true;
+bool Log::_showDestructors = false;
 
 #if defined(_WIN32)
 	string bold_red = 		"";
@@ -50,7 +51,8 @@ void Log::warning(string msg)
 }
 void Log::destruct(string msg)
 {
-	cerr << yellow << destructPrefix << msg << reset_color << endl;
+	if (_showDestructors)
+		cerr << yellow << destructPrefix << msg << reset_color << endl;
 }
 void Log::log(string msg)
 {
@@ -59,6 +61,17 @@ void Log::log(string msg)
 void Log::log_raw(string msg)
 {
 	cout << bold_green << msg << reset_color;
+}
+void Log::debug(string file, string msg)
+{
+	if (_isDebugMode)
+	{
+		for (auto &debugClass : Log::_debugClasses)
+		{
+			if (debugClass.compare(file) == 0)
+				cerr << bold_cyan << debugPrefix << file << " | " << msg << reset_color << endl;
+		}
+	}
 }
 void Log::debug(string msg)
 {
