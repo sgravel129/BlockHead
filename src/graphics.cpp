@@ -16,16 +16,16 @@ Graphics::Graphics(const char *windowTitle, int screenWidth, int screenHeight)
 
 Graphics::~Graphics()
 {
-	Log::debug("~Graphics\t| Called");
-	Log::debug("~Graphics\t| Destroy Surfaces:");
+	Log::destruct("Graphics\t| Called");
+	Log::destruct("Graphics\t| Destroy Surfaces:");
 	for (auto &surf : _spriteSheets)
 	{
-		Log::debug("~Graphics\t| " + surf.first);
+		Log::destruct("Graphics\t| " + surf.first);
 		SDL_FreeSurface(surf.second);
 	}
-	Log::debug("~Graphics\t| Destroy Renderer");
+	Log::destruct("Graphics\t| Destroy Renderer");
 	SDL_DestroyRenderer(_renderer);
-	Log::debug("~Graphics\t| Destroy Window");
+	Log::destruct("Graphics\t| Destroy Window");
 	SDL_DestroyWindow(_window);
 }
 

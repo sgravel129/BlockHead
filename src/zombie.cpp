@@ -1,7 +1,10 @@
 #include "zombie.hpp"
 #include "log.hpp"
+#include "animation.hpp"
 
 // TODO: Migrate to point system.
+const int MOVE_ANIMS = 3;
+const int NUM_DIR = 4;
 
 Zombie::Zombie()
 {
@@ -9,7 +12,7 @@ Zombie::Zombie()
 
 Zombie::~Zombie()
 {
-    Log::debug("~Zombie\t| Called");
+    Log::destruct("Zombie\t| Called");
     _sprite->~Sprite();
 }
 
@@ -21,12 +24,15 @@ Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float 
     _moveSpeed = 1;
 
     _sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
-    for (int i = 0; i < 4; i++)
+    _anims.resize( NUM_DIR, std::vector<SDL_Rect>( MOVE_ANIMS ) );
+
+    for (int i = 0; i < NUM_DIR; i++)
     {
-        _anims.emplace_back(SDL_Rect{96, h * i, w, h});
+        for(int j = 0; j < MOVE_ANIMS; j++){
+            _anims[i][j] = SDL_Rect{w*j+96, h*i, w, h};
+        }
     }
 }
-
 void Zombie::update(int target_x, int target_y)
 {
     // Do path finding. Euclidian Distance
@@ -55,10 +61,15 @@ void Zombie::update(int target_x, int target_y)
         _x -= _moveSpeed;
         _angle = 1;
     }
+
+
+    if (Animation::getTicks() % int(20 / _moveSpeed) == 0) {
+        _currAnim = (_currAnim + 1) % MOVE_ANIMS;
+    }
 }
 
 void Zombie::draw(Graphics &graphics)
 {
-    _sprite->change_src(_anims[_angle]);
+    _sprite->change_src(_anims[_angle][_currAnim]);
     _sprite->draw(graphics, _x, _y);
 }
