@@ -2,7 +2,6 @@
 
 #include "graphics.hpp"
 #include "input.hpp"
-#include "color.hpp"
 
 // Game Objects
 #include "player.hpp"

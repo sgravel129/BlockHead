@@ -1,8 +1,10 @@
 #include "game.hpp"
 #include "util.hpp"
 #include "log.hpp"
+#include "color.hpp"
 #include "input.hpp"
 #include "constants.hpp"
+#include "animation.hpp"
 
 // TODO: Framerate bug
 // TODO: Removed default constructors?
@@ -81,6 +83,7 @@ int y = 200;
 
 void Game::update()
 {
+	Animation::updateTicks();
 	/* Updating of game classes */
 	_player->update(_input);
 	_zombie->update(_player->getX(), _player->getY());

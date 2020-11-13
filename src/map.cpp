@@ -55,7 +55,7 @@ void Map::loadTextures(const std::string &spriteSheet, const std::string &sprite
                                     boost::token_compress_on);
             try
             {
-                Log::debug("map | Adding: " + line);
+                Log::debug("map", "Adding TileProps: " + line);
                 _tileProps.push_back(SDL_Rect{  stoi(srcVec[0]),
                                                 stoi(srcVec[1]),
                                                 stoi(srcVec[2]),
@@ -110,7 +110,7 @@ void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath)
                                     false,
                                     location));
 
-                    Log::debug("map | Created MapTile: " + idxSrc +
+                    Log::debug("map", "Created MapTile: " + idxSrc +
                                " @ " + std::to_string(location.x) + " " +
                                std::to_string(location.y));
                 }

@@ -1,5 +1,6 @@
 #include "player.hpp"
 #include "log.hpp"
+#include "animation.hpp"
 
 // TODO: Migrate to point system.
 const int MOVE_ANIMS = 3;
@@ -57,10 +58,8 @@ void Player::update(Input input){
         input.isKeyHeld(SDL_SCANCODE_D) ||
         input.isKeyHeld(SDL_SCANCODE_A))
     {
-        counter++;
-        if (counter >= 10) {
+        if (Animation::getTicks() % int(20 / _moveSpeed) == 0) {
             _currAnim = (_currAnim + 1) % MOVE_ANIMS;
-            counter = 0;
         }
     }
     if( input.wasKeyReleased(SDL_SCANCODE_W) ||
