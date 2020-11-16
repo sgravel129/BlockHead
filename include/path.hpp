@@ -81,6 +81,8 @@ public:
 
     Cluster* getClusterAddress(const Point&);      /// returns pointer to encapsulated cluster
     bool getTransitionTileAddresses(const int, PathTile*&, PathTile*&);
+    bool getStartAddress(PathTile*& t);
+    bool getGoalAddress(PathTile*& t);
 
     // Destructors
     void deleteStartAndGoal();

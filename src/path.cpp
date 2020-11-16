@@ -341,6 +341,19 @@ bool Path_Hierarchy::getTransitionTileAddresses(const int transNum, PathTile*& t
     return true;
 }
 
+bool Path_Hierarchy::getStartAddress(PathTile*& t) {
+    if (_startT.getParentC() == NULL)
+        return false;
+    t = &_startT;
+    return true;
+}
+bool Path_Hierarchy::getGoalAddress(PathTile*& t) {
+    if (_goalT.getParentC() == NULL)
+        return false;
+    t = &_goalT;
+    return true;
+}
+
 // Deletion Mutators
 void Path_Hierarchy::deleteStartAndGoal() {
     _startT.~PathTile();
@@ -428,8 +441,6 @@ void buildGraph() {
     int cNum1, cNum2;
     Vertex v1, v2;
     PathTile* t1; PathTile* t2;
-    std::vector<Vertex*> dummyV;
-    std::vector<Edge*> dummyE;
     int numTrans = map_hierarchy.get_numTrans();
     int numClusters = map_hierarchy.get_numClusters();
     for (int i = 0; i < numTrans; i++) {
@@ -437,8 +448,8 @@ void buildGraph() {
             break;
         cNum1 = getClusterNum(t1->getParentCCopy().clusterPos);
         cNum2 = getClusterNum(t2->getParentCCopy().clusterPos);
-        v1 = { map_graph.getVCNum(cNum1), t1, dummyV, dummyE };
-        v2 = { map_graph.getVCNum(cNum2), t2, dummyV, dummyE };
+        v1 = { map_graph.getVCNum(cNum1), t1, {}, {} };
+        v2 = { map_graph.getVCNum(cNum2), t2, {}, {} };
         map_graph.addVertex(v1, cNum1);
         map_graph.addVertex(v2, cNum2);
         if(v1.t->getParentCCopy().clusterPos.x == v2.t->getParentCCopy().clusterPos.x)  // if v1 and v2 horizontally adjacent

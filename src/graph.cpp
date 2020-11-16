@@ -56,7 +56,8 @@ std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point&
     PathTile* tempT;
     bool addStart(false), addGoal(false);
     Point p1, p2;
-    std::vector<int> path;
+    std::vector<int> intPath;
+    std::vector<Vertex*> graphPath;
     int cNum1 = getClusterNum(startP), cNum2 = getClusterNum(goalP);
     /*
     if start Cluster == goal Cluster
@@ -71,9 +72,9 @@ std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point&
             if (getEdge(startV, goalV, tempEdge))
                 return tempEdge.path;
         }
-        path = pathFind({ startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH }, { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH }, cNum1);
-        if (path.size() > 0)
-            return path;
+        intPath = pathFind({ startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH }, { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH }, cNum1);
+        if (intPath.size() > 0)
+            return intPath;
     }
 
     if (!getVertexCopy(startP, startV)) {
@@ -84,17 +85,17 @@ std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point&
         map_hierarchy.addStart(tempT);
         // connect to all cluster border transitions with A star
         p1 = { startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH };
-        for (int i = 0; i < _vNums[cNum1]; i++) {
-            p2 = _vertexS[cNum1][i].t->get_clusterRelPos();
-            path = pathFind(p1, p2, cNum1);
-            //addEdge()
-        }
+        map_hierarchy.getStartAddress(tempT);
+        addVertex({ getVCNum(cNum1), tempT, {}, {} }, cNum1);
         // add edges to graph
-
-        // get startVP
+        for (int i = 0; i < _vNums[cNum1] - 1; i++) {
+            p2 = _vertexS[cNum1][i].t->get_clusterRelPos();
+            intPath = pathFind(p1, p2, cNum1);
+            addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
+        }
     }
-    else
-        startVP = getVertexAddress(startP);
+    startVP = getVertexAddress(startP);
+
     if (!getVertexCopy(goalP, goalV)) {
         // set flag that we are adding goal vertex to graph (for cleanup later)
         addGoal = true;
@@ -102,17 +103,27 @@ std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point&
         tempT = new PathTile(*getMapTileFromPoint(goalP), map_hierarchy);
         map_hierarchy.addGoal(tempT);
         // connect to all cluster border transitions with A star
+        p1 = { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH };
+        map_hierarchy.getGoalAddress(tempT);
+        addVertex({ getVCNum(cNum2), tempT, {}, {} }, cNum2);
         // add edges to graph
-        
-        // get goalVP
+        for (int i = 0; i < _vNums[cNum2] - 1; i++) {
+            p2 = _vertexS[cNum2][i].t->get_clusterRelPos();
+            intPath = pathFind(p1, p2, cNum2);
+            addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
+        }
     }
-    else
-        goalVP = getVertexAddress(goalP);
+    goalVP = getVertexAddress(goalP);
 
+    // Start and Goal in abstract Graph: can now proceed with graph search
+    graphPath = searchForGraphPath(startVP, goalVP);
 
     // Cleanup: delete extra tiles from Path_Hierarchy, and extra vertices and edges from Abstract_Graph
 
-    return path;
+
+
+
+    return graphPathToIntPath(graphPath);
 }
 
 
