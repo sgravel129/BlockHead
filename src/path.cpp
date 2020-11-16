@@ -25,6 +25,11 @@
 #define MIN_ENTRANCE_LENGTH 3   // minimum tile lenght for entrance
 #define TRANSITION_INTERVAL 3   // number of tiles between transitions in single entrance
 
+const int dir = 8;  // number of possible directions to go in
+static int dx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };
+static int dy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
+
+
 
 //TODO
 // Implement A* search algorithm
@@ -49,7 +54,7 @@ PathTile getPathTileFromPoint(const Point& p) {
 // PathTile class implementation
 ///////////////////////////////////////
 //
-PathTile::PathTile() {};
+PathTile::PathTile() :_xPos{}, _yPos{}, _traversable{}, _level{}, _priority{}, _parentC{}, _parentH{} {};
 PathTile::PathTile(const MapTile& refTile, Path_Hierarchy& parentH) {
     _xPos = refTile.getPos().x;
     _yPos = refTile.getPos().y;
@@ -64,10 +69,12 @@ Cluster* PathTile::findParent() {
 }
 
 // Accessors
-int PathTile::get_xPos() { return _xPos; }
-int PathTile::get_yPos() { return _yPos; }
-bool PathTile::get_traversable() { return _traversable; }
-Cluster PathTile::getParentCCopy() { return *_parentC; }
+int PathTile::get_xPos() const { return _xPos; }
+int PathTile::get_yPos() const { return _yPos; }
+bool PathTile::get_traversable() const { return _traversable; }
+int PathTile::get_level() const { return _level;  }
+int PathTile::get_priority() const { return _priority; }
+Cluster PathTile::getParentCCopy() const { return *_parentC; }
 
 // Memory Accessors
 Cluster* PathTile::getParentC() { return _parentC; }
@@ -114,13 +121,13 @@ std::pair<PathTile, PathTile> Path_Hierarchy::getAdjTiles(const int c1TileX, con
 std::vector<std::pair<PathTile, PathTile>> Path_Hierarchy::get_transitionS() { return _transitionS; }
 std::pair<PathTile, PathTile> Path_Hierarchy::get_transition(const int transNum) { return _transitionS[transNum]; }
 std::vector<Cluster> Path_Hierarchy::get_clusterS() {return _clusterS;}
-Cluster Path_Hierarchy::get_cluster(const int x, const int y) {return _clusterS[y*CLUSTER_YNUM + x];}
+Cluster Path_Hierarchy::get_cluster(const int x, const int y) {return _clusterS[y*CLUSTER_YNUM + static_cast<__int64>(x)];}
 int Path_Hierarchy::get_numTrans() { return _numTrans; }
 int Path_Hierarchy::get_numClusters() { return _numClusters; }
 
 // Private Memory Accessors
 Cluster* Path_Hierarchy::getClusterAddress(const int x, const int y) {
-    return &(_clusterS[y * CLUSTER_YNUM + x]);
+    return &(_clusterS[y * CLUSTER_YNUM + static_cast<__int64>(x)]);
 }
 
 bool Path_Hierarchy::getTransitionTileAddresses(const int transNum, PathTile*& t1, PathTile*& t2) {

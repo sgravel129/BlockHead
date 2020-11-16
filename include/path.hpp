@@ -7,6 +7,9 @@
 #include <cmath>
 
 
+
+
+
 typedef struct Cluster {
     int x;
     int y;
@@ -21,22 +24,31 @@ public:
     PathTile(const MapTile&, Path_Hierarchy&);
 
     Cluster* findParent();
+    void updatePriority(const int xDest, const int yDest);
+    void nextLevel(const int i);
+    const int estimate(const int xDest, const int yDest) const;
+
     // Accessors
-    int get_xPos();
-    int get_yPos();
-    bool get_traversable();
-    Cluster getParentCCopy();   // returns copy of parent cluster
+    int get_xPos() const;
+    int get_yPos() const;
+    bool get_traversable() const;
+    int get_level() const;
+    int get_priority() const;
+    Cluster getParentCCopy() const;   // returns copy of parent cluster
     Cluster* getParentC();  // returns address of parent cluster
     
 private:    
     int _xPos;
     int _yPos;
     bool _traversable;   // True if no obstacle on tile, False o/w
+    int _level;
+    int _priority;
+    
     Cluster* _parentC;
     Path_Hierarchy* _parentH;
-
-    
 };
+
+bool operator<(const PathTile& LHS, const PathTile& RHS);
 
 
 class Path_Hierarchy {

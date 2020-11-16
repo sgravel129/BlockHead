@@ -11,8 +11,8 @@ enum edgeType {
 struct Edge;
 
 typedef struct Vertex {
-    int key;
-    PathTile * t;
+    int key{};
+    PathTile* t{};
     std::vector<Vertex *> adjList;
     std::vector<Edge *> adjEdges;
 } Vertex;
