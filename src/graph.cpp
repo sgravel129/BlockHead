@@ -23,7 +23,6 @@ void Abstract_Graph::addVertex(const Vertex& v, const int cNum) {
 }
 
 // Adds edge to graph connecting to vertices, with supplied distance as weight
-// IMPORTANT THAT POINTERS STORED POINT TO APPROPRIATE ENCAPSULATED ADDRESSES
 bool Abstract_Graph::addEdge(const Point& p1, const Point& p2, const int d, const edgeType eT, const std::vector<int>& path) {
     Vertex* v1 = getVertexAddress(p1);
     Vertex* v2 = getVertexAddress(p2);
@@ -42,6 +41,25 @@ bool Abstract_Graph::addEdge(const Point& p1, const Point& p2, const int d, cons
     return true;
 }
 
+// DELETE Start/Goal Vertex
+void Abstract_Graph::deleteStartAndGoal(const Vertex* v, const int cNum) {
+    Vertex* vTemp;
+    // first iterate through neighbors, and delete all edge information in neighbour vertices
+    int numNeighbours = v->adjList.size();
+    for (int i = 0; i < numNeighbours; i++) {
+        vTemp = getVertexAddress(v->adjList[i]->t->get_mapRelPos());
+        vTemp->adjList.pop_back();      // we know that the start vertex was the last one inserted, so just need to pop back
+        vTemp->adjEdges.pop_back();
+    }
+    _vertexS[cNum].pop_back();
+    _edgeL.pop_back();
+    _vNums[cNum]--;
+    _eNum--;
+    delete vTemp;
+}
+
+
+//////////////
 // Algorithms
 
 // Takes two vertices
@@ -119,9 +137,11 @@ std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point&
     graphPath = searchForGraphPath(startVP, goalVP);
 
     // Cleanup: delete extra tiles from Path_Hierarchy, and extra vertices and edges from Abstract_Graph
-
-
-
+    map_hierarchy.deleteStartAndGoal();
+    if (addStart)
+        deleteStartAndGoal(startVP, cNum1);
+    if (addGoal)
+        deleteStartAndGoal(goalVP, cNum2);
 
     return graphPathToIntPath(graphPath);
 }

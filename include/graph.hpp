@@ -31,7 +31,7 @@ public:
     void addVertex(const Vertex&, const int cNum);
     bool addEdge(const Point&, const Point&, const int, const edgeType, const std::vector<int>&);
 
-
+    
     double searchForDistance(const Vertex&, const Vertex&, const int cNum);
     std::vector<int> searchForPath(const Point&, const Point&);
     std::vector<Vertex*> searchForGraphPath(const Vertex*, const Vertex*);
@@ -48,6 +48,7 @@ public:
 
 private:
     Vertex* getVertexAddress(const Point&);    // returns pointer to encapsulated vertex
+    void deleteStartAndGoal(const Vertex*, const int);
 
     std::vector<std::vector<Vertex>> _vertexS;   // set of vertices, organized by Cluster
     std::vector<Edge> _edgeL;                    // set of edges
