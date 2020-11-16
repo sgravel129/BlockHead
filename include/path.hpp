@@ -65,7 +65,8 @@ public:
     Path_Hierarchy(const int numClusters);
     
     void addTransition(const std::pair<PathTile*, PathTile*>& tilePair);
-    void addPathTile(const PathTile*);
+    void addStart(const PathTile*);
+    void addGoal(const PathTile*);
     void buildClusterS();
     
 
@@ -86,13 +87,12 @@ public:
     ~Path_Hierarchy();
 
 private:
-    PathTile _startT;
-    PathTile _goalT;
     std::vector<std::pair<PathTile, PathTile>> _transitionS;
     std::vector<Cluster> _clusterS;
     int _numTrans;
     int _numClusters;
-
+    PathTile _startT;
+    PathTile _goalT;
 
 };
 

@@ -64,12 +64,13 @@ PathTile::PathTile() : _mapRelPos{}, _clusterRelPos{}, _traversable{}, _level{},
 PathTile::PathTile(const MapTile& refTile, Path_Hierarchy& parentH) : PathTile(refTile, parentH, 0, 0) {}
 PathTile::PathTile(const MapTile& refTile, Path_Hierarchy& parentH, const int level, const int priority) {
     _mapRelPos = { refTile.getPos().x, refTile.getPos().y };
+    _clusterRelPos = { _mapRelPos.x % CLUSTER_TLENGTH, _mapRelPos.y % CLUSTER_TLENGTH };
     _traversable = !refTile.getCollision();
     _level = level;
     _priority = priority;    
     _parentH = &parentH;
     _parentC = findParent();
-    _clusterRelPos = {};
+    
 }
 PathTile::PathTile(const PathTile& t2) {        // Copy Constructor
     _mapRelPos = t2._mapRelPos; _clusterRelPos = t2._clusterRelPos; _traversable = t2._traversable;
@@ -262,22 +263,10 @@ double pathToDistance(const std::vector<int>& path) {
 ///////////////
 // Path_Hierarchy class implementation
 ////////////////////////////////////////
-//
-Path_Hierarchy::Path_Hierarchy(const int numClusters) {
+// Constructor
+Path_Hierarchy::Path_Hierarchy(const int numClusters) : _startT{}, _goalT{}, _transitionS{}, _clusterS{} {
     _numTrans = 0;
     _numClusters = numClusters;
-}
-
-void Path_Hierarchy::addTransition(const std::pair<PathTile*, PathTile*>& tilePair) {
-    _transitionS.push_back(std::pair<PathTile, PathTile> {*tilePair.first, *tilePair.second});
-    _numTrans++;
-}
-
-void Path_Hierarchy::buildClusterS() {
-    for(int j = 0; j < CLUSTER_YNUM; j++) {
-        for(int i = 0; i < CLUSTER_XNUM; i++)
-            _clusterS.push_back(Cluster{ {i,j}, {i*CLUSTER_TLENGTH, j*CLUSTER_TLENGTH}, NULL });
-    }
 }
 // Destructor
 Path_Hierarchy::~Path_Hierarchy() {
@@ -296,6 +285,24 @@ Path_Hierarchy::~Path_Hierarchy() {
     }
     _clusterS.~vector();
 }
+
+//////////////
+
+void Path_Hierarchy::addTransition(const std::pair<PathTile*, PathTile*>& tilePair) {
+    _transitionS.push_back(std::pair<PathTile, PathTile> {*tilePair.first, *tilePair.second});
+    _numTrans++;
+}
+
+void Path_Hierarchy::addStart(const PathTile* startT) { _startT = *startT; }
+void Path_Hierarchy::addGoal(const PathTile* goalT) { _goalT = *goalT; }
+
+void Path_Hierarchy::buildClusterS() {
+    for(int j = 0; j < CLUSTER_YNUM; j++) {
+        for(int i = 0; i < CLUSTER_XNUM; i++)
+            _clusterS.push_back(Cluster{ {i,j}, {i*CLUSTER_TLENGTH, j*CLUSTER_TLENGTH}, NULL });
+    }
+}
+
 
 // returns pair of adjacent tiles from cluster pos and tile displacement
 std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster& c1, const Cluster& c2, const int k, const bool adjOrientation) {
@@ -435,9 +442,9 @@ void buildGraph() {
         map_graph.addVertex(v1, cNum1);
         map_graph.addVertex(v2, cNum2);
         if(v1.t->getParentCCopy().clusterPos.x == v2.t->getParentCCopy().clusterPos.x)  // if v1 and v2 horizontally adjacent
-            map_graph.addEdge(v1.key, v2.key, cNum1, cNum2, 1, INTER, { 0 });     // {0} is the path of going right once
+            map_graph.addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 0 });     // {0} is the path of going right once
         else                                                                            // if v1 and v2 vertically adjacent
-            map_graph.addEdge(v1.key, v2.key, cNum1, cNum2, 1, INTER, { 2 });     // {2} is the path of going down once
+            map_graph.addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 2 });     // {2} is the path of going down once
     }
     int numVC;
     double distance;
@@ -453,7 +460,7 @@ void buildGraph() {
                 path = pathFind(v1.t->get_clusterRelPos(), v2.t->get_clusterRelPos(), cNum);
                 distance = pathToDistance(path);
                 if (distance != HUGE_VAL)
-                    map_graph.addEdge(v1.key, v2.key, cNum, cNum, distance, INTRA, path);
+                    map_graph.addEdge(v1.t->get_mapRelPos(), v2.t->get_mapRelPos(), distance, INTRA, path);
             }
         }
     }

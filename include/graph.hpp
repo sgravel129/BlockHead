@@ -29,7 +29,8 @@ class Abstract_Graph {
 public:
     Abstract_Graph(const int numClusters);
     void addVertex(const Vertex&, const int cNum);
-    bool addEdge(const int, const int, const int, const int, const int, const edgeType, const std::vector<int>&);
+    bool addEdge(const Point&, const Point&, const int, const edgeType, const std::vector<int>&);
+
 
     double searchForDistance(const Vertex&, const Vertex&, const int cNum);
     std::vector<int> searchForPath(const Point&, const Point&);
@@ -37,8 +38,7 @@ public:
     std::vector<int> graphPathToIntPath(const std::vector<Vertex*>&) const ;
 
     // Accessors
-    
-    bool getVertexCopy(const int, const int cNum, Vertex&);    // returns copy of Vertex with supplied key in supplied cluster
+    bool getVertexCopy(const int k, const int cNum, Vertex& v);
     bool getVertexCopy(const Point&, Vertex&);  // returns copy of Vertex containing tile of supplied point
     bool getEdge(const Vertex&, const Vertex&, Edge&);          // returns copy of Edge between supplied vertices
     int getVCNum(const int);        // return number of vertices in supplied cluster
@@ -47,10 +47,12 @@ public:
     ~Abstract_Graph();
 
 private:
-    Vertex* getVertexAddress(const int, const int);    // returns pointer to encapsulated vertex
+    Vertex* getVertexAddress(const Point&);    // returns pointer to encapsulated vertex
 
     std::vector<std::vector<Vertex>> _vertexS;   // set of vertices, organized by Cluster
     std::vector<Edge> _edgeL;                    // set of edges
     std::vector<int> _vNums;    // number of vertices per cluster
     int _eNum;       // number of edges
+
+
 };

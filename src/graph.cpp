@@ -2,7 +2,7 @@
 #include "../include/path.hpp"
 #include "../include/graph.hpp"
 */
-#include "path.hpp"
+#include "path.cpp"
 #include "graph.hpp"
 
 #define X_STEP 30   // x size of tile
@@ -24,9 +24,9 @@ void Abstract_Graph::addVertex(const Vertex& v, const int cNum) {
 
 // Adds edge to graph connecting to vertices, with supplied distance as weight
 // IMPORTANT THAT POINTERS STORED POINT TO APPROPRIATE ENCAPSULATED ADDRESSES
-bool Abstract_Graph::addEdge(const int key1, const int key2, const int cNum1, const int cNum2, const int d, const edgeType eT, const std::vector<int>& path) {
-    Vertex* v1 = getVertexAddress(key1, cNum1);
-    Vertex* v2 = getVertexAddress(key2, cNum2);
+bool Abstract_Graph::addEdge(const Point& p1, const Point& p2, const int d, const edgeType eT, const std::vector<int>& path) {
+    Vertex* v1 = getVertexAddress(p1);
+    Vertex* v2 = getVertexAddress(p2);
     if (v1 == NULL || v2 == NULL)
         return false;
     Edge e = {{ v1, v2 }, eT, d, path};
@@ -53,7 +53,9 @@ double Abstract_Graph::searchForDistance(const Vertex& v1, const Vertex& v2, con
 std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point& goalP) {
     Vertex startV, * startVP, goalV, * goalVP;
     Edge tempEdge;
-    
+    PathTile* tempT;
+    bool addStart(false), addGoal(false);
+    Point p1, p2;
     std::vector<int> path;
     int cNum1 = getClusterNum(startP), cNum2 = getClusterNum(goalP);
     /*
@@ -76,24 +78,36 @@ std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point&
 
     if (!getVertexCopy(startP, startV)) {
         // set flag that we are adding start vertex to graph (for cleanup later)
+        addStart = true;
         // encapsulate vertex into graph
+        tempT = new PathTile(*getMapTileFromPoint(startP), map_hierarchy);
+        map_hierarchy.addStart(tempT);
         // connect to all cluster border transitions with A star
+        p1 = { startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH };
+        for (int i = 0; i < _vNums[cNum1]; i++) {
+            p2 = _vertexS[cNum1][i].t->get_clusterRelPos();
+            path = pathFind(p1, p2, cNum1);
+            //addEdge()
+        }
         // add edges to graph
 
         // get startVP
     }
     else
-        startVP = getVertexAddress(startV.key, cNum1);
+        startVP = getVertexAddress(startP);
     if (!getVertexCopy(goalP, goalV)) {
         // set flag that we are adding goal vertex to graph (for cleanup later)
+        addGoal = true;
         // encapsulate vertex into graph
+        tempT = new PathTile(*getMapTileFromPoint(goalP), map_hierarchy);
+        map_hierarchy.addGoal(tempT);
         // connect to all cluster border transitions with A star
         // add edges to graph
         
         // get goalVP
     }
     else
-        goalVP = getVertexAddress(goalV.key, cNum2);
+        goalVP = getVertexAddress(goalP);
 
 
     // Cleanup: delete extra tiles from Path_Hierarchy, and extra vertices and edges from Abstract_Graph
@@ -160,24 +174,14 @@ bool Abstract_Graph::getVertexCopy(const Point& p, Vertex& v) {
 
 
 bool Abstract_Graph::getEdge(const Vertex& v1, const Vertex& v2, Edge& e) {
-    int tempCNum;
-    Vertex tempV;
-    int v1CNum = getClusterNum(v1.t->getParentCCopy().clusterPos);
-    int v2CNum = getClusterNum(v2.t->getParentCCopy().clusterPos);
-
-    for (auto tempE : v1.adjEdges) {
-        tempV = *(tempE->vPair.first);
-        tempCNum = getClusterNum(tempV.t->getParentCCopy().clusterPos);
-        if (tempV.key == v1.key && tempCNum == v1CNum || tempV.key == v2.key && tempCNum == v2CNum) {
-            e = *tempE;
+    Point p1, p2;
+    for (int i = 0; i < v1.adjList.size(); i++) {
+        p1 = v1.adjList[i]->t->get_mapRelPos();
+        p2 = v2.t->get_mapRelPos();
+        if (p1.x == p2.x && p1.y == p2.y) {
+            e = *v1.adjEdges[i];
             return true;
-        }   
-        tempV = *(tempE->vPair.second);
-        tempCNum = getClusterNum(tempV.t->getParentCCopy().clusterPos);
-        if (tempV.key == v1.key && tempCNum == v1CNum || tempV.key == v2.key && tempCNum == v2CNum) {
-            e = *tempE;
-            return true;
-        }   
+        }
     }
     return false;
 }
@@ -189,10 +193,14 @@ int Abstract_Graph::getVCNum(const int cNum) {
 
 // Memory Accessor
 
-Vertex* Abstract_Graph::getVertexAddress(const int k, const int cNum) {
-    for (int i = k; i < _vNums[cNum]; i++) {
-        if (_vertexS[cNum][k].key == k)
-            return &_vertexS[cNum][k];
+Vertex* Abstract_Graph::getVertexAddress(const Point& p) {
+    int cNum = getClusterNum(p);
+    Point tempP;
+    for (int i = 0; i < _vNums[cNum]; i++) {
+        tempP = _vertexS[cNum][i].t->get_mapRelPos();
+        if (tempP.x == p.x && tempP.y == p.y) {
+            return &_vertexS[cNum][i];
+        }
     }
     return NULL;
 }
