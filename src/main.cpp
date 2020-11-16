@@ -18,7 +18,10 @@ int main(int argc, char **argv)
 
     if (game.init())
     {
-        game.run();
+        while(True){
+            game.welcome();
+            game.run();
+        } 
     }
 
     game.exit();
