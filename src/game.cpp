@@ -37,8 +37,8 @@ bool Game::init()
 	_graphics->setRenderColor(Color("65846c"));
 
 	/* Custom class initialization */
-	_player = new Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+	_player = new Player(*_graphics, "res/robot_sprites.png", 480, 500, 0.50F);		// loads up the robot sprite
+	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);				// loads up the zombie
 	_map = new Map(Point{10, 10});
 	_map->loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
 	_map->loadMapFile(*_graphics, "res/maps/test.map");
@@ -49,48 +49,48 @@ bool Game::init()
 	return true;
 }
 
-bool Game::welcome()
-{
-	class menuObjs(){
-		private: 
-			Sprite _playAgain;				// need to have 2 buttons and one background image
-			Sprite _mapEditor;				// specify locations for the above on the GUI scene
-		public:
-			void draw(Graphics &graphics);	// draw all the sprites which will be the background photos and the menu buttons
-			int update(Input input) 		// to allow the user to exit on Quit (N)
-	}
+// bool Game::welcome()
+// {
+// 	class menuObjs(){
+// 		private: 
+// 			Sprite _playAgain;				// need to have 2 buttons and one background image
+// 			Sprite _mapEditor;				// specify locations for the above on the GUI scene
+// 		public:
+// 			void draw(Graphics &graphics);	// draw all the sprites which will be the background photos and the menu buttons
+// 			int update(Input input) 		// to allow the user to exit on Quit (N)
+// 	}
 
-	// variables instantiated here
-	_graphics = new Graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT);
-	_graphics->setRenderColor(Color("FFFFFF"));
+// 	// variables instantiated here
+// 	_graphics = new Graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT);
+// 	_graphics->setRenderColor(Color("FFFFFF"));
 
-	/* Custom class initialization */
-	_player = new Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-	_map = new Map(Point{10, 10});
-	_map->loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-	_map->loadMapFile(*_graphics, "res/maps/test.map");
+// 	/* Custom class initialization */
+// 	_player = new Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+// 	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+// 	_map = new Map(Point{10, 10});
+// 	_map->loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
+// 	_map->loadMapFile(*_graphics, "res/maps/test.map");
 	
-	// instantiate the menuObjs class
-	bool closeMenu = false					// to be able to exit the menu and get into the game play
-	Input input = new Input();
+// 	// instantiate the menuObjs class
+// 	bool closeMenu = false					// to be able to exit the menu and get into the game play
+// 	Input input = new Input();
 
-	while not closeMenu {
-		Game::handleUserInput()				// TODO: make static!
+// 	while not closeMenu {
+// 		Game::handleUserInput()				// TODO: make static!
 
-		int menuChoice = menuObjs.update(input);
+// 		int menuChoice = menuObjs.update(input);
 
-		if menuChoice == USER_QUIT 
-		{
-			Game::setIsRunning = false;		// TODO: make static!
-		}
-		else if menuChoice == PLAY_GAME 
-		{
-			closeMenu = true;				// see above where closeMenu is initially set to False
-		}
-		menuObjs.draw()
-	}
-}
+// 		if menuChoice == USER_QUIT 
+// 		{
+// 			Game::setIsRunning = false;		// TODO: make static!
+// 		}
+// 		else if menuChoice == PLAY_GAME 
+// 		{
+// 			closeMenu = true;				// see above where closeMenu is initially set to False
+// 		}
+// 		menuObjs.draw()
+// 	}
+// }
 
 void Game::handleUserInput()
 {
