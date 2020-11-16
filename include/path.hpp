@@ -13,9 +13,9 @@
 
 
 typedef struct Cluster {
-    Point clusterPos;
-    Point tilePos;
-    Cluster* parent;
+    Point clusterPos{};
+    Point tilePos{};
+    Cluster* parent{};
 } Cluster;
 
 class Path_Hierarchy;
@@ -53,7 +53,8 @@ private:
 };
 
 bool operator<(const PathTile& LHS, const PathTile& RHS);
-std::vector<int> pathFind(const Point, const Point, const int);     // A STAR ALGORITHM
+std::vector<int> pathFind(const Point, const Point, const int);     // A STAR ALGORITHM, takes cluster relative points
+                                                                    // of start and goal, and cluster number
 double pathToDistance(const std::vector<int>&);
 
 class Path_Hierarchy {

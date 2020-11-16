@@ -5,7 +5,9 @@
 #include "path.hpp"
 #include "graph.hpp"
 
-
+#define X_STEP 30   // x size of tile
+#define CLUSTER_SLENGTH 120     // side length of cluster (square)
+#define CLUSTER_TLENGTH CLUSTER_SLENGTH / X_STEP
 
 //////////////////////////////////
 // ABSTRACT_GRAPH Implementation
@@ -48,9 +50,11 @@ double Abstract_Graph::searchForDistance(const Vertex& v1, const Vertex& v2, con
     return 0;
 }
 
-
-std::vector<Vertex> Abstract_Graph::searchForGraphPath(const Point& startP, const Point& goalP) {
-    std::vector<Vertex> Path;
+std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point& goalP) {
+    Vertex startV, * startVP, goalV, * goalVP;
+    Edge tempEdge;
+    std::vector<int> path;
+    int cNum1 = getClusterNum(startP), cNum2 = getClusterNum(goalP);
     /*
     if start Cluster == goal Cluster
         if both in graph
@@ -58,7 +62,38 @@ std::vector<Vertex> Abstract_Graph::searchForGraphPath(const Point& startP, cons
         A star algorithm
         if soln
             return path
-    
+    */
+    if (cNum1 == cNum2) {            // start and goal in same cluster
+        if (getVertexCopy(startP, startV) && getVertexCopy(goalP, goalV)) {     // start and goal vertices already in graph
+            if (getEdge(startV, goalV, tempEdge))
+                return tempEdge.path;
+        }
+        path = pathFind({ startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH }, { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH }, cNum1);
+        if (path.size() > 0)
+            return path;
+    }
+
+    if (!getVertexCopy(startP, startV)) {
+        // connect to border, encapsulate into graph
+        // get startVP
+    }
+    else
+        startVP = getVertexAddress(startV.key, cNum1);
+    if (!getVertexCopy(goalP, goalV)) {
+        // connect to border, encapsulate into graph
+        // get goalVP
+    }
+    else
+        goalVP = getVertexAddress(goalV.key, cNum2);
+
+    return path;
+}
+
+
+std::vector<Vertex*> Abstract_Graph::searchForGraphPath(const Vertex* startV, const Vertex* goalV) {
+    std::vector<Vertex*> Path;
+
+    /*
     add vertices if not in graph
     connect to border (with A star), add edges to graph
     Djikstra's on abstract graph
@@ -69,6 +104,23 @@ std::vector<Vertex> Abstract_Graph::searchForGraphPath(const Point& startP, cons
     return Path;
 }
 
+// Takes vector path of Vertices, finds the edges between them, and translates it to int Path info
+std::vector<int> Abstract_Graph::graphPathToIntPath(const std::vector<Vertex*>& graphPath) const {
+    std::vector<int> intPath, tempPath;
+    Vertex* v1, * v2;
+    int k;
+    for (int i = 0; i < graphPath.size() - 1; i++) {
+        v1 = graphPath[i]; v2 = graphPath[static_cast<__int64>(i)+1];
+        for (int j = 0; j < v1->adjList.size(); j++) {
+            if (v1->adjList[j] == v2) {
+                tempPath = v1->adjEdges[j]->path;
+                intPath.insert(intPath.end(), tempPath.begin(), tempPath.end());
+                break;
+            }   
+        }
+    }
+    return intPath;
+}
 
 
 // Accessors
