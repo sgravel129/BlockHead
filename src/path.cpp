@@ -448,8 +448,8 @@ void buildGraph() {
             break;
         cNum1 = getClusterNum(t1->getParentCCopy().clusterPos);
         cNum2 = getClusterNum(t2->getParentCCopy().clusterPos);
-        v1 = { map_graph.getVCNum(cNum1), t1, {}, {} };
-        v2 = { map_graph.getVCNum(cNum2), t2, {}, {} };
+        v1 = { map_graph.getVCNum(cNum1), cNum1, t1, {}, {} };
+        v2 = { map_graph.getVCNum(cNum2), cNum2, t2, {}, {} };
         map_graph.addVertex(v1, cNum1);
         map_graph.addVertex(v2, cNum2);
         if(v1.t->getParentCCopy().clusterPos.x == v2.t->getParentCCopy().clusterPos.x)  // if v1 and v2 horizontally adjacent

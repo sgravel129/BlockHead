@@ -12,6 +12,7 @@ struct Edge;
 
 typedef struct Vertex {
     int key{};
+    int cNum{};
     PathTile* t{};
     std::vector<Vertex*> adjList{};
     std::vector<Edge*> adjEdges{};

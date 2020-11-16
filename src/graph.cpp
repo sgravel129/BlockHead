@@ -104,7 +104,7 @@ std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point&
         // connect to all cluster border transitions with A star
         p1 = { startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH };
         map_hierarchy.getStartAddress(tempT);
-        addVertex({ getVCNum(cNum1), tempT, {}, {} }, cNum1);
+        addVertex({ getVCNum(cNum1), cNum1, tempT, {}, {} }, cNum1);
         // add edges to graph
         for (int i = 0; i < _vNums[cNum1] - 1; i++) {
             p2 = _vertexS[cNum1][i].t->get_clusterRelPos();
@@ -123,7 +123,7 @@ std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point&
         // connect to all cluster border transitions with A star
         p1 = { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH };
         map_hierarchy.getGoalAddress(tempT);
-        addVertex({ getVCNum(cNum2), tempT, {}, {} }, cNum2);
+        addVertex({ getVCNum(cNum2), cNum2, tempT, {}, {} }, cNum2);
         // add edges to graph
         for (int i = 0; i < _vNums[cNum2] - 1; i++) {
             p2 = _vertexS[cNum2][i].t->get_clusterRelPos();
