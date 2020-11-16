@@ -159,6 +159,106 @@ std::vector<Vertex*> Abstract_Graph::searchForGraphPath(const Vertex* startV, co
     return Path;
 }
 
+int * Abstract_Graph::Dijkstra(const int src) {
+    int V = getVNum();
+    int** graph(map_graph.getWeightedAdj(V));
+
+    int * dist = static_cast<int*>(malloc(V * sizeof(int))); // The output array.  dist[i] will hold the shortest 
+    // distance from src to i 
+
+    bool * sptSet = static_cast<bool*>(malloc(V * sizeof(bool))); // sptSet[i] will be true if vertex i is included in shortest 
+    // path tree or shortest distance from src to i is finalized 
+
+    // Initialize all distances as INFINITE and stpSet[] as false 
+    for (int i = 0; i < V; i++)
+        dist[i] = INT_MAX, sptSet[i] = false;
+
+    // Distance of source vertex from itself is always 0 
+    dist[src] = 0;
+
+    // Find shortest path for all vertices 
+    for (int count = 0; count < V - 1; count++) {
+        // Pick the minimum distance vertex from the set of vertices not 
+        // yet processed. u is always equal to src in the first iteration. 
+        int u = minDistance(dist, sptSet);
+
+        // Mark the picked vertex as processed 
+        sptSet[u] = true;
+
+        // Update dist value of the adjacent vertices of the picked vertex. 
+        for (int v = 0; v < V; v++)
+
+            // Update dist[v] only if is not in sptSet, there is an edge from 
+            // u to v, and total weight of path from src to  v through u is 
+            // smaller than current value of dist[v] 
+            if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX
+                && dist[u] + graph[u][v] < dist[v])
+                dist[v] = dist[u] + graph[u][v];
+    }
+
+    // cleanup
+    for (int i = 0; i < V; i++) {
+        free(graph[i]);
+    }
+    free(graph); free(sptSet);
+
+    return dist;
+
+}
+
+// get Weighted Adjacency Matrix with edge distances as weights
+int** Abstract_Graph::getWeightedAdj(const int V) {
+    int** adjM;
+    int* temp;
+    adjM = static_cast<int**>(malloc(V * sizeof(*adjM)));
+    temp = static_cast<int*>(malloc(V * V * sizeof(adjM[0])));
+    for (int i = 0; i < V; i++)
+        adjM[i] = temp + (i * V);
+    
+    if (adjM) {
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++)
+                adjM[i][j] = 0;
+        }
+
+        Vertex* v1, * v2;
+        int k1, k2;
+        for (auto e : _edgeL) {
+            v1 = e.vPair.first; v2 = e.vPair.second;
+            k1 = keyToGlobalK(v1->key, v1->cNum); k2 = keyToGlobalK(v2->key, v2->cNum);
+            adjM[k1][k2] = e.distance;
+            adjM[k2][k1] = e.distance;
+        }
+        return adjM;
+    }
+    else {
+        Log::error("Failed to allocate memory for path finding");
+        return NULL;
+    }
+
+}
+
+int keyToGlobalK(const int key, const int cNum) {
+    int globalKey = 0;
+    for (int i = 0; i < cNum; i++) {
+        globalKey += map_graph.getVCNum(i);
+    }
+    return globalKey + key;
+}
+
+
+
+int minDistance(int dist[], bool sptSet[]) {
+    // Initialize min value 
+    int min = INT_MAX, min_index;
+    int V = map_graph.getVNum();
+    for (int v = 0; v < V; v++)
+        if (sptSet[v] == false && dist[v] <= min)
+            min = dist[v], min_index = v;
+
+    return min_index;
+}
+
 // Takes vector path of Vertices, finds the edges between them, and translates it to int Path info
 std::vector<int> Abstract_Graph::graphPathToIntPath(const std::vector<Vertex*>& graphPath) const {
     std::vector<int> intPath, tempPath;
@@ -180,7 +280,7 @@ std::vector<int> Abstract_Graph::graphPathToIntPath(const std::vector<Vertex*>& 
 
 // Accessors
 
-bool Abstract_Graph::getVertexCopy(const int k, const int cNum, Vertex& v) {
+bool Abstract_Graph::getVertexCopy(const int k, const int cNum, Vertex& v) const {
     
     for (int i = k; i < _vNums[cNum]; i++) {
         if (_vertexS[cNum][k].key == k) {
@@ -190,7 +290,7 @@ bool Abstract_Graph::getVertexCopy(const int k, const int cNum, Vertex& v) {
     }
     return false;
 }
-bool Abstract_Graph::getVertexCopy(const Point& p, Vertex& v) {
+bool Abstract_Graph::getVertexCopy(const Point& p, Vertex& v) const {
     int cNum = getClusterNum(p);
     Point tempP;
     for (int i = 0; i < _vNums[cNum]; i++) {
@@ -204,7 +304,7 @@ bool Abstract_Graph::getVertexCopy(const Point& p, Vertex& v) {
 }
 
 
-bool Abstract_Graph::getEdge(const Vertex& v1, const Vertex& v2, Edge& e) {
+bool Abstract_Graph::getEdge(const Vertex& v1, const Vertex& v2, Edge& e) const {
     Point p1, p2;
     for (int i = 0; i < v1.adjList.size(); i++) {
         p1 = v1.adjList[i]->t->get_mapRelPos();
@@ -217,10 +317,16 @@ bool Abstract_Graph::getEdge(const Vertex& v1, const Vertex& v2, Edge& e) {
     return false;
 }
 
-int Abstract_Graph::getVCNum(const int cNum) {
+int Abstract_Graph::getVCNum(const int cNum) const {
     return _vNums[cNum];
 }
 
+int Abstract_Graph::getVNum() const {
+    int sum(0);
+    for (int i = 0; i < _vNums.size(); i++)
+        sum += _vNums[i];
+    return sum;
+}
 
 // Memory Accessor
 

@@ -477,8 +477,24 @@ void buildGraph() {
     }
 }
 
+void buildGraphPathDs() {
+    // allocating memory
+    int V = map_graph.getVNum();
+    int** graphDistances;
+    int* temp;
+    graphDistances = static_cast<int**>(malloc(V * sizeof(*graphDistances)));
+    temp = static_cast<int*>(malloc(V * V * sizeof(graphDistances[0])));
+    
+    // running Dijkstra for every vertex as source
+    for (int i = 0; i < V; i++)
+        graphDistances[i] = map_graph.Dijkstra(i);
+
+    
+}
+
 
 void preprocessing() {
     abstractMap();
     buildGraph();
+    buildGraphPathDs();
 }

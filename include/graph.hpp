@@ -36,13 +36,17 @@ public:
     double searchForDistance(const Vertex&, const Vertex&, const int cNum);
     std::vector<int> searchForPath(const Point&, const Point&);
     std::vector<Vertex*> searchForGraphPath(const Vertex*, const Vertex*);
+    int* Dijkstra(const int);
+    int** getWeightedAdj(const int);
     std::vector<int> graphPathToIntPath(const std::vector<Vertex*>&) const ;
 
+    
     // Accessors
-    bool getVertexCopy(const int k, const int cNum, Vertex& v);
-    bool getVertexCopy(const Point&, Vertex&);  // returns copy of Vertex containing tile of supplied point
-    bool getEdge(const Vertex&, const Vertex&, Edge&);          // returns copy of Edge between supplied vertices
-    int getVCNum(const int);        // return number of vertices in supplied cluster
+    bool getVertexCopy(const int k, const int cNum, Vertex& v) const;
+    bool getVertexCopy(const Point&, Vertex&) const;  // returns copy of Vertex containing tile of supplied point
+    bool getEdge(const Vertex&, const Vertex&, Edge&) const;          // returns copy of Edge between supplied vertices
+    int getVCNum(const int) const;        // return number of vertices in supplied cluster
+    int getVNum() const;      // return total number of vertices in graph
 
     // Destructor
     ~Abstract_Graph();
@@ -58,3 +62,6 @@ private:
 
 
 };
+
+int minDistance(int dist[], bool sptSet[]);
+int keyToGlobalK(const int, const int);

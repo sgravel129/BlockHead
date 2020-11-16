@@ -107,5 +107,6 @@ MapTile* getMapTileFromPoint(const Point& p);
 
 void abstractMap();
 void buildGraph();
+void buildGraphPathDs();
 void preprocessing();
 
