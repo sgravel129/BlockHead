@@ -53,7 +53,8 @@ private:
 };
 
 bool operator<(const PathTile& LHS, const PathTile& RHS);
-std::string pathFind(const Point, const Point, const int);
+std::vector<int> pathFind(const Point, const Point, const int);
+double pathToDistance(const std::vector<int>&);
 
 class Path_Hierarchy {
 public:

@@ -26,7 +26,7 @@
 #define TRANSITION_INTERVAL 3   // number of tiles between transitions in single entrance
 
 const int dir = 8;  // number of possible directions to go in
-const int dx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };
+const int dx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };              // dx and dy representing 8 cardinal directions, starting East then proceeding clockwise
 const int dy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
 static int intMap[CLUSTER_XNUM][CLUSTER_YNUM][CLUSTER_TLENGTH][CLUSTER_TLENGTH];
 
@@ -57,7 +57,7 @@ MapTile* getMapTileFromPoint(const Point& p) {
 /////////////////////
 // PathTile class implementation
 ///////////////////////////////////////
-//
+// Constructors
 PathTile::PathTile() : _mapRelPos{}, _clusterRelPos{}, _traversable{}, _level{}, _priority{}, _parentC{}, _parentH{} {};
 PathTile::PathTile(const MapTile& refTile, Path_Hierarchy& parentH) : PathTile(refTile, parentH, 0, 0) {}
 PathTile::PathTile(const MapTile& refTile, Path_Hierarchy& parentH, const int level, const int priority) {
@@ -74,17 +74,21 @@ PathTile::PathTile(const PathTile& t2) {        // Copy Constructor
     _level = t2._level; _priority = t2._priority; _parentC = t2._parentC; _parentH = t2._parentH;
 }
 
+///////////////////
+// Member Functions
+// Called by constructor, finds parent cluster from tile point
 Cluster* PathTile::findParent() {
     return _parentH->getClusterAddress(_mapRelPos.x / CLUSTER_TLENGTH, _mapRelPos.y / CLUSTER_TLENGTH);
 }
-
+// Update A * priority
 void PathTile::updatePriority(const int xDest, const int yDest) {
     _priority = _level + estimate(xDest, yDest) * 10;
 }
+// Update A * level
 void PathTile::nextLevel(const int i) { // i : direction
     _level += (dir == 8 ? (i % 2 == 0 ? 10 : 14) : 10);
 }
-
+// Find estimate distance to supplied destination
 const int PathTile::estimate(const int xDest, const int yDest) const {
     int xd, yd, d;
     xd = xDest - _clusterRelPos.x;
@@ -110,7 +114,7 @@ bool operator<(const PathTile& LHS, const PathTile& RHS) {
     return LHS.get_priority() > RHS.get_priority();
 }
 // A STAR ALGORITHM
-std::string pathFind(const Point startP, const Point finishP, const int cNum) {
+std::vector<int> pathFind(const Point startP, const Point finishP, const int cNum) {
     Point clusterP = getClusterPoint(cNum);
     const int xStart = startP.x, yStart = startP.y;         // x and y values in cluster relative terms
     const int xFinish = finishP.x, yFinish = finishP.y;
@@ -123,6 +127,7 @@ std::string pathFind(const Point startP, const Point finishP, const int cNum) {
     PathTile* m0;
     MapTile* tempMT;
     int i, j, x, y, xdx, ydy;
+    std::vector<int> path;
     char c;
     // create the start node and push into list of open nodes
     n0 = new PathTile(*getMapTileFromPoint({ xStart+clusterP.x, yStart+clusterP.y }), map_hierarchy, 0, 0);
@@ -149,12 +154,13 @@ std::string pathFind(const Point startP, const Point finishP, const int cNum) {
         {
             // generate the path from finish to start
             // by following the directions
-            std::string path = "";
+            //std::string path = "";
             while (!(x == xStart && y == yStart))
             {
                 j = dir_map[x][y];
-                c = '0' + (j + dir / 2) % dir;
-                path = c + path;
+                path.insert(path.begin(), ((j + dir / 2) % dir));
+                //c = '0' + (j + dir / 2) % dir;
+                //path = c + path;
                 x += dx[j];
                 y += dy[j];
             }
@@ -226,7 +232,21 @@ std::string pathFind(const Point startP, const Point finishP, const int cNum) {
         }
         delete n0; // garbage collection
     }
-    return ""; // no route found
+    return path; // no route found
+}
+
+
+double pathToDistance(const std::vector<int>& path) {
+    if (path.size() == 0)
+        return HUGE_VAL;
+    double d = 0;
+    for (int i = 0; i < path.size(); i++) {
+        if (path[i] % 2 == 1)
+            d += 1.414;
+        else
+            d++;
+    }
+    return d;
 }
 
 
@@ -383,14 +403,14 @@ void buildGraph() {
         v2 = { map_graph.getVCNum(cNum2), t2, dummyV, dummyE };
         map_graph.addVertex(v1, cNum1);
         map_graph.addVertex(v2, cNum2);
-        if(v1.t->getParentCCopy().clusterPos.x == v2.t->getParentCCopy().clusterPos.x)
-            map_graph.addEdge(v1.key, v2.key, cNum1, cNum2, 1, INTER, " ");     // to change; string representation of going right
-        else
-            map_graph.addEdge(v1.key, v2.key, cNum1, cNum2, 1, INTER, " ");     // to change; string representation of going down
+        if(v1.t->getParentCCopy().clusterPos.x == v2.t->getParentCCopy().clusterPos.x)  // if v1 and v2 horizontally adjacent
+            map_graph.addEdge(v1.key, v2.key, cNum1, cNum2, 1, INTER, { 0 });     // {0} is the path of going right once
+        else                                                                            // if v1 and v2 vertically adjacent
+            map_graph.addEdge(v1.key, v2.key, cNum1, cNum2, 1, INTER, { 2 });     // {2} is the path of going down once
     }
     int numVC;
     double distance;
-    std::string path;
+    std::vector<int> path;
     for (int cNum = 0; cNum < numClusters; cNum++) {
         numVC = map_graph.getVCNum(cNum);
         for (int i = 0; i < numVC; i++) {
@@ -400,7 +420,7 @@ void buildGraph() {
                 if (!(map_graph.getVertexCopy(i, cNum, v1) && map_graph.getVertexCopy(j, cNum, v2)))
                     break;
                 path = pathFind(v1.t->get_clusterRelPos(), v2.t->get_clusterRelPos(), cNum);
-                distance = map_graph.searchForDistance(v1, v2, cNum);
+                distance = pathToDistance(path);
                 if (distance != HUGE_VAL)
                     map_graph.addEdge(v1.key, v2.key, cNum, cNum, distance, INTRA, path);
             }
