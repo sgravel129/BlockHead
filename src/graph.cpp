@@ -53,6 +53,7 @@ double Abstract_Graph::searchForDistance(const Vertex& v1, const Vertex& v2, con
 std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point& goalP) {
     Vertex startV, * startVP, goalV, * goalVP;
     Edge tempEdge;
+    
     std::vector<int> path;
     int cNum1 = getClusterNum(startP), cNum2 = getClusterNum(goalP);
     /*
@@ -74,17 +75,28 @@ std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point&
     }
 
     if (!getVertexCopy(startP, startV)) {
-        // connect to border, encapsulate into graph
+        // set flag that we are adding start vertex to graph (for cleanup later)
+        // encapsulate vertex into graph
+        // connect to all cluster border transitions with A star
+        // add edges to graph
+
         // get startVP
     }
     else
         startVP = getVertexAddress(startV.key, cNum1);
     if (!getVertexCopy(goalP, goalV)) {
-        // connect to border, encapsulate into graph
+        // set flag that we are adding goal vertex to graph (for cleanup later)
+        // encapsulate vertex into graph
+        // connect to all cluster border transitions with A star
+        // add edges to graph
+        
         // get goalVP
     }
     else
         goalVP = getVertexAddress(goalV.key, cNum2);
+
+
+    // Cleanup: delete extra tiles from Path_Hierarchy, and extra vertices and edges from Abstract_Graph
 
     return path;
 }
@@ -94,11 +106,9 @@ std::vector<Vertex*> Abstract_Graph::searchForGraphPath(const Vertex* startV, co
     std::vector<Vertex*> Path;
 
     /*
-    add vertices if not in graph
-    connect to border (with A star), add edges to graph
+
     Djikstra's on abstract graph
     return path
-
     
     */
     return Path;

@@ -6,6 +6,7 @@
 #include "path.hpp"
 #include "constants.hpp"
 #include "graph.hpp"
+#include "log.hpp"
 
 #include <vector>
 
@@ -74,12 +75,17 @@ PathTile::PathTile(const PathTile& t2) {        // Copy Constructor
     _mapRelPos = t2._mapRelPos; _clusterRelPos = t2._clusterRelPos; _traversable = t2._traversable;
     _level = t2._level; _priority = t2._priority; _parentC = t2._parentC; _parentH = t2._parentH;
 }
-
+// Destructor
+PathTile::~PathTile() { // set pointers to parent cluster and hierarchy to null to avoid leaks
+    _parentC = NULL;
+    _parentH = NULL;
+}
 ///////////////////
 // Member Functions
 // Called by constructor, finds parent cluster from tile point
 Cluster* PathTile::findParent() {
-    return _parentH->getClusterAddress(_mapRelPos.x / CLUSTER_TLENGTH, _mapRelPos.y / CLUSTER_TLENGTH);
+    Point p = { _mapRelPos.x / CLUSTER_TLENGTH , _mapRelPos.y / CLUSTER_TLENGTH };
+    return _parentH->getClusterAddress(p);
 }
 // Update A * priority
 void PathTile::updatePriority(const int xDest, const int yDest) {
@@ -273,6 +279,23 @@ void Path_Hierarchy::buildClusterS() {
             _clusterS.push_back(Cluster{ {i,j}, {i*CLUSTER_TLENGTH, j*CLUSTER_TLENGTH}, NULL });
     }
 }
+// Destructor
+Path_Hierarchy::~Path_Hierarchy() {
+    deleteStartAndGoal();
+    PathTile* temp1, * temp2;
+    Cluster* tempC;
+    for (int i = 0; i < _numTrans; i++) {
+        getTransitionTileAddresses(i, temp1, temp2);
+        delete temp1;
+        delete temp2;
+    }
+    _transitionS.~vector();
+    for (int i = 0; i < _numClusters; i++) {
+        tempC = getClusterAddress(getClusterPoint(i));
+        delete tempC;
+    }
+    _clusterS.~vector();
+}
 
 // returns pair of adjacent tiles from cluster pos and tile displacement
 std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster& c1, const Cluster& c2, const int k, const bool adjOrientation) {
@@ -299,8 +322,8 @@ int Path_Hierarchy::get_numTrans() { return _numTrans; }
 int Path_Hierarchy::get_numClusters() { return _numClusters; }
 
 // Private Memory Accessors
-Cluster* Path_Hierarchy::getClusterAddress(const int x, const int y) {
-    return &(_clusterS[y * CLUSTER_YNUM + static_cast<__int64>(x)]);
+Cluster* Path_Hierarchy::getClusterAddress(const Point& p) {
+    return &(_clusterS[p.y * CLUSTER_YNUM + static_cast<__int64>(p.x)]);
 }
 
 bool Path_Hierarchy::getTransitionTileAddresses(const int transNum, PathTile*& t1, PathTile*& t2) {
@@ -309,6 +332,12 @@ bool Path_Hierarchy::getTransitionTileAddresses(const int transNum, PathTile*& t
     t1 = &(_transitionS[transNum].first);
     t2 = &(_transitionS[transNum].second);
     return true;
+}
+
+// Deletion Mutators
+void Path_Hierarchy::deleteStartAndGoal() {
+    _startT.~PathTile();
+    _goalT.~PathTile();
 }
 
 //////////////////////////////////////////////////////////////////////////

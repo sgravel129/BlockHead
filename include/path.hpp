@@ -41,6 +41,9 @@ public:
     Cluster getParentCCopy() const;   // returns copy of parent cluster
     Cluster* getParentC();  // returns address of parent cluster
     
+    // Destructors
+    ~PathTile();
+
 private:    
     Point _mapRelPos;
     Point _clusterRelPos;
@@ -62,8 +65,9 @@ public:
     Path_Hierarchy(const int numClusters);
     
     void addTransition(const std::pair<PathTile*, PathTile*>& tilePair);
+    void addPathTile(const PathTile*);
     void buildClusterS();
-    //std::pair<PathTile, PathTile> getAdjTiles(const Cluster&, const Cluster&, const int, const bool);
+    
 
     // Accessors
     std::vector<std::pair<PathTile, PathTile>> get_transitionS();
@@ -74,10 +78,16 @@ public:
     int get_numTrans();
     int get_numClusters();
 
-    Cluster* getClusterAddress(const int, const int);      /// returns pointer to encapsulated cluster
+    Cluster* getClusterAddress(const Point&);      /// returns pointer to encapsulated cluster
     bool getTransitionTileAddresses(const int, PathTile*&, PathTile*&);
 
+    // Destructors
+    void deleteStartAndGoal();
+    ~Path_Hierarchy();
+
 private:
+    PathTile _startT;
+    PathTile _goalT;
     std::vector<std::pair<PathTile, PathTile>> _transitionS;
     std::vector<Cluster> _clusterS;
     int _numTrans;
