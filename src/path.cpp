@@ -31,10 +31,11 @@ const int dy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
 static int intMap[CLUSTER_XNUM][CLUSTER_YNUM][CLUSTER_TLENGTH][CLUSTER_TLENGTH];
 
 
-//TODO
-// Implement A* search algorithm
+// TODO
 // Implement Destructor
+// Test
 // Integrate with rest of build
+// Define and add Zombie spawns to abstract graph
 
 
 // dummy global variable: might want to declare this in separate file, which is run when we load a map
@@ -318,8 +319,8 @@ Point getClusterPoint(const int clusterNum) {
     return { x, y };
 }
 // gets cluster index in _clusterS vector
-int getClusterNum(const Cluster& c) {
-    return(c.clusterPos.y*CLUSTER_YNUM + c.clusterPos.x);
+int getClusterNum(const Point& p) {
+    return(p.y*CLUSTER_YNUM + p.x);
 }
 
 // Function abstractMap
@@ -386,6 +387,7 @@ void findTransitions(const Cluster& c1, const Cluster& c2) {
 
 
 // Inserts Cluster Transition Tiles into Abstract Graph and sets distances between them as edges
+// NOTE Might be a good idea to define zombie spawns, and add them to the graph
 void buildGraph() {
     int cNum1, cNum2;
     Vertex v1, v2;
@@ -397,8 +399,8 @@ void buildGraph() {
     for (int i = 0; i < numTrans; i++) {
         if (!map_hierarchy.getTransitionTileAddresses(i, t1, t2))
             break;
-        cNum1 = getClusterNum(t1->getParentCCopy());
-        cNum2 = getClusterNum(t2->getParentCCopy());
+        cNum1 = getClusterNum(t1->getParentCCopy().clusterPos);
+        cNum2 = getClusterNum(t2->getParentCCopy().clusterPos);
         v1 = { map_graph.getVCNum(cNum1), t1, dummyV, dummyE };
         v2 = { map_graph.getVCNum(cNum2), t2, dummyV, dummyE };
         map_graph.addVertex(v1, cNum1);
@@ -429,7 +431,7 @@ void buildGraph() {
 }
 
 
-void preprocessing(int maxLevel) {
+void preprocessing() {
     abstractMap();
     buildGraph();
 }

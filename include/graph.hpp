@@ -32,7 +32,7 @@ public:
     bool addEdge(const int, const int, const int, const int, const int, const edgeType, const std::vector<int>&);
 
     double searchForDistance(const Vertex&, const Vertex&, const int cNum);
-    std::vector<Vertex> searchForGraphPath(const Vertex&, const Vertex&);
+    std::vector<Vertex> searchForGraphPath(const Point&, const Point&);
 
     // Accessors
     

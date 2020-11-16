@@ -49,9 +49,23 @@ double Abstract_Graph::searchForDistance(const Vertex& v1, const Vertex& v2, con
 }
 
 
-std::vector<Vertex> Abstract_Graph::searchForGraphPath(const Vertex& v1, const Vertex& v2) {
+std::vector<Vertex> Abstract_Graph::searchForGraphPath(const Point& startP, const Point& goalP) {
     std::vector<Vertex> Path;
+    /*
+    if start Cluster == goal Cluster
+        if both in graph
+            return path
+        A star algorithm
+        if soln
+            return path
+    
+    add vertices if not in graph
+    connect to border (with A star), add edges to graph
+    Djikstra's on abstract graph
+    return path
 
+    
+    */
     return Path;
 }
 
@@ -69,22 +83,35 @@ bool Abstract_Graph::getVertexCopy(const int k, const int cNum, Vertex& v) {
     }
     return false;
 }
+bool Abstract_Graph::getVertexCopy(const Point& p, Vertex& v) {
+    int cNum = getClusterNum(p);
+    Point tempP;
+    for (int i = 0; i < _vNums[cNum]; i++) {
+        tempP = _vertexS[cNum][i].t->get_mapRelPos();
+        if (tempP.x == p.x && tempP.y == p.y) {
+            v = _vertexS[cNum][i];
+            return true;
+        }
+    }
+    return false;
+}
+
 
 bool Abstract_Graph::getEdge(const Vertex& v1, const Vertex& v2, Edge& e) {
     int tempCNum;
     Vertex tempV;
-    int v1CNum = getClusterNum(v1.t->getParentCCopy());
-    int v2CNum = getClusterNum(v2.t->getParentCCopy());
+    int v1CNum = getClusterNum(v1.t->getParentCCopy().clusterPos);
+    int v2CNum = getClusterNum(v2.t->getParentCCopy().clusterPos);
 
     for (auto tempE : v1.adjEdges) {
         tempV = *(tempE->vPair.first);
-        tempCNum = getClusterNum(tempV.t->getParentCCopy());
+        tempCNum = getClusterNum(tempV.t->getParentCCopy().clusterPos);
         if (tempV.key == v1.key && tempCNum == v1CNum || tempV.key == v2.key && tempCNum == v2CNum) {
             e = *tempE;
             return true;
         }   
         tempV = *(tempE->vPair.second);
-        tempCNum = getClusterNum(tempV.t->getParentCCopy());
+        tempCNum = getClusterNum(tempV.t->getParentCCopy().clusterPos);
         if (tempV.key == v1.key && tempCNum == v1CNum || tempV.key == v2.key && tempCNum == v2CNum) {
             e = *tempE;
             return true;

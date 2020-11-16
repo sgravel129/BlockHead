@@ -53,7 +53,7 @@ private:
 };
 
 bool operator<(const PathTile& LHS, const PathTile& RHS);
-std::vector<int> pathFind(const Point, const Point, const int);
+std::vector<int> pathFind(const Point, const Point, const int);     // A STAR ALGORITHM
 double pathToDistance(const std::vector<int>&);
 
 class Path_Hierarchy {
@@ -86,7 +86,7 @@ private:
 };
 
 Point getClusterPoint(const int);
-int getClusterNum(const Cluster& c);
+int getClusterNum(const Point&);
 void findTransitions(const Cluster& c1, const Cluster& c2);
 std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster&, const Cluster&, const int, const bool);
 PathTile* getPathTileFromPoint(const Point& p);
@@ -94,5 +94,5 @@ MapTile* getMapTileFromPoint(const Point& p);
 
 void abstractMap();
 void buildGraph();
-void preprocessing(int maxLevel);
+void preprocessing();
 
