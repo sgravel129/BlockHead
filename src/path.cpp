@@ -9,6 +9,23 @@
 
 #include <vector>
 
+
+#define X_MAX SCREEN_WIDTH
+#define Y_MAX SCREEN_HEIGHT
+// will change these depending on amount of pixels sprite occupies
+// #define CLUSTER_WIDTH 120
+// #define CLUSTER_HEIGHT 120
+#define CLUSTER_SLENGTH 120     // side length of cluster (square)
+#define CLUSTER_TLENGTH CLUSTER_SLENGTH / X_STEP
+#define CLUSTER_XNUM X_MAX/CLUSTER_SLENGTH
+#define CLUSTER_YNUM Y_MAX/CLUSTER_SLENGTH
+
+#define X_STEP 30   // x size of tile
+#define Y_STEP 30   // y size of tile
+#define MIN_ENTRANCE_LENGTH 3   // minimum tile lenght for entrance
+#define TRANSITION_INTERVAL 3   // number of tiles between transitions in single entrance
+
+
 //TODO
 // Implement A* search algorithm
 // Implement Destructor

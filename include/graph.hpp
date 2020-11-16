@@ -30,7 +30,7 @@ public:
     void addVertex(const Vertex&, const int cNum);
     bool addEdge(const int, const int, const int, const int, const int, const edgeType);
 
-    double searchForDistance(consst Vertex&, const Vertex&, const int cNum);
+    double searchForDistance(const Vertex&, const Vertex&, const int cNum);
     std::vector<Vertex> searchForPath(const Vertex&, const Vertex&);
 
     // Accessors
