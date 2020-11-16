@@ -22,12 +22,12 @@ void Abstract_Graph::addVertex(const Vertex& v, const int cNum) {
 
 // Adds edge to graph connecting to vertices, with supplied distance as weight
 // IMPORTANT THAT POINTERS STORED POINT TO APPROPRIATE ENCAPSULATED ADDRESSES
-bool Abstract_Graph::addEdge(const int key1, const int key2, const int cNum1, const int cNum2, const int d, const edgeType eT) {
+bool Abstract_Graph::addEdge(const int key1, const int key2, const int cNum1, const int cNum2, const int d, const edgeType eT, const std::string& path) {
     Vertex* v1 = getVertexAddress(key1, cNum1);
     Vertex* v2 = getVertexAddress(key2, cNum2);
     if (v1 == NULL || v2 == NULL)
         return false;
-    Edge e = {{ v1, v2 }, eT, d};
+    Edge e = {{ v1, v2 }, eT, d, path};
     _edgeL.push_back(e);
     
     v1->adjList.push_back(v2);
@@ -49,7 +49,7 @@ double Abstract_Graph::searchForDistance(const Vertex& v1, const Vertex& v2, con
 }
 
 
-std::vector<Vertex> Abstract_Graph::searchForPath(const Vertex& v1, const Vertex& v2) {
+std::vector<Vertex> Abstract_Graph::searchForGraphPath(const Vertex& v1, const Vertex& v2) {
     std::vector<Vertex> Path;
 
     return Path;

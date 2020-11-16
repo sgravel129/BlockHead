@@ -21,6 +21,7 @@ typedef struct Edge {
     std::pair<Vertex *, Vertex *> vPair;
     edgeType eType;
     int distance;
+    std::string path;
 } Edge;
 
 
@@ -28,10 +29,10 @@ class Abstract_Graph {
 public:
     Abstract_Graph(const int numClusters);
     void addVertex(const Vertex&, const int cNum);
-    bool addEdge(const int, const int, const int, const int, const int, const edgeType);
+    bool addEdge(const int, const int, const int, const int, const int, const edgeType, const std::string&);
 
     double searchForDistance(const Vertex&, const Vertex&, const int cNum);
-    std::vector<Vertex> searchForPath(const Vertex&, const Vertex&);
+    std::vector<Vertex> searchForGraphPath(const Vertex&, const Vertex&);
 
     // Accessors
     

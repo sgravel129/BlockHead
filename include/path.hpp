@@ -3,16 +3,18 @@
 #include "constants.hpp"
 #include "map.hpp"
 
+#include <iostream>
+#include <iomanip>
+#include <string>
 #include <vector>
 #include <cmath>
-
-
+#include <queue>
 
 
 
 typedef struct Cluster {
-    int x;
-    int y;
+    Point clusterPos;
+    Point tilePos;
     Cluster* parent;
 } Cluster;
 
@@ -21,6 +23,7 @@ class Path_Hierarchy;
 class PathTile {
 public:
     PathTile();
+    PathTile(const MapTile&, Path_Hierarchy&, const int, const int);
     PathTile(const MapTile&, Path_Hierarchy&);
 
     Cluster* findParent();
@@ -29,8 +32,8 @@ public:
     const int estimate(const int xDest, const int yDest) const;
 
     // Accessors
-    int get_xPos() const;
-    int get_yPos() const;
+    Point get_mapRelPos() const;
+    Point get_clusterRelPos() const;
     bool get_traversable() const;
     int get_level() const;
     int get_priority() const;
@@ -38,8 +41,8 @@ public:
     Cluster* getParentC();  // returns address of parent cluster
     
 private:    
-    int _xPos;
-    int _yPos;
+    Point _mapRelPos;
+    Point _clusterRelPos;
     bool _traversable;   // True if no obstacle on tile, False o/w
     int _level;
     int _priority;
@@ -49,7 +52,7 @@ private:
 };
 
 bool operator<(const PathTile& LHS, const PathTile& RHS);
-
+std::string pathFind(const Point, const Point);
 
 class Path_Hierarchy {
 public:
@@ -57,7 +60,7 @@ public:
     
     void addTransition(const std::pair<PathTile, PathTile>& tilePair);
     void buildClusterS();
-    std::pair<PathTile, PathTile> getAdjTiles(const int, const int, const int, const bool);
+    //std::pair<PathTile, PathTile> getAdjTiles(const Cluster&, const Cluster&, const int, const bool);
 
     // Accessors
     std::vector<std::pair<PathTile, PathTile>> get_transitionS();
@@ -83,10 +86,11 @@ private:
 
 int getClusterNum(const Cluster& c);
 void findTransitions(const Cluster& c1, const Cluster& c2);
-std::pair<PathTile, PathTile> getAdjTiles(const int c1TileX, const int c2TileY, const int k, const bool adjOrientation);
+std::pair<PathTile, PathTile> getAdjTiles(const Cluster&, const Cluster&, const int, const bool);
 PathTile getPathTileFromPoint(const Point& p);
 
 
 void abstractMap();
 void buildGraph();
 void preprocessing(int maxLevel);
+
