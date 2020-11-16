@@ -8,7 +8,7 @@ class Zombie
 {
 private:
     Sprite *_sprite;
-    std::vector<SDL_Rect> _anims;
+    std::vector<std::vector<SDL_Rect>> _anims;
     int _currAnim;
     int _x, _y;
     int _angle; // for sprite info

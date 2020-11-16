@@ -13,7 +13,7 @@ Sprite::Sprite()
 Sprite::~Sprite()
 {
 	// Log::debug("~Sprite\t| Called");
-	Log::debug("~Sprite\t| Destroy Texture");
+	Log::destruct("Sprite\t| Destroy Texture");
 	SDL_DestroyTexture(_spriteSheet);
 }
 

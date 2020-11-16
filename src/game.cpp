@@ -1,8 +1,10 @@
 #include "game.hpp"
 #include "util.hpp"
 #include "log.hpp"
+#include "color.hpp"
 #include "input.hpp"
 #include "constants.hpp"
+#include "animation.hpp"
 
 // TODO: Framerate bug
 // TODO: Removed default constructors?
@@ -14,7 +16,7 @@ Game::Game()
 
 Game::~Game()
 {
-	Log::debug("~Game\t| Called ");
+	Log::destruct("Game\t| Called ");
 	_player->~Player();
 	_zombie->~Zombie();
 	_map->~Map();
@@ -37,10 +39,11 @@ bool Game::init()
 	_graphics->setRenderColor(Color("65846c"));
 
 	/* Custom class initialization */
-	_player = new Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
+	_player = new Player(*_graphics, "res/zombie.png", 32, 32, 4.0F);
+	_zombie = new Zombie(*_graphics, "res/zombie.png", 32, 32, 4.0F);
 	_map = new Map(Point{10, 10});
-	_map->loadMapFile(*_graphics, "res/maps/test.map", "res/maps/graveyard/graveyard.png");
+	_map->loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
+	_map->loadMapFile(*_graphics, "res/maps/test.map");
 
 	/* End of class initialization */
 
@@ -80,6 +83,7 @@ int y = 200;
 
 void Game::update()
 {
+	Animation::updateTicks();
 	/* Updating of game classes */
 	_player->update(_input);
 	_zombie->update(_player->getX(), _player->getY());
@@ -92,8 +96,8 @@ void Game::render()
 
 	_map->draw(*_graphics);
 	/* Rendering of different classes */
-	_player->draw(*_graphics);
 	_zombie->draw(*_graphics);
+	_player->draw(*_graphics);
 
 	/* End of rendering */
 	_graphics->flip();
