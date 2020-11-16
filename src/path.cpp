@@ -28,7 +28,7 @@
 const int dir = 8;  // number of possible directions to go in
 const int dx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };
 const int dy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
-
+static int intMap[CLUSTER_XNUM][CLUSTER_YNUM][CLUSTER_TLENGTH][CLUSTER_TLENGTH];
 
 
 //TODO
@@ -44,11 +44,15 @@ Map game_map = Map();
 
 // Need to add accessor for _tiles in Map class
 // accesses map info
-PathTile getPathTileFromPoint(const Point& p) {
+PathTile* getPathTileFromPoint(const Point& p) {
     //return PathTile(game_map.get_tile(p), map_hierarchy);
     MapTile mt;
-    return PathTile(mt, map_hierarchy);    // dummy return for now
+    return new PathTile(mt, map_hierarchy);    // dummy return for now
 }
+MapTile* getMapTileFromPoint(const Point& p) {
+    return new MapTile;  // dummy return for now
+}
+
 
 /////////////////////
 // PathTile class implementation
@@ -64,6 +68,10 @@ PathTile::PathTile(const MapTile& refTile, Path_Hierarchy& parentH, const int le
     _parentH = &parentH;
     _parentC = findParent();
     _clusterRelPos = {};
+}
+PathTile::PathTile(const PathTile& t2) {        // Copy Constructor
+    _mapRelPos = t2._mapRelPos; _clusterRelPos = t2._clusterRelPos; _traversable = t2._traversable;
+    _level = t2._level; _priority = t2._priority; _parentC = t2._parentC; _parentH = t2._parentH;
 }
 
 Cluster* PathTile::findParent() {
@@ -102,20 +110,123 @@ bool operator<(const PathTile& LHS, const PathTile& RHS) {
     return LHS.get_priority() > RHS.get_priority();
 }
 // A STAR ALGORITHM
-std::string pathFind(const Point startP, const Point finishP) {
-    const int xStart = startP.x, yStart = startP.y;         // x and y values in map relative terms
+std::string pathFind(const Point startP, const Point finishP, const int cNum) {
+    Point clusterP = getClusterPoint(cNum);
+    const int xStart = startP.x, yStart = startP.y;         // x and y values in cluster relative terms
     const int xFinish = finishP.x, yFinish = finishP.y;
+    int closed_nodes_map[CLUSTER_TLENGTH][CLUSTER_TLENGTH];
+    int open_nodes_map[CLUSTER_TLENGTH][CLUSTER_TLENGTH];
+    int dir_map[CLUSTER_TLENGTH][CLUSTER_TLENGTH];
     std::priority_queue<PathTile> pq[2];
     int pqi = 0;
     PathTile* n0;
     PathTile* m0;
+    MapTile* tempMT;
     int i, j, x, y, xdx, ydy;
     char c;
+    // create the start node and push into list of open nodes
+    n0 = new PathTile(*getMapTileFromPoint({ xStart+clusterP.x, yStart+clusterP.y }), map_hierarchy, 0, 0);
+    n0->updatePriority(xFinish, yFinish);
+    pq[pqi].push(*n0);
+    open_nodes_map[xStart][yStart] = n0->get_priority(); // mark it on the open nodes map
 
-    // still need to code
+    // A* search
+    while (!pq[pqi].empty())
+    {
+        // get the current node w/ the highest priority
+        // from the list of open nodes
+        n0 = new PathTile(pq[pqi].top());
+        x = n0->get_clusterRelPos().x; y = n0->get_clusterRelPos().y;
 
-    //
-    return " ";
+        pq[pqi].pop(); // remove the node from the open list
+        open_nodes_map[x][y] = 0;
+        // mark it on the closed nodes map
+        closed_nodes_map[x][y] = 1;
+
+        // quit searching when the goal state is reached
+        //if((*n0).estimate(xFinish, yFinish) == 0)
+        if (x == xFinish && y == yFinish)
+        {
+            // generate the path from finish to start
+            // by following the directions
+            std::string path = "";
+            while (!(x == xStart && y == yStart))
+            {
+                j = dir_map[x][y];
+                c = '0' + (j + dir / 2) % dir;
+                path = c + path;
+                x += dx[j];
+                y += dy[j];
+            }
+
+            // garbage collection
+            delete n0;
+            // empty the leftover nodes
+            while (!pq[pqi].empty()) pq[pqi].pop();
+            return path;
+        }
+
+        // generate moves (child nodes) in all possible directions
+        for (i = 0; i < dir; i++)
+        {
+            xdx = x + dx[i]; ydy = y + dy[i];
+
+            if (!(xdx<0 || xdx> CLUSTER_TLENGTH - 1 || ydy<0 || ydy > CLUSTER_TLENGTH - 1 || intMap[clusterP.x][clusterP.y][xdx][ydy] == 1
+                || closed_nodes_map[xdx][ydy] == 1))
+            {
+                // generate a child node
+                tempMT = getMapTileFromPoint({ clusterP.x+xdx, clusterP.y+ydy });     // get MapTile for new possible tile to move to
+                if (tempMT->getCollision()) {                   // if an obstacle, update map data and go to next loop iteration
+                    intMap[clusterP.x][clusterP.y][xdx][ydy] = 1;
+                    continue;
+                }
+                m0 = new PathTile(*tempMT, map_hierarchy, n0->get_level(), n0->get_priority());
+                m0->nextLevel(i);
+                m0->updatePriority(xFinish, yFinish);
+
+                // if it is not in the open list then add into that
+                if (open_nodes_map[xdx][ydy] == 0)
+                {
+                    open_nodes_map[xdx][ydy] = m0->get_priority();
+                    pq[pqi].push(*m0);
+                    // mark its parent node direction
+                    dir_map[xdx][ydy] = (i + dir / 2) % dir;
+                }
+                else if (open_nodes_map[xdx][ydy] > m0->get_priority())
+                {
+                    // update the priority info
+                    open_nodes_map[xdx][ydy] = m0->get_priority();
+                    // update the parent direction info
+                    dir_map[xdx][ydy] = (i + dir / 2) % dir;
+
+                    // replace the node
+                    // by emptying one pq to the other one
+                    // except the node to be replaced will be ignored
+                    // and the new node will be pushed in instead
+                    while (!(pq[pqi].top().get_clusterRelPos().x == xdx &&
+                        pq[pqi].top().get_clusterRelPos().y == ydy))
+                    {
+                        pq[1 - pqi].push(pq[pqi].top());
+                        pq[pqi].pop();
+                    }
+                    pq[pqi].pop(); // remove the wanted node
+
+                    // empty the larger size pq to the smaller one
+                    if (pq[pqi].size() > pq[1 - pqi].size()) pqi = 1 - pqi;
+                    while (!pq[pqi].empty())
+                    {
+                        pq[1 - pqi].push(pq[pqi].top());
+                        pq[pqi].pop();
+                    }
+                    pqi = 1 - pqi;
+                    pq[pqi].push(*m0); // add the better node instead
+                }
+                else delete m0; // garbage collection
+            }
+        }
+        delete n0; // garbage collection
+    }
+    return ""; // no route found
 }
 
 
@@ -130,8 +241,8 @@ Path_Hierarchy::Path_Hierarchy(const int numClusters) {
     _numClusters = numClusters;
 }
 
-void Path_Hierarchy::addTransition(const std::pair<PathTile, PathTile>& tilePair) {
-    _transitionS.push_back(tilePair);
+void Path_Hierarchy::addTransition(const std::pair<PathTile*, PathTile*>& tilePair) {
+    _transitionS.push_back(std::pair<PathTile, PathTile> {*tilePair.first, *tilePair.second});
     _numTrans++;
 }
 
@@ -143,7 +254,7 @@ void Path_Hierarchy::buildClusterS() {
 }
 
 // returns pair of adjacent tiles from cluster pos and tile displacement
-std::pair<PathTile, PathTile> getAdjTiles(const Cluster& c1, const Cluster& c2, const int k, const bool adjOrientation) {
+std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster& c1, const Cluster& c2, const int k, const bool adjOrientation) {
     Point p1, p2;
     if (adjOrientation) {   // Cluster 1 on left of Cluster 2
         p1.x = k + c1.tilePos.x; p1.y = c2.tilePos.y - 1;
@@ -180,6 +291,12 @@ bool Path_Hierarchy::getTransitionTileAddresses(const int transNum, PathTile*& t
 }
 
 //////////////////////////////////////////////////////////////////////////
+// get cluster Point from Cluster Num
+Point getClusterPoint(const int clusterNum) {
+    int x = clusterNum % CLUSTER_YNUM;
+    int y = (clusterNum - x) / CLUSTER_YNUM;
+    return { x, y };
+}
 // gets cluster index in _clusterS vector
 int getClusterNum(const Cluster& c) {
     return(c.clusterPos.y*CLUSTER_YNUM + c.clusterPos.x);
@@ -209,8 +326,8 @@ void abstractMap() {
 // takes two adjacent clusters and finds transition points between them
 void findTransitions(const Cluster& c1, const Cluster& c2) {
 
-    std::pair<PathTile, PathTile> adjTiles;
-    PathTile l1, l2;
+    std::pair<PathTile*, PathTile*> adjTiles;
+    PathTile* l1, * l2;
     
     bool adjOrientation(c1.clusterPos.x == c2.clusterPos.x);    // True if c1 on top of c2, False if c1 left of c2 
 
@@ -223,7 +340,7 @@ void findTransitions(const Cluster& c1, const Cluster& c2) {
         l1 = adjTiles.first;
         l2 = adjTiles.second;
         
-        currEnt = (l1.get_traversable() && l2.get_traversable());
+        currEnt = (l1->get_traversable() && l2->get_traversable());
         if(currEnt && !validEnt) {  // starting a new entrance
             entStart = i;
             validEnt = true;
@@ -282,7 +399,7 @@ void buildGraph() {
                     continue;
                 if (!(map_graph.getVertexCopy(i, cNum, v1) && map_graph.getVertexCopy(j, cNum, v2)))
                     break;
-                path = pathFind(v1.t->get_mapRelPos(), v2.t->get_mapRelPos());
+                path = pathFind(v1.t->get_clusterRelPos(), v2.t->get_clusterRelPos(), cNum);
                 distance = map_graph.searchForDistance(v1, v2, cNum);
                 if (distance != HUGE_VAL)
                     map_graph.addEdge(v1.key, v2.key, cNum, cNum, distance, INTRA, path);

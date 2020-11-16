@@ -22,9 +22,10 @@ class Path_Hierarchy;
 
 class PathTile {
 public:
-    PathTile();
-    PathTile(const MapTile&, Path_Hierarchy&, const int, const int);
-    PathTile(const MapTile&, Path_Hierarchy&);
+    PathTile(); // dummy initialization constructor
+    PathTile(const MapTile&, Path_Hierarchy&, const int, const int);    // constructor for A * algorithm
+    PathTile(const MapTile&, Path_Hierarchy&);  // constructor for encapsulated transition points
+    PathTile(const PathTile& t2);   // copy constructor
 
     Cluster* findParent();
     void updatePriority(const int xDest, const int yDest);
@@ -52,13 +53,13 @@ private:
 };
 
 bool operator<(const PathTile& LHS, const PathTile& RHS);
-std::string pathFind(const Point, const Point);
+std::string pathFind(const Point, const Point, const int);
 
 class Path_Hierarchy {
 public:
     Path_Hierarchy(const int numClusters);
     
-    void addTransition(const std::pair<PathTile, PathTile>& tilePair);
+    void addTransition(const std::pair<PathTile*, PathTile*>& tilePair);
     void buildClusterS();
     //std::pair<PathTile, PathTile> getAdjTiles(const Cluster&, const Cluster&, const int, const bool);
 
@@ -83,12 +84,12 @@ private:
 
 };
 
-
+Point getClusterPoint(const int);
 int getClusterNum(const Cluster& c);
 void findTransitions(const Cluster& c1, const Cluster& c2);
-std::pair<PathTile, PathTile> getAdjTiles(const Cluster&, const Cluster&, const int, const bool);
-PathTile getPathTileFromPoint(const Point& p);
-
+std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster&, const Cluster&, const int, const bool);
+PathTile* getPathTileFromPoint(const Point& p);
+MapTile* getMapTileFromPoint(const Point& p);
 
 void abstractMap();
 void buildGraph();
