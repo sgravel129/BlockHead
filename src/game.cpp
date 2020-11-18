@@ -9,111 +9,97 @@
 // TODO: Log option just for destructors.
 
 Game::Game()
+		:	graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT),
+			player(graphics, "res/robot_sprites.png", 480, 500, 0.50F),
+			zombie(graphics, "res/zombie.png", 30, 32, 4.0F),
+			map(Point{10,10}),
+			isRunning(false)
 {
+	Log::verbose("Game Constructor\t| SDL Subsystems initialized");
+	map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
+	map.loadMapFile(graphics, "res/maps/test.map");
+
+	isRunning = true;
 }
 
 Game::~Game()
 {
 	Log::debug("~Game\t| Called ");
-	_player->~Player();
-	_zombie->~Zombie();
-	_map->~Map();
-	_graphics->~Graphics();
 }
 
-bool Game::init()
+bool Game::menu(const std::string &background_path, const std::string &play_button_path, const std::string &exit_button_path)
 {
-	int flags = 0;
+	Sprite background(graphics, background_path, {0, 256, 1820, 900}, 0.7f);
+	Sprite button_1(graphics, play_button_path, {0, 0, 422, 92}, 0.7f);
+	Sprite button_2(graphics, exit_button_path, {0, 0, 422, 92}, 0.7f);
 
-	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	unsigned int last = SDL_GetTicks();
+	unsigned int current;
+
+	graphics.setRenderColor(Color("FFFFFF"));
+	graphics.fillBackground();
+
+	while (isRunning)
 	{
-		Log::error("Game::init | SDL Subsystems failed to init: " + std::string(SDL_GetError()));
-		return false;
+		current = SDL_GetTicks();
+
+		if (current - last >= (1000 / framerate))
+		{
+			background.draw(graphics, 0, 100);
+			button_1.draw(graphics, 650, 340);
+			button_2.draw(graphics, 650, 420);
+			graphics.flip();
+			last = current;
+		}
+
+		handleUserInput();
+
+		if (input.wasKeyPressed(SDL_SCANCODE_Y))
+			break;
+
+		if (input.wasKeyPressed(SDL_SCANCODE_N))
+			isRunning = false;;
+
+		SDL_Delay(10);
 	}
 
-	Log::verbose("Game::init | SDL Subsystems initialized");
-
-	_graphics = new Graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT);
-	_graphics->setRenderColor(Color("65846c"));
-
-	/* Custom class initialization */
-	_player = new Player(*_graphics, "res/robot_sprites.png", 480, 500, 0.50F);		// loads up the robot sprite
-	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);				// loads up the zombie
-	_map = new Map(Point{10, 10});
-	_map->loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-	_map->loadMapFile(*_graphics, "res/maps/test.map");
-
-	/* End of class initialization */
-
-	_isRunning = true;
-	return true;
+	return isRunning;
 }
 
-// bool Game::welcome()
-// {
-// 	class menuObjs(){
-// 		private: 
-// 			Sprite _playAgain;				// need to have 2 buttons and one background image
-// 			Sprite _mapEditor;				// specify locations for the above on the GUI scene
-// 		public:
-// 			void draw(Graphics &graphics);	// draw all the sprites which will be the background photos and the menu buttons
-// 			int update(Input input) 		// to allow the user to exit on Quit (N)
-// 	}
+bool Game::start_menu() {
+	return menu("res/assets/open_page.png", "res/assets/start_button.png", "res/assets/quit_button.png");
+}
 
-// 	// variables instantiated here
-// 	_graphics = new Graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT);
-// 	_graphics->setRenderColor(Color("FFFFFF"));
+bool Game::again_menu() {
+	return menu("res/assets/game_over.png", "res/assets/playagain_button.png", "res/assets/quit_button.png");
+}
 
-// 	/* Custom class initialization */
-// 	_player = new Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-// 	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-// 	_map = new Map(Point{10, 10});
-// 	_map->loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-// 	_map->loadMapFile(*_graphics, "res/maps/test.map");
-	
-// 	// instantiate the menuObjs class
-// 	bool closeMenu = false					// to be able to exit the menu and get into the game play
-// 	Input input = new Input();
-
-// 	while not closeMenu {
-// 		Game::handleUserInput()				// TODO: make static!
-
-// 		int menuChoice = menuObjs.update(input);
-
-// 		if menuChoice == USER_QUIT 
-// 		{
-// 			Game::setIsRunning = false;		// TODO: make static!
-// 		}
-// 		else if menuChoice == PLAY_GAME 
-// 		{
-// 			closeMenu = true;				// see above where closeMenu is initially set to False
-// 		}
-// 		menuObjs.draw()
-// 	}
-// }
+bool Game::winner_menu() {
+	return menu("res/assets/winner.png", "res/assets/nextlevel_button.png", "res/assets/quit_button.png");
+}
 
 void Game::handleUserInput()
 {
-	_input.beginNewFrame();
+	input.beginNewFrame();
 
-	if (SDL_PollEvent(&_event))
+	while (SDL_PollEvent(&event))
 	{
-		if (_event.type == SDL_QUIT)
+		if (event.type == SDL_QUIT)
 		{
 			exit();
 		}
-		else if (_event.type == SDL_KEYDOWN)
+		else if (event.type == SDL_KEYDOWN)
 		{
-			if (_event.key.repeat == 0)
-				_input.keyDownEvent(_event);
+			if (event.key.repeat == 0)
+				input.keyDownEvent(event);
 		}
-		else if (_event.type == SDL_KEYUP)
+		else if (event.type == SDL_KEYUP)
 		{
-			_input.keyUpEvent(_event);
+			input.keyUpEvent(event);
 		}
 	}
 
-	if (_input.wasKeyPressed(SDL_SCANCODE_ESCAPE))
+	if (input.wasKeyPressed(SDL_SCANCODE_ESCAPE))
 	{
 		exit();
 	}
@@ -125,33 +111,34 @@ int y = 200;
 void Game::update()
 {
 	/* Updating of game classes */
-	_player->update(_input);
-	_zombie->update(_player->getX(), _player->getY());
+	player.update(input);
+	zombie.update(player.getX(), player.getY());
 	/* End of updating */
 }
 
 void Game::render()
 {
-	_graphics->fillBackground();
 
-	_map->draw(*_graphics);
+	graphics.setRenderColor(Color("65846c"));
+	graphics.fillBackground();
+
+	map.draw(graphics);
 	/* Rendering of different classes */
-	_player->draw(*_graphics);
-	_zombie->draw(*_graphics);
+	player.draw(graphics);
+	zombie.draw(graphics);
 
 	/* End of rendering */
-	_graphics->flip();
+	graphics.flip();
 }
 
 void Game::exit()
 {
-	_isRunning = false;
-	SDL_Quit();
+	isRunning = false;
 }
 
 bool Game::running()
 {
-	return _isRunning;
+	return isRunning;
 }
 
 void Game::run()
@@ -159,14 +146,14 @@ void Game::run()
 	unsigned int last = SDL_GetTicks();
 	unsigned int current;
 
-	while (_isRunning)
+	while (isRunning)
 	{
 		current = SDL_GetTicks();
 
 		handleUserInput();
 		update();
 
-		if (current - last >= (1000 / _framerate))
+		if (current - last >= (1000 / framerate))
 		{
 			render();
 			last = current;
@@ -180,5 +167,5 @@ void Game::run()
 
 void Game::setFramerate(int framerate)
 {
-	_framerate = framerate;
+	this->framerate = framerate;
 }

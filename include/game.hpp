@@ -18,7 +18,9 @@ public:
 	Game();
 	~Game();
 
-	bool init();
+	bool start_menu();
+	bool again_menu();
+	bool winner_menu();
 
 	/*
 		Destroy current renderer and render, unload textures from GPU
@@ -40,6 +42,9 @@ public:
 	void setFramerate(int framerate);
 
 private:
+	
+	bool menu(const std::string &background_path, const std::string &exit_button, const std::string &play_button);
+
 	/*
 		Configure starting game conditions such as spawn point and labirinth
 	 */
@@ -64,17 +69,17 @@ private:
 		Process collisions between game objects
 	 */
 	void handleCollisions();
-	int _framerate;
+	int framerate;
 
-	bool _isRunning;
-	Graphics *_graphics;
-	Input _input;
+	bool isRunning;
+	Graphics graphics;
+	Input input;
 
-	SDL_Event _event;
+	SDL_Event event;
 
 	// Custom game classes
-	Player *_player;
-	Zombie *_zombie;
-	Map *_map;
+	Player player;
+	Zombie zombie;
+	Map map;
 	// End of custom classes
 };

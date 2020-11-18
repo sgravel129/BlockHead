@@ -12,19 +12,21 @@ int main(int argc, char **argv)
         framerate = atoi(argv[2]);
     }
 
-    Game game;
-
-    game.setFramerate(framerate);
-
-    if (game.init())
+    try
     {
-        while(True){
-            game.welcome();
-            game.run();
-        } 
+        Game game;
+
+        game.setFramerate(framerate);
+
+        game.start_menu();
+        game.run();
+        game.exit();
+    }
+    catch(std::runtime_error &err)
+    {
+        std::cerr << err.what() << std::endl;
     }
 
-    game.exit();
-
+    
     return 0;
 }

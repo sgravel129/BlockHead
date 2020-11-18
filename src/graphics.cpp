@@ -9,6 +9,12 @@
 
 Graphics::Graphics(const char *windowTitle, int screenWidth, int screenHeight)
 {
+	if (SDL_Init(SDL_INIT_EVERYTHING) != 0)
+	{
+		Log::error("Graphics | SDL Subsystems failed to init: " + std::string(SDL_GetError()));
+		throw std::runtime_error("FATAL ERROR: SDL Subsystem failed to initiate");
+	}
+
 	_window = SDL_CreateWindow(windowTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_SHOWN);
 	// SDL_SetWindowTitle(_window, windowTitle);
 	_renderer = SDL_CreateRenderer(_window, -1, 0);
@@ -27,6 +33,8 @@ Graphics::~Graphics()
 	SDL_DestroyRenderer(_renderer);
 	Log::debug("~Graphics\t| Destroy Window");
 	SDL_DestroyWindow(_window);
+	Log::debug("~Graphics\t| Shutdown SDL Subsystem");
+	SDL_Quit();
 }
 
 SDL_Surface *Graphics::loadImage(const std::string &path)
