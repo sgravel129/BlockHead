@@ -2,12 +2,13 @@
 #include "../include/path.hpp"
 #include "../include/graph.hpp"
 */
-#include "path.cpp"
+//#include "path.cpp"
 #include "graph.hpp"
-
+#include "log.hpp"
 #define X_STEP 30   // x size of tile
 #define CLUSTER_SLENGTH 120     // side length of cluster (square)
 #define CLUSTER_TLENGTH CLUSTER_SLENGTH / X_STEP
+
 
 //////////////////////////////////
 // ABSTRACT_GRAPH Implementation
@@ -68,83 +69,7 @@ double Abstract_Graph::searchForDistance(const Vertex& v1, const Vertex& v2, con
     return 0;
 }
 
-std::vector<int> Abstract_Graph::searchForPath(const Point& startP, const Point& goalP) {
-    Vertex startV, * startVP, goalV, * goalVP;
-    Edge tempEdge;
-    PathTile* tempT;
-    bool addStart(false), addGoal(false);
-    Point p1, p2;
-    std::vector<int> intPath;
-    std::vector<Vertex*> graphPath;
-    int cNum1 = getClusterNum(startP), cNum2 = getClusterNum(goalP);
-    /*
-    if start Cluster == goal Cluster
-        if both in graph
-            return path
-        A star algorithm
-        if soln
-            return path
-    */
-    if (cNum1 == cNum2) {            // start and goal in same cluster
-        if (getVertexCopy(startP, startV) && getVertexCopy(goalP, goalV)) {     // start and goal vertices already in graph
-            if (getEdge(startV, goalV, tempEdge))
-                return tempEdge.path;
-        }
-        intPath = pathFind({ startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH }, { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH }, cNum1);
-        if (intPath.size() > 0)
-            return intPath;
-    }
 
-    if (!getVertexCopy(startP, startV)) {
-        // set flag that we are adding start vertex to graph (for cleanup later)
-        addStart = true;
-        // encapsulate vertex into graph
-        tempT = new PathTile(*getMapTileFromPoint(startP), map_hierarchy);
-        map_hierarchy.addStart(tempT);
-        // connect to all cluster border transitions with A star
-        p1 = { startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH };
-        map_hierarchy.getStartAddress(tempT);
-        addVertex({ getVCNum(cNum1), cNum1, tempT, {}, {} }, cNum1);
-        // add edges to graph
-        for (int i = 0; i < _vNums[cNum1] - 1; i++) {
-            p2 = _vertexS[cNum1][i].t->get_clusterRelPos();
-            intPath = pathFind(p1, p2, cNum1);
-            addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
-        }
-    }
-    startVP = getVertexAddress(startP);
-
-    if (!getVertexCopy(goalP, goalV)) {
-        // set flag that we are adding goal vertex to graph (for cleanup later)
-        addGoal = true;
-        // encapsulate vertex into graph
-        tempT = new PathTile(*getMapTileFromPoint(goalP), map_hierarchy);
-        map_hierarchy.addGoal(tempT);
-        // connect to all cluster border transitions with A star
-        p1 = { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH };
-        map_hierarchy.getGoalAddress(tempT);
-        addVertex({ getVCNum(cNum2), cNum2, tempT, {}, {} }, cNum2);
-        // add edges to graph
-        for (int i = 0; i < _vNums[cNum2] - 1; i++) {
-            p2 = _vertexS[cNum2][i].t->get_clusterRelPos();
-            intPath = pathFind(p1, p2, cNum2);
-            addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
-        }
-    }
-    goalVP = getVertexAddress(goalP);
-
-    // Start and Goal in abstract Graph: can now proceed with graph search
-    graphPath = searchForGraphPath(startVP, goalVP);
-
-    // Cleanup: delete extra tiles from Path_Hierarchy, and extra vertices and edges from Abstract_Graph
-    map_hierarchy.deleteStartAndGoal();
-    if (addStart)
-        deleteStartAndGoal(startVP, cNum1);
-    if (addGoal)
-        deleteStartAndGoal(goalVP, cNum2);
-
-    return graphPathToIntPath(graphPath);
-}
 
 
 std::vector<Vertex*> Abstract_Graph::searchForGraphPath(const Vertex* startV, const Vertex* goalV) {
@@ -159,52 +84,7 @@ std::vector<Vertex*> Abstract_Graph::searchForGraphPath(const Vertex* startV, co
     return Path;
 }
 
-int * Abstract_Graph::Dijkstra(const int src) {
-    int V = getVNum();
-    int** graph(map_graph.getWeightedAdj(V));
 
-    int * dist = static_cast<int*>(malloc(V * sizeof(int))); // The output array.  dist[i] will hold the shortest 
-    // distance from src to i 
-
-    bool * sptSet = static_cast<bool*>(malloc(V * sizeof(bool))); // sptSet[i] will be true if vertex i is included in shortest 
-    // path tree or shortest distance from src to i is finalized 
-
-    // Initialize all distances as INFINITE and stpSet[] as false 
-    for (int i = 0; i < V; i++)
-        dist[i] = INT_MAX, sptSet[i] = false;
-
-    // Distance of source vertex from itself is always 0 
-    dist[src] = 0;
-
-    // Find shortest path for all vertices 
-    for (int count = 0; count < V - 1; count++) {
-        // Pick the minimum distance vertex from the set of vertices not 
-        // yet processed. u is always equal to src in the first iteration. 
-        int u = minDistance(dist, sptSet);
-
-        // Mark the picked vertex as processed 
-        sptSet[u] = true;
-
-        // Update dist value of the adjacent vertices of the picked vertex. 
-        for (int v = 0; v < V; v++)
-
-            // Update dist[v] only if is not in sptSet, there is an edge from 
-            // u to v, and total weight of path from src to  v through u is 
-            // smaller than current value of dist[v] 
-            if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX
-                && dist[u] + graph[u][v] < dist[v])
-                dist[v] = dist[u] + graph[u][v];
-    }
-
-    // cleanup
-    for (int i = 0; i < V; i++) {
-        free(graph[i]);
-    }
-    free(graph); free(sptSet);
-
-    return dist;
-
-}
 
 // get Weighted Adjacency Matrix with edge distances as weights
 int** Abstract_Graph::getWeightedAdj(const int V) {
@@ -238,43 +118,12 @@ int** Abstract_Graph::getWeightedAdj(const int V) {
 
 }
 
-int keyToGlobalK(const int key, const int cNum) {
+int Abstract_Graph::keyToGlobalK(const int key, const int cNum) {
     int globalKey = 0;
     for (int i = 0; i < cNum; i++) {
-        globalKey += map_graph.getVCNum(i);
+        globalKey += _vNums[i];
     }
     return globalKey + key;
-}
-
-
-
-int minDistance(int dist[], bool sptSet[]) {
-    // Initialize min value 
-    int min = INT_MAX, min_index;
-    int V = map_graph.getVNum();
-    for (int v = 0; v < V; v++)
-        if (sptSet[v] == false && dist[v] <= min)
-            min = dist[v], min_index = v;
-
-    return min_index;
-}
-
-// Takes vector path of Vertices, finds the edges between them, and translates it to int Path info
-std::vector<int> Abstract_Graph::graphPathToIntPath(const std::vector<Vertex*>& graphPath) const {
-    std::vector<int> intPath, tempPath;
-    Vertex* v1, * v2;
-    int k;
-    for (int i = 0; i < graphPath.size() - 1; i++) {
-        v1 = graphPath[i]; v2 = graphPath[static_cast<__int64>(i)+1];
-        for (int j = 0; j < v1->adjList.size(); j++) {
-            if (v1->adjList[j] == v2) {
-                tempPath = v1->adjEdges[j]->path;
-                intPath.insert(intPath.end(), tempPath.begin(), tempPath.end());
-                break;
-            }   
-        }
-    }
-    return intPath;
 }
 
 

@@ -3,6 +3,7 @@
 //#include "../include/path.hpp"
 #include "path.hpp"
 
+
 enum edgeType {
     INTER,
     INTRA
@@ -34,12 +35,9 @@ public:
 
     
     double searchForDistance(const Vertex&, const Vertex&, const int cNum);
-    std::vector<int> searchForPath(const Point&, const Point&);
     std::vector<Vertex*> searchForGraphPath(const Vertex*, const Vertex*);
-    int* Dijkstra(const int);
     int** getWeightedAdj(const int);
-    std::vector<int> graphPathToIntPath(const std::vector<Vertex*>&) const ;
-
+    int keyToGlobalK(const int, const int);
     
     // Accessors
     bool getVertexCopy(const int k, const int cNum, Vertex& v) const;
@@ -49,12 +47,13 @@ public:
     int getVNum() const;      // return total number of vertices in graph
 
     // Destructor
-    ~Abstract_Graph();
+    //~Abstract_Graph();
 
-private:
+
     Vertex* getVertexAddress(const Point&);    // returns pointer to encapsulated vertex
     void deleteStartAndGoal(const Vertex*, const int);
 
+private:
     std::vector<std::vector<Vertex>> _vertexS;   // set of vertices, organized by Cluster
     std::vector<Edge> _edgeL;                    // set of edges
     std::vector<int> _vNums;    // number of vertices per cluster
@@ -63,5 +62,4 @@ private:
 
 };
 
-int minDistance(int dist[], bool sptSet[]);
-int keyToGlobalK(const int, const int);
+

@@ -4,15 +4,15 @@
 #include "../include/graph.hpp"
 */
 #include "path.hpp"
-#include "constants.hpp"
 #include "graph.hpp"
+#include "dijkstra.hpp"
 #include "log.hpp"
 
 #include <vector>
 
 
-#define X_MAX SCREEN_WIDTH
-#define Y_MAX SCREEN_HEIGHT
+#define X_MAX 1280
+#define Y_MAX 720
 // will change these depending on amount of pixels sprite occupies
 // #define CLUSTER_WIDTH 120
 // #define CLUSTER_HEIGHT 120
@@ -477,7 +477,12 @@ void buildGraph() {
     }
 }
 
-void buildGraphPathDs() {
+void buildGraphPaths() {
+    
+    // Call dijkstra with getVnum() and graph as below
+    //int** graph(map_graph.getWeightedAdj(V));
+
+    /*
     // allocating memory
     int V = map_graph.getVNum();
     int** graphDistances;
@@ -489,12 +494,121 @@ void buildGraphPathDs() {
     for (int i = 0; i < V; i++)
         graphDistances[i] = map_graph.Dijkstra(i);
 
-    
+    int*** graphPaths;
+    int** temp2;
+    graphPaths = static_cast<int***>(malloc(V * sizeof(**graphPaths)));
+    temp2 = static_cast<int**>(malloc(V * V * sizeof(*graphPaths)));
+    temp = static_cast<int*>(malloc(V * V * V * sizeof(graphPaths[0])));
+
+
+
+    int * graphDistances = static_cast<int*>(malloc(V*V*sizeof(int)));
+    for (int i = 0; i < V; i++)
+        graphDistances[i] = map_graph.Dijkstra(i);
+
+    int* graphPaths = static_cast<int*>(malloc(V * V * V * sizeof(int)));
+    */
 }
+
+
+
+
+std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
+    Vertex startV, * startVP, goalV, * goalVP, v;
+    Edge tempEdge;
+    PathTile* tempT;
+    bool addStart(false), addGoal(false);
+    Point p1, p2;
+    std::vector<int> intPath;
+    std::vector<Vertex*> graphPath;
+    int cNum1 = getClusterNum(startP), cNum2 = getClusterNum(goalP);
+    /*
+    if start Cluster == goal Cluster
+        if both in graph
+            return path
+        A star algorithm
+        if soln
+            return path
+    */
+    if (cNum1 == cNum2) {            // start and goal in same cluster
+        if (map_graph.getVertexCopy(startP, startV) && map_graph.getVertexCopy(goalP, goalV)) {     // start and goal vertices already in graph
+            if (map_graph.getEdge(startV, goalV, tempEdge))
+                return tempEdge.path;
+        }
+        intPath = pathFind({ startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH }, { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH }, cNum1);
+        if (intPath.size() > 0)
+            return intPath;
+    }
+
+    /////////////
+    // TODO
+    // PUT THIS STUFF IN GRAPH.CPP
+    if (!map_graph.getVertexCopy(startP, startV)) {
+        // set flag that we are adding start vertex to graph (for cleanup later)
+        addStart = true;
+        // encapsulate vertex into graph
+        tempT = new PathTile(*getMapTileFromPoint(startP), map_hierarchy);
+        map_hierarchy.addStart(tempT);
+        // connect to all cluster border transitions with A star
+        p1 = { startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH };
+        map_hierarchy.getStartAddress(tempT);
+        map_graph.addVertex({ map_graph.getVCNum(cNum1), cNum1, tempT, {}, {} }, cNum1);
+        // add edges to graph
+        for (int i = 0; i < map_graph.getVCNum(cNum1) - 1; i++) {
+            map_graph.getVertexCopy(i, cNum1, v);
+            p2 = v.t->get_clusterRelPos();
+            intPath = pathFind(p1, p2, cNum1);
+            map_graph.addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
+        }
+    }
+    startVP = map_graph.getVertexAddress(startP);
+
+    if (!map_graph.getVertexCopy(goalP, goalV)) {
+        // set flag that we are adding goal vertex to graph (for cleanup later)
+        addGoal = true;
+        // encapsulate vertex into graph
+        tempT = new PathTile(*getMapTileFromPoint(goalP), map_hierarchy);
+        map_hierarchy.addGoal(tempT);
+        // connect to all cluster border transitions with A star
+        p1 = { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH };
+        map_hierarchy.getGoalAddress(tempT);
+        map_graph.addVertex({ map_graph.getVCNum(cNum2), cNum2, tempT, {}, {} }, cNum2);
+        // add edges to graph
+        for (int i = 0; i < map_graph.getVCNum(cNum2) - 1; i++) {
+            map_graph.getVertexCopy(i, cNum2, v);
+            p2 = v.t->get_clusterRelPos();
+            intPath = pathFind(p1, p2, cNum2);
+            map_graph.addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
+        }
+    }
+    goalVP = map_graph.getVertexAddress(goalP);
+    ////////////
+
+    // Start and Goal in abstract Graph: can now proceed with graph search
+    graphPath = map_graph.searchForGraphPath(startVP, goalVP);
+
+    // Cleanup: delete extra tiles from Path_Hierarchy, and extra vertices and edges from Abstract_Graph
+    map_hierarchy.deleteStartAndGoal();
+    if (addStart)
+        map_graph.deleteStartAndGoal(startVP, cNum1);
+    if (addGoal)
+        map_graph.deleteStartAndGoal(goalVP, cNum2);
+
+    return graphPathToIntPath(graphPath);
+}
+
+
+
+
+
+
+
+
+
 
 
 void preprocessing() {
     abstractMap();
     buildGraph();
-    buildGraphPathDs();
+    buildGraphPaths();
 }

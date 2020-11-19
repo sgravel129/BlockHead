@@ -1,6 +1,6 @@
 #pragma once
 
-#include "constants.hpp"
+
 #include "map.hpp"
 
 #include <iostream>
@@ -10,6 +10,7 @@
 #include <cmath>
 #include <queue>
 
+class Path_Hierarchy;
 
 
 typedef struct Cluster {
@@ -18,7 +19,7 @@ typedef struct Cluster {
     Cluster* parent{};
 } Cluster;
 
-class Path_Hierarchy;
+
 
 class PathTile {
 public:
@@ -105,8 +106,11 @@ std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster&, const Cluster&, cons
 PathTile* getPathTileFromPoint(const Point& p);
 MapTile* getMapTileFromPoint(const Point& p);
 
+
+std::vector<int> searchForPath(const Point& startP, const Point& goalP);
+
 void abstractMap();
 void buildGraph();
-void buildGraphPathDs();
+void buildGraphPaths();
 void preprocessing();
 
