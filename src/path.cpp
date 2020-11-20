@@ -275,9 +275,7 @@ Path_Hierarchy::~Path_Hierarchy() {
         delete temp1;
         delete temp2;
     }
-    _transitionS.~vector();
-
-    _clusterS.~vector();
+    
 }
 
 //////////////
