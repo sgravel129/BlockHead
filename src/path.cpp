@@ -40,9 +40,9 @@ static int intMap[CLUSTER_XNUM][CLUSTER_YNUM][CLUSTER_TLENGTH][CLUSTER_TLENGTH];
 
 
 // dummy global variable: might want to declare this in separate file, which is run when we load a map
-Path_Hierarchy map_hierarchy = Path_Hierarchy(CLUSTER_XNUM * CLUSTER_YNUM);
-Abstract_Graph map_graph = Abstract_Graph( CLUSTER_XNUM * CLUSTER_YNUM );
-Map game_map = Map();
+Path_Hierarchy* map_hierarchy = new Path_Hierarchy(CLUSTER_XNUM * CLUSTER_YNUM);
+Abstract_Graph* map_graph = new Abstract_Graph( CLUSTER_XNUM * CLUSTER_YNUM );
+Map* game_map = new Map();
 
 // Need to add accessor for _tiles in Map class
 // accesses map info
@@ -61,14 +61,14 @@ MapTile* getMapTileFromPoint(const Point& p) {
 ///////////////////////////////////////
 // Constructors
 PathTile::PathTile() : _mapRelPos{}, _clusterRelPos{}, _traversable{}, _level{}, _priority{}, _parentC{}, _parentH{} {};
-PathTile::PathTile(const MapTile& refTile, Path_Hierarchy& parentH) : PathTile(refTile, parentH, 0, 0) {}
-PathTile::PathTile(const MapTile& refTile, Path_Hierarchy& parentH, const int level, const int priority) {
+PathTile::PathTile(const MapTile& refTile, Path_Hierarchy* parentH) : PathTile(refTile, parentH, 0, 0) {}
+PathTile::PathTile(const MapTile& refTile, Path_Hierarchy* parentH, const int level, const int priority) {
     _mapRelPos = { refTile.getPos().x, refTile.getPos().y };
     _clusterRelPos = { _mapRelPos.x % CLUSTER_TLENGTH, _mapRelPos.y % CLUSTER_TLENGTH };
     _traversable = !refTile.getCollision();
     _level = level;
     _priority = priority;    
-    _parentH = &parentH;
+    _parentH = parentH;
     _parentC = findParent();
     
 }
@@ -77,16 +77,15 @@ PathTile::PathTile(const PathTile& t2) {        // Copy Constructor
     _level = t2._level; _priority = t2._priority; _parentC = t2._parentC; _parentH = t2._parentH;
 }
 // Destructor
-PathTile::~PathTile() { // set pointers to parent cluster and hierarchy to null to avoid leaks
-    _parentC = NULL;
-    _parentH = NULL;
+PathTile::~PathTile() { // set pointer to hierarchy to null to avoid leaks
+    _parentH = nullptr;
 }
 ///////////////////
 // Member Functions
 // Called by constructor, finds parent cluster from tile point
-Cluster* PathTile::findParent() {
+Cluster PathTile::findParent() {
     Point p = { _mapRelPos.x / CLUSTER_TLENGTH , _mapRelPos.y / CLUSTER_TLENGTH };
-    return _parentH->getClusterAddress(p);
+    return _parentH->get_cluster(p);
 }
 // Update A * priority
 void PathTile::updatePriority(const int xDest, const int yDest) {
@@ -112,10 +111,9 @@ Point PathTile::get_clusterRelPos() const { return _clusterRelPos; }
 bool PathTile::get_traversable() const { return _traversable; }
 int PathTile::get_level() const { return _level;  }
 int PathTile::get_priority() const { return _priority; }
-Cluster PathTile::getParentCCopy() const { return *_parentC; }
+Cluster PathTile::getParentCluster() const { return _parentC; }
 
-// Memory Accessors
-Cluster* PathTile::getParentC() { return _parentC; }
+
 /////////////////////////////////////////////////////////////////////////////
 // PathTile operator overload
 bool operator<(const PathTile& LHS, const PathTile& RHS) {
@@ -264,7 +262,7 @@ double pathToDistance(const std::vector<int>& path) {
 // Path_Hierarchy class implementation
 ////////////////////////////////////////
 // Constructor
-Path_Hierarchy::Path_Hierarchy(const int numClusters) : _startT{}, _goalT{}, _transitionS{}, _clusterS{} {
+Path_Hierarchy::Path_Hierarchy(const int numClusters) : _startT(nullptr), _goalT(nullptr), _transitionS{}, _clusterS{} {
     _numTrans = 0;
     _numClusters = numClusters;
 }
@@ -272,34 +270,30 @@ Path_Hierarchy::Path_Hierarchy(const int numClusters) : _startT{}, _goalT{}, _tr
 Path_Hierarchy::~Path_Hierarchy() {
     deleteStartAndGoal();
     PathTile* temp1, * temp2;
-    Cluster* tempC;
     for (int i = 0; i < _numTrans; i++) {
         getTransitionTileAddresses(i, temp1, temp2);
         delete temp1;
         delete temp2;
     }
     _transitionS.~vector();
-    for (int i = 0; i < _numClusters; i++) {
-        tempC = getClusterAddress(getClusterPoint(i));
-        delete tempC;
-    }
+
     _clusterS.~vector();
 }
 
 //////////////
 
 void Path_Hierarchy::addTransition(const std::pair<PathTile*, PathTile*>& tilePair) {
-    _transitionS.push_back(std::pair<PathTile, PathTile> {*tilePair.first, *tilePair.second});
+    _transitionS.push_back(std::pair<PathTile*, PathTile*> {tilePair.first, tilePair.second});
     _numTrans++;
 }
 
-void Path_Hierarchy::addStart(const PathTile* startT) { _startT = *startT; }
-void Path_Hierarchy::addGoal(const PathTile* goalT) { _goalT = *goalT; }
+void Path_Hierarchy::addStart(PathTile* const startT) { _startT = startT; }
+void Path_Hierarchy::addGoal(PathTile* const goalT) { _goalT = goalT; }
 
 void Path_Hierarchy::buildClusterS() {
     for(int j = 0; j < CLUSTER_YNUM; j++) {
         for(int i = 0; i < CLUSTER_XNUM; i++)
-            _clusterS.push_back(Cluster{ {i,j}, {i*CLUSTER_TLENGTH, j*CLUSTER_TLENGTH}, NULL });
+            _clusterS.push_back(Cluster{ {i,j}, {i*CLUSTER_TLENGTH, j*CLUSTER_TLENGTH}});
     }
 }
 
@@ -321,43 +315,45 @@ std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster& c1, const Cluster& c2
 
 
 // Accessors
-std::vector<std::pair<PathTile, PathTile>> Path_Hierarchy::get_transitionS() { return _transitionS; }
-std::pair<PathTile, PathTile> Path_Hierarchy::get_transition(const int transNum) { return _transitionS[transNum]; }
+//std::vector<std::pair<PathTile, PathTile>> Path_Hierarchy::get_transitionS() { return _transitionS; }
+std::pair<PathTile, PathTile> Path_Hierarchy::get_transition(const int transNum) { 
+    return std::make_pair(*_transitionS[transNum].first, *_transitionS[transNum].second); }
 std::vector<Cluster> Path_Hierarchy::get_clusterS() {return _clusterS;}
-Cluster Path_Hierarchy::get_cluster(const int x, const int y) {return _clusterS[y*CLUSTER_YNUM + static_cast<__int64>(x)];}
+Cluster Path_Hierarchy::get_cluster(const Point p) {return _clusterS[p.y*CLUSTER_YNUM + static_cast<__int64>(p.x)];}
 int Path_Hierarchy::get_numTrans() { return _numTrans; }
 int Path_Hierarchy::get_numClusters() { return _numClusters; }
 
 // Private Memory Accessors
-Cluster* Path_Hierarchy::getClusterAddress(const Point& p) {
-    return &(_clusterS[p.y * CLUSTER_YNUM + static_cast<__int64>(p.x)]);
-}
 
 bool Path_Hierarchy::getTransitionTileAddresses(const int transNum, PathTile*& t1, PathTile*& t2) {
     if (transNum >= _numTrans)
         return false;
-    t1 = &(_transitionS[transNum].first);
-    t2 = &(_transitionS[transNum].second);
+    t1 = _transitionS[transNum].first;
+    t2 = _transitionS[transNum].second;
     return true;
 }
 
+
 bool Path_Hierarchy::getStartAddress(PathTile*& t) {
-    if (_startT.getParentC() == NULL)
+    if (!_startT)
         return false;
-    t = &_startT;
+    t = _startT;
     return true;
 }
 bool Path_Hierarchy::getGoalAddress(PathTile*& t) {
-    if (_goalT.getParentC() == NULL)
+    if (!_goalT)
         return false;
-    t = &_goalT;
+    t = _goalT;
     return true;
 }
 
 // Deletion Mutators
 void Path_Hierarchy::deleteStartAndGoal() {
-    _startT.~PathTile();
-    _goalT.~PathTile();
+    delete _startT;
+    _startT = nullptr;
+    delete _goalT;
+    _goalT = nullptr;
+    
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -376,18 +372,18 @@ int getClusterNum(const Point& p) {
 // divides map into clusters and defines transition points between them
 void abstractMap() {
 
-    map_hierarchy.buildClusterS();
+    map_hierarchy->buildClusterS();
 
     // Adding entrances between clusters for all adjacent clusters
     for(int i = 0; i < CLUSTER_XNUM; i++) {     // checking all vertically adjacent clusters
         for(int j =0; j < CLUSTER_YNUM -1; j++) {
-            findTransitions(map_hierarchy.get_cluster(i,j), map_hierarchy.get_cluster(i,j+1));
+            findTransitions(map_hierarchy->get_cluster({ i,j }), map_hierarchy->get_cluster({ i, j + 1 }));
         }
     }
     
     for(int j = 0; j < CLUSTER_XNUM; j++) {     // checking all laterally adjacent clusters
         for(int i = 0; i < CLUSTER_XNUM - 1; i++) {
-            findTransitions(map_hierarchy.get_cluster(i,j), map_hierarchy.get_cluster(i+1,j));
+            findTransitions(map_hierarchy->get_cluster({ i,j }), map_hierarchy->get_cluster({ i + 1, j }));
         }
     }
 }
@@ -419,16 +415,16 @@ void findTransitions(const Cluster& c1, const Cluster& c2) {
             entEnd = i-1;
             if (entStart == entEnd) {  // if single-tile entrance, define one transition point
                 
-                map_hierarchy.addTransition(getAdjTiles(c1, c2, entStart, adjOrientation));
+                map_hierarchy->addTransition(getAdjTiles(c1, c2, entStart, adjOrientation));
             }
             else if(entEnd - entStart < MIN_ENTRANCE_LENGTH) {  // if small entrance, define one transition point in middle
                 
-                map_hierarchy.addTransition(getAdjTiles(c1, c2, entStart + static_cast<int>((entEnd-entStart)/2), adjOrientation));
+                map_hierarchy->addTransition(getAdjTiles(c1, c2, entStart + static_cast<int>((entEnd-entStart)/2), adjOrientation));
             }
             else {      // otherwise define multiple transition points
                 for(int k = entStart; k < entEnd+1; k += TRANSITION_INTERVAL)
                     
-                    map_hierarchy.addTransition(getAdjTiles(c1, c2, k, adjOrientation));
+                    map_hierarchy->addTransition(getAdjTiles(c1, c2, k, adjOrientation));
             }
         }
     }   
@@ -441,37 +437,37 @@ void buildGraph() {
     int cNum1, cNum2;
     Vertex v1, v2;
     PathTile* t1; PathTile* t2;
-    int numTrans = map_hierarchy.get_numTrans();
-    int numClusters = map_hierarchy.get_numClusters();
+    int numTrans = map_hierarchy->get_numTrans();
+    int numClusters = map_hierarchy->get_numClusters();
     for (int i = 0; i < numTrans; i++) {
-        if (!map_hierarchy.getTransitionTileAddresses(i, t1, t2))
+        if (!map_hierarchy->getTransitionTileAddresses(i, t1, t2))
             break;
-        cNum1 = getClusterNum(t1->getParentCCopy().clusterPos);
-        cNum2 = getClusterNum(t2->getParentCCopy().clusterPos);
-        v1 = { map_graph.getVCNum(cNum1), cNum1, t1, {}, {} };
-        v2 = { map_graph.getVCNum(cNum2), cNum2, t2, {}, {} };
-        map_graph.addVertex(v1, cNum1);
-        map_graph.addVertex(v2, cNum2);
-        if(v1.t->getParentCCopy().clusterPos.x == v2.t->getParentCCopy().clusterPos.x)  // if v1 and v2 horizontally adjacent
-            map_graph.addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 0 });     // {0} is the path of going right once
+        cNum1 = getClusterNum(t1->getParentCluster().clusterPos);
+        cNum2 = getClusterNum(t2->getParentCluster().clusterPos);
+        v1 = { map_graph->getVCNum(cNum1), cNum1, t1, {}, {} };
+        v2 = { map_graph->getVCNum(cNum2), cNum2, t2, {}, {} };
+        map_graph->addVertex(v1, cNum1);
+        map_graph->addVertex(v2, cNum2);
+        if(v1.t->getParentCluster().clusterPos.x == v2.t->getParentCluster().clusterPos.x)  // if v1 and v2 horizontally adjacent
+            map_graph->addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 0 });     // {0} is the path of going right once
         else                                                                            // if v1 and v2 vertically adjacent
-            map_graph.addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 2 });     // {2} is the path of going down once
+            map_graph->addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 2 });     // {2} is the path of going down once
     }
     int numVC;
     double distance;
     std::vector<int> path;
     for (int cNum = 0; cNum < numClusters; cNum++) {
-        numVC = map_graph.getVCNum(cNum);
+        numVC = map_graph->getVCNum(cNum);
         for (int i = 0; i < numVC; i++) {
             for (int j = 0; j < numVC; j++) {
                 if (i == j)
                     continue;
-                if (!(map_graph.getVertexCopy(i, cNum, v1) && map_graph.getVertexCopy(j, cNum, v2)))
+                if (!(map_graph->getVertexCopy(i, cNum, v1) && map_graph->getVertexCopy(j, cNum, v2)))
                     break;
                 path = pathFind(v1.t->get_clusterRelPos(), v2.t->get_clusterRelPos(), cNum);
                 distance = pathToDistance(path);
                 if (distance != HUGE_VAL)
-                    map_graph.addEdge(v1.t->get_mapRelPos(), v2.t->get_mapRelPos(), distance, INTRA, path);
+                    map_graph->addEdge(v1.t->get_mapRelPos(), v2.t->get_mapRelPos(), distance, INTRA, path);
             }
         }
     }
@@ -480,7 +476,7 @@ void buildGraph() {
 void buildGraphPaths() {
     
     // Call dijkstra with getVnum() and graph as below
-    //int** graph(map_graph.getWeightedAdj(V));
+    //int** graph(new map_graph.getWeightedAdj(V));
 
     /*
     // allocating memory
@@ -531,8 +527,8 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
             return path
     */
     if (cNum1 == cNum2) {            // start and goal in same cluster
-        if (map_graph.getVertexCopy(startP, startV) && map_graph.getVertexCopy(goalP, goalV)) {     // start and goal vertices already in graph
-            if (map_graph.getEdge(startV, goalV, tempEdge))
+        if (map_graph->getVertexCopy(startP, startV) && map_graph->getVertexCopy(goalP, goalV)) {     // start and goal vertices already in graph
+            if (map_graph->getEdge(startV, goalV, tempEdge))
                 return tempEdge.path;
         }
         intPath = pathFind({ startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH }, { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH }, cNum1);
@@ -543,56 +539,56 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
     /////////////
     // TODO
     // PUT THIS STUFF IN GRAPH.CPP
-    if (!map_graph.getVertexCopy(startP, startV)) {
+    if (!map_graph->getVertexCopy(startP, startV)) {
         // set flag that we are adding start vertex to graph (for cleanup later)
         addStart = true;
         // encapsulate vertex into graph
         tempT = new PathTile(*getMapTileFromPoint(startP), map_hierarchy);
-        map_hierarchy.addStart(tempT);
+        map_hierarchy->addStart(tempT);
         // connect to all cluster border transitions with A star
         p1 = { startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH };
-        map_hierarchy.getStartAddress(tempT);
-        map_graph.addVertex({ map_graph.getVCNum(cNum1), cNum1, tempT, {}, {} }, cNum1);
+        map_hierarchy->getStartAddress(tempT);
+        map_graph->addVertex({ map_graph->getVCNum(cNum1), cNum1, tempT, {}, {} }, cNum1);
         // add edges to graph
-        for (int i = 0; i < map_graph.getVCNum(cNum1) - 1; i++) {
-            map_graph.getVertexCopy(i, cNum1, v);
+        for (int i = 0; i < map_graph->getVCNum(cNum1) - 1; i++) {
+            map_graph->getVertexCopy(i, cNum1, v);
             p2 = v.t->get_clusterRelPos();
             intPath = pathFind(p1, p2, cNum1);
-            map_graph.addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
+            map_graph->addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
         }
     }
-    startVP = map_graph.getVertexAddress(startP);
+    startVP = map_graph->getVertexAddress(startP);
 
-    if (!map_graph.getVertexCopy(goalP, goalV)) {
+    if (!map_graph->getVertexCopy(goalP, goalV)) {
         // set flag that we are adding goal vertex to graph (for cleanup later)
         addGoal = true;
         // encapsulate vertex into graph
         tempT = new PathTile(*getMapTileFromPoint(goalP), map_hierarchy);
-        map_hierarchy.addGoal(tempT);
+        map_hierarchy->addGoal(tempT);
         // connect to all cluster border transitions with A star
         p1 = { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH };
-        map_hierarchy.getGoalAddress(tempT);
-        map_graph.addVertex({ map_graph.getVCNum(cNum2), cNum2, tempT, {}, {} }, cNum2);
+        map_hierarchy->getGoalAddress(tempT);
+        map_graph->addVertex({ map_graph->getVCNum(cNum2), cNum2, tempT, {}, {} }, cNum2);
         // add edges to graph
-        for (int i = 0; i < map_graph.getVCNum(cNum2) - 1; i++) {
-            map_graph.getVertexCopy(i, cNum2, v);
+        for (int i = 0; i < map_graph->getVCNum(cNum2) - 1; i++) {
+            map_graph->getVertexCopy(i, cNum2, v);
             p2 = v.t->get_clusterRelPos();
             intPath = pathFind(p1, p2, cNum2);
-            map_graph.addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
+            map_graph->addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
         }
     }
-    goalVP = map_graph.getVertexAddress(goalP);
+    goalVP = map_graph->getVertexAddress(goalP);
     ////////////
 
     // Start and Goal in abstract Graph: can now proceed with graph search
-    graphPath = map_graph.searchForGraphPath(startVP, goalVP);
+    graphPath = map_graph->searchForGraphPath(startVP, goalVP);
 
     // Cleanup: delete extra tiles from Path_Hierarchy, and extra vertices and edges from Abstract_Graph
-    map_hierarchy.deleteStartAndGoal();
+    map_hierarchy->deleteStartAndGoal();
     if (addStart)
-        map_graph.deleteStartAndGoal(startVP, cNum1);
+        map_graph->deleteStartAndGoal(startVP, cNum1);
     if (addGoal)
-        map_graph.deleteStartAndGoal(goalVP, cNum2);
+        map_graph->deleteStartAndGoal(goalVP, cNum2);
 
     return graphPathToIntPath(graphPath);
 }

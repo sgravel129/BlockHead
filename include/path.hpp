@@ -13,10 +13,12 @@
 class Path_Hierarchy;
 
 
+
+typedef int* intArrayPtr;
+
 typedef struct Cluster {
     Point clusterPos{};
     Point tilePos{};
-    Cluster* parent{};
 } Cluster;
 
 
@@ -24,11 +26,11 @@ typedef struct Cluster {
 class PathTile {
 public:
     PathTile(); // dummy initialization constructor
-    PathTile(const MapTile&, Path_Hierarchy&, const int, const int);    // constructor for A * algorithm
-    PathTile(const MapTile&, Path_Hierarchy&);  // constructor for encapsulated transition points
+    PathTile(const MapTile&, Path_Hierarchy*, const int, const int);    // constructor for A * algorithm
+    PathTile(const MapTile&, Path_Hierarchy*);  // constructor for encapsulated transition points
     PathTile(const PathTile& t2);   // copy constructor
 
-    Cluster* findParent();
+    Cluster findParent();
     void updatePriority(const int xDest, const int yDest);
     void nextLevel(const int i);
     const int estimate(const int xDest, const int yDest) const;
@@ -39,8 +41,7 @@ public:
     bool get_traversable() const;
     int get_level() const;
     int get_priority() const;
-    Cluster getParentCCopy() const;   // returns copy of parent cluster
-    Cluster* getParentC();  // returns address of parent cluster
+    Cluster getParentCluster() const;   // returns copy of parent cluster
     
     // Destructors
     ~PathTile();
@@ -52,7 +53,7 @@ private:
     int _level;
     int _priority;
     
-    Cluster* _parentC;
+    Cluster _parentC;
     Path_Hierarchy* _parentH;
 };
 
@@ -66,21 +67,21 @@ public:
     Path_Hierarchy(const int numClusters);
     
     void addTransition(const std::pair<PathTile*, PathTile*>& tilePair);
-    void addStart(const PathTile*);
-    void addGoal(const PathTile*);
+    void addStart(PathTile* const);
+    void addGoal(PathTile* const);
     void buildClusterS();
     
 
     // Accessors
-    std::vector<std::pair<PathTile, PathTile>> get_transitionS();
+    //std::vector<std::pair<PathTile*, PathTile*>> get_transitionS();
     std::pair<PathTile, PathTile> get_transition(const int);
     std::vector<Cluster> get_clusterS();
-    Cluster get_cluster(const int, const int);   // returns copy of cluster located at supplied x,y tile pos
+    Cluster get_cluster(const Point);   // returns copy of cluster located at supplied x,y tile pos
 
     int get_numTrans();
     int get_numClusters();
 
-    Cluster* getClusterAddress(const Point&);      /// returns pointer to encapsulated cluster
+    // Memory Accessors
     bool getTransitionTileAddresses(const int, PathTile*&, PathTile*&);
     bool getStartAddress(PathTile*& t);
     bool getGoalAddress(PathTile*& t);
@@ -90,12 +91,12 @@ public:
     ~Path_Hierarchy();
 
 private:
-    std::vector<std::pair<PathTile, PathTile>> _transitionS;
+    std::vector<std::pair<PathTile*, PathTile*>> _transitionS;
     std::vector<Cluster> _clusterS;
     int _numTrans;
     int _numClusters;
-    PathTile _startT;
-    PathTile _goalT;
+    PathTile* _startT;
+    PathTile* _goalT;
 
 };
 

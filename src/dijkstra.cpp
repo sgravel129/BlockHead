@@ -9,16 +9,17 @@ using namespace std;
 std::pair<int*, int*> Dijkstra(const int src, const int V, int** graph) {
     int* paths;
     
-
-    int* dist = static_cast<int*>(malloc(V * sizeof(int))); // The output array.  dist[i] will hold the shortest 
+    // to keep
+    int* dist = new int[V]; // The output array.  dist[i] will hold the shortest 
     // distance from src to i 
 
-    bool* sptSet = static_cast<bool*>(malloc(V * sizeof(bool))); // sptSet[i] will be true if vertex i is included in shortest 
+    // to FREE
+    bool* sptSet = new bool[V]; // sptSet[i] will be true if vertex i is included in shortest 
     // path tree or shortest distance from src to i is finalized 
 
     // Initialize all distances as INFINITE and stpSet[] as false 
     for (int i = 0; i < V; i++)
-        dist[i] = INT_MAX, sptSet[i] = false;
+        dist[i] = static_cast<__int32>(INT_MAX), sptSet[i] = 0;  
 
     // Distance of source vertex from itself is always 0 
     dist[src] = 0;
@@ -47,7 +48,7 @@ std::pair<int*, int*> Dijkstra(const int src, const int V, int** graph) {
     for (int i = 0; i < V; i++) {
         free(graph[i]);
     }
-    free(graph); free(sptSet);
+    free(graph); delete[] sptSet;
 
     return std::make_pair(dist, paths);
 
@@ -59,7 +60,7 @@ std::pair<int*, int*> Dijkstra(const int src, const int V, int** graph) {
 
 int minDistance(int dist[], bool sptSet[], const int V) {
     // Initialize min value 
-    int min = INT_MAX, min_index;
+    int min = INT_MAX, min_index(0);
     for (int v = 0; v < V; v++)
         if (sptSet[v] == false && dist[v] <= min)
             min = dist[v], min_index = v;

@@ -56,7 +56,6 @@ void Abstract_Graph::deleteStartAndGoal(const Vertex* v, const int cNum) {
     _edgeL.pop_back();
     _vNums[cNum]--;
     _eNum--;
-    delete vTemp;
 }
 
 
@@ -88,12 +87,11 @@ std::vector<Vertex*> Abstract_Graph::searchForGraphPath(const Vertex* startV, co
 
 // get Weighted Adjacency Matrix with edge distances as weights
 int** Abstract_Graph::getWeightedAdj(const int V) {
-    int** adjM;
-    int* temp;
-    adjM = static_cast<int**>(malloc(V * sizeof(*adjM)));
-    temp = static_cast<int*>(malloc(V * V * sizeof(adjM[0])));
+    
+    int** adjM = new intArrayPtr[V];
+
     for (int i = 0; i < V; i++)
-        adjM[i] = temp + (i * V);
+        adjM[i] = new int[V];
     
     if (adjM) {
         for (int i = 0; i < V; i++) {
