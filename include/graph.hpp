@@ -36,7 +36,10 @@ public:
     
     double searchForDistance(const Vertex&, const Vertex&, const int cNum);
     std::vector<Vertex*> searchForGraphPath(const Vertex*, const Vertex*);
-    int** getWeightedAdj(const int);
+    
+    void setWeightedAdj();
+    std::vector<std::vector<neighbor>*>* getWeightedAdj();
+
     int keyToGlobalK(const int, const int);
     
     // Accessors
@@ -56,6 +59,7 @@ public:
 private:
     std::vector<std::vector<Vertex>> _vertexS;   // set of vertices, organized by Cluster
     std::vector<Edge> _edgeL;                    // set of edges
+    int** _weightedAdj;
     std::vector<int> _vNums;    // number of vertices per cluster
     int _eNum;       // number of edges
 

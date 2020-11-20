@@ -12,7 +12,7 @@
 
 //////////////////////////////////
 // ABSTRACT_GRAPH Implementation
-Abstract_Graph::Abstract_Graph(const int numClusters) {
+Abstract_Graph::Abstract_Graph(const int numClusters) : _weightedAdj(nullptr) {
     _vertexS = std::vector<std::vector<Vertex>>(numClusters);
     _vNums = std::vector<int>(numClusters, 0);
 };
@@ -49,7 +49,7 @@ void Abstract_Graph::deleteStartAndGoal(const Vertex* v, const int cNum) {
     int numNeighbours = v->adjList.size();
     for (int i = 0; i < numNeighbours; i++) {
         vTemp = getVertexAddress(v->adjList[i]->t->get_mapRelPos());
-        vTemp->adjList.pop_back();      // we know that the start vertex was the last one inserted, so just need to pop back
+        vTemp->adjList.pop_back();      // we know that the start/goal vertices were the last ones inserted, so just need to pop back
         vTemp->adjEdges.pop_back();
     }
     _vertexS[cNum].pop_back();
@@ -84,10 +84,9 @@ std::vector<Vertex*> Abstract_Graph::searchForGraphPath(const Vertex* startV, co
 }
 
 
-
 // get Weighted Adjacency Matrix with edge distances as weights
-int** Abstract_Graph::getWeightedAdj(const int V) {
-    
+void Abstract_Graph::setWeightedAdj() {
+    int V = getVNum();
     int** adjM = new intArrayPtr[V];
 
     for (int i = 0; i < V; i++)
@@ -107,14 +106,43 @@ int** Abstract_Graph::getWeightedAdj(const int V) {
             adjM[k1][k2] = e.distance;
             adjM[k2][k1] = e.distance;
         }
-        return adjM;
+        delete _weightedAdj;
+        _weightedAdj = adjM;
     }
     else {
         Log::error("Failed to allocate memory for path finding");
-        return NULL;
     }
 
 }
+
+
+// get Weighted Adjacency Matrix with edge distances as weights
+std::vector<std::vector<neighbor>*>* Abstract_Graph::getWeightedAdj() {
+    int V = getVNum();
+    std::vector<std::vector<neighbor>*>* adjM = new std::vector<std::vector<neighbor>*>(V);
+    std::vector<neighbor>* temp = new std::vector<neighbor>;
+
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            if (_weightedAdj)
+                temp->push_back(neighbor(j, _weightedAdj[i][j]));
+        }
+        adjM->push_back(temp);
+    }
+    temp = nullptr;
+    return adjM;
+}
+
+
+
+
+
+
+
+
+
+
+
 
 int Abstract_Graph::keyToGlobalK(const int key, const int cNum) {
     int globalKey = 0;

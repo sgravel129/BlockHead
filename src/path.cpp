@@ -275,7 +275,6 @@ Path_Hierarchy::~Path_Hierarchy() {
         delete temp1;
         delete temp2;
     }
-    
 }
 
 //////////////
@@ -302,11 +301,13 @@ std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster& c1, const Cluster& c2
     if (adjOrientation) {   // Cluster 1 on left of Cluster 2
         p1.x = k + c1.tilePos.x; p1.y = c2.tilePos.y - 1;
         p2.x = k + c1.tilePos.x; p2.y = c2.tilePos.y;
+        // From the Heap       
         return std::make_pair(getPathTileFromPoint(p1), getPathTileFromPoint(p2));
     }
     else {                  // Cluster 1 on top of Cluster 2
         p1.x = c1.tilePos.x; p1.y = k + c2.tilePos.y;
         p2.x = c1.tilePos.x + 1; p2.y = k + c2.tilePos.y;
+        // From the Heap
         return std::make_pair(getPathTileFromPoint(p1), getPathTileFromPoint(p2));
     }
 }
@@ -472,40 +473,57 @@ void buildGraph() {
 }
 
 void buildGraphPaths() {
+ 
     
-    // Call dijkstra with getVnum() and graph as below
-    //int** graph(new map_graph.getWeightedAdj(V));
-
-    /*
-    // allocating memory
-    int V = map_graph.getVNum();
-    int** graphDistances;
-    int* temp;
-    graphDistances = static_cast<int**>(malloc(V * sizeof(*graphDistances)));
-    temp = static_cast<int*>(malloc(V * V * sizeof(graphDistances[0])));
+    int V = map_graph->getVNum();   // get number of vertices
     
-    // running Dijkstra for every vertex as source
-    for (int i = 0; i < V; i++)
-        graphDistances[i] = map_graph.Dijkstra(i);
+    map_graph->setWeightedAdj();   // encapsulates weightedAdj ptr to heap inside abstract_graph
 
-    int*** graphPaths;
-    int** temp2;
-    graphPaths = static_cast<int***>(malloc(V * sizeof(**graphPaths)));
-    temp2 = static_cast<int**>(malloc(V * V * sizeof(*graphPaths)));
-    temp = static_cast<int*>(malloc(V * V * V * sizeof(graphPaths[0])));
+    std::vector<std::vector<neighbor>*>* weightedAdj = map_graph->getWeightedAdj();     // gets from heap
+    
+
+    std::vector<double>* min_distance = new std::vector<double>(V);
+    std::vector<int> previous(V);
+
+    std::vector<std::vector<double>*>* distances = new std::vector<std::vector<double>*>;
+    
+    std::vector<std::vector<std::vector<int>*>*>* paths = new std::vector<std::vector<std::vector<int>*>*>(V);
+    std::vector<std::vector<int>*>* pathsFromSrc = new std::vector<std::vector<int>*>;
+
+    for (int i = 0; i < V; i++) {
+        DijkstraComputePaths(i, weightedAdj, min_distance, previous);
+        for (int j = 0; j < V; j++) {
+            pathsFromSrc->push_back(DijkstraGetShortestPathTo(j, previous));
+        }
+        paths->push_back(pathsFromSrc);
+    }
+    pathsFromSrc = nullptr;
+
+    
+
+
+    // STORE PATHS HERE
 
 
 
-    int * graphDistances = static_cast<int*>(malloc(V*V*sizeof(int)));
-    for (int i = 0; i < V; i++)
-        graphDistances[i] = map_graph.Dijkstra(i);
-
-    int* graphPaths = static_cast<int*>(malloc(V * V * V * sizeof(int)));
-    */
+    free(weightedAdj);
+    weightedAdj = nullptr;
+    
 }
 
 
 
+
+
+
+
+
+
+
+
+
+
+// RUNTIME ALGO
 
 std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
     Vertex startV, * startVP, goalV, * goalVP, v;
@@ -545,7 +563,6 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
         map_hierarchy->addStart(tempT);
         // connect to all cluster border transitions with A star
         p1 = { startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH };
-        map_hierarchy->getStartAddress(tempT);
         map_graph->addVertex({ map_graph->getVCNum(cNum1), cNum1, tempT, {}, {} }, cNum1);
         // add edges to graph
         for (int i = 0; i < map_graph->getVCNum(cNum1) - 1; i++) {
@@ -565,7 +582,6 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
         map_hierarchy->addGoal(tempT);
         // connect to all cluster border transitions with A star
         p1 = { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH };
-        map_hierarchy->getGoalAddress(tempT);
         map_graph->addVertex({ map_graph->getVCNum(cNum2), cNum2, tempT, {}, {} }, cNum2);
         // add edges to graph
         for (int i = 0; i < map_graph->getVCNum(cNum2) - 1; i++) {
