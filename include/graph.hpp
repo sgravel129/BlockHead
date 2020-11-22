@@ -50,7 +50,7 @@ public:
     int getVNum() const;      // return total number of vertices in graph
 
     // Destructor
-    //~Abstract_Graph();
+    ~Abstract_Graph();
 
 
     Vertex* getVertexAddress(const Point&);    // returns pointer to encapsulated vertex

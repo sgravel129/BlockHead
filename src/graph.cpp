@@ -216,4 +216,28 @@ Vertex* Abstract_Graph::getVertexAddress(const Point& p) {
     }
     return NULL;
 }
+
+
+
+// Destructor
+
+Abstract_Graph::~Abstract_Graph() {
+    delete _weightedAdj;
+    _weightedAdj = nullptr;
+    
+    // All on stack for now... might change later
+
+    /*
+    for (int i = 0; i < _vertexS.size(); i++) {
+        for (int j = 0; j < _vertexS[i].size(); j++) {
+            delete _vertexS[i][j]
+        }
+    }
+    */
+
+}
+
+
+
+
 /////////////////////////////////

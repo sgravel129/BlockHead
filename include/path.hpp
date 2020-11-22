@@ -13,7 +13,6 @@
 class Path_Hierarchy;
 
 
-
 typedef int* intArrayPtr;
 
 typedef struct Cluster {
@@ -26,8 +25,11 @@ typedef struct Cluster {
 class PathTile {
 public:
     PathTile(); // dummy initialization constructor
-    PathTile(const MapTile&, Path_Hierarchy*, const int, const int);    // constructor for A * algorithm
-    PathTile(const MapTile&, Path_Hierarchy*);  // constructor for encapsulated transition points
+    PathTile(const Point&, Path_Hierarchy*, const int, const int);    // constructor for A * algorithm
+    PathTile(const Point&, const bool, Path_Hierarchy*, const int, const int);    // constructor for A * algorithm
+    PathTile(const Point&, Path_Hierarchy*);  // constructor for encapsulated transition points
+    PathTile(const Point&, const bool, Path_Hierarchy*);  // constructor for encapsulated transition points
+
     PathTile(const PathTile& t2);   // copy constructor
 
     Cluster findParent();
@@ -126,3 +128,5 @@ struct neighbor {
 };
 
 typedef std::vector<std::vector<neighbor> > adjacency_list_t;
+
+

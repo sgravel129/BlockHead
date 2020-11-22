@@ -1,4 +1,6 @@
 #include "game.hpp"
+#include "testPath.hpp"
+
 
 #include <iostream>
 
@@ -12,16 +14,26 @@ int main(int argc, char **argv)
         framerate = atoi(argv[2]);
     }
 
+    testTile();
+    
+    /*
     Game game;
 
     game.setFramerate(framerate);
 
+    ////////
+    
+    /////////
+
+    /*
     if (game.init())
     {
         game.run();
     }
 
     game.exit();
-
+    */
     return 0;
 }
+
+
