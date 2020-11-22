@@ -67,14 +67,15 @@ bool getTileCol(const Point& p) {
 
 PathTile* getPathTileFromPoint(const Point& p) {
     //return PathTile(game_map.get_tile(p), map_hierarchy);
-    MapTile mt;
+    //MapTile mt;
     return new PathTile(p, getTileCol(p), GP.map_hierarchy);    // dummy return for now
 }
+/*
 MapTile* getMapTileFromPoint(const Point& p) {
     
     return new MapTile;  // dummy return for now
 }
-
+*/
 
 
 /////////////////////
@@ -154,13 +155,13 @@ std::vector<int> pathFind(const Point startP, const Point finishP, const int cNu
     int pqi = 0;
     PathTile* n0;
     PathTile* m0;
-    MapTile* tempMT;
+    //MapTile* tempMT;
     int i, j, x, y, xdx, ydy;
     std::vector<int> path;
     char c;
     // create the start node and push into list of open nodes
     Point p = { xStart + clusterP.x, yStart + clusterP.y };
-    tempMT = getMapTileFromPoint({ xStart + clusterP.x, yStart + clusterP.y });
+    //tempMT = getMapTileFromPoint({ xStart + clusterP.x, yStart + clusterP.y });
     n0 = new PathTile(p, GP.map_hierarchy, 0, 0);
     n0->updatePriority(xFinish, yFinish);
     pq[pqi].push(*n0);
@@ -212,12 +213,13 @@ std::vector<int> pathFind(const Point startP, const Point finishP, const int cNu
                 || closed_nodes_map[xdx][ydy] == 1))
             {
                 // generate a child node
-                tempMT = getMapTileFromPoint({ clusterP.x+xdx, clusterP.y+ydy });     // get MapTile for new possible tile to move to
-                if (tempMT->getCollision()) {                   // if an obstacle, update map data and go to next loop iteration
+                //tempMT = getMapTileFromPoint({ clusterP.x+xdx, clusterP.y+ydy });     // get MapTile for new possible tile to move to
+                p = { clusterP.x + xdx, clusterP.y + ydy };
+                if (!getTileCol(p)) {                   // if an obstacle, update map data and go to next loop iteration
                     intMap[clusterP.x][clusterP.y][xdx][ydy] = 1;
                     continue;
                 }
-                m0 = new PathTile(tempMT->getPos(), !tempMT->getCollision(), GP.map_hierarchy, n0->get_level(), n0->get_priority());
+                m0 = new PathTile(p, GP.map_hierarchy, n0->get_level(), n0->get_priority());
                 m0->nextLevel(i);
                 m0->updatePriority(xFinish, yFinish);
 
@@ -323,15 +325,15 @@ void Path_Hierarchy::buildClusterS() {
 // returns pair of adjacent tiles from cluster pos and tile displacement
 std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster& c1, const Cluster& c2, const int k, const bool adjOrientation) {
     Point p1, p2;
-    if (adjOrientation) {   // Cluster 1 on left of Cluster 2
+    if (adjOrientation) {   // Cluster 1 on top of Cluster 2
         p1.x = k + c1.tilePos.x; p1.y = c2.tilePos.y - 1;
         p2.x = k + c1.tilePos.x; p2.y = c2.tilePos.y;
         // From the Heap       
         return std::make_pair(getPathTileFromPoint(p1), getPathTileFromPoint(p2));
     }
-    else {                  // Cluster 1 on top of Cluster 2
-        p1.x = c1.tilePos.x; p1.y = k + c2.tilePos.y;
-        p2.x = c1.tilePos.x + 1; p2.y = k + c2.tilePos.y;
+    else {                  // Cluster 1 on left of Cluster 2
+        p1.x = c2.tilePos.x; p1.y = k + c2.tilePos.y;
+        p2.x = c2.tilePos.x - 1; p2.y = k + c2.tilePos.y;
         // From the Heap
         return std::make_pair(getPathTileFromPoint(p1), getPathTileFromPoint(p2));
     }
@@ -408,11 +410,12 @@ void abstractMap() {
         }
     }
     
-    for(int j = 0; j < CLUSTER_XNUM; j++) {     // checking all laterally adjacent clusters
-        for(int i = 0; i < CLUSTER_XNUM - 1; i++) {
+    for(int i = 0; i < CLUSTER_XNUM - 1; i++) {     // checking all laterally adjacent clusters
+        for(int j = 0; j < CLUSTER_YNUM; j++) {
             findTransitions(GP.map_hierarchy->get_cluster({ i,j }), GP.map_hierarchy->get_cluster({ i + 1, j }));
         }
     }
+    
 }
 
 // Function findTransitions
@@ -557,7 +560,7 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
     Vertex startV, * startVP, goalV, * goalVP, v;
     Edge tempEdge;
     PathTile* tempT;
-    MapTile* tempMT;
+    //MapTile* tempMT;
     bool addStart(false), addGoal(false);
     Point p1, p2;
     std::vector<int> intPath;
@@ -589,8 +592,8 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
         // set flag that we are adding start vertex to graph (for cleanup later)
         addStart = true;
         // encapsulate vertex into graph
-        tempMT = getMapTileFromPoint(startP);
-        tempT = new PathTile(tempMT->getPos(), !tempMT->getCollision(), GP.map_hierarchy);
+        //tempMT = getMapTileFromPoint(startP);
+        tempT = new PathTile(startP, GP.map_hierarchy);
         GP.map_hierarchy->addStart(tempT);
         // connect to all cluster border transitions with A star
         p1 = { startP.x % static_cast<__int32>(CLUSTER_TLENGTH), startP.y % static_cast<__int32>(CLUSTER_TLENGTH) };
@@ -609,8 +612,8 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
         // set flag that we are adding goal vertex to graph (for cleanup later)
         addGoal = true;
         // encapsulate vertex into graph
-        tempMT = getMapTileFromPoint(goalP);
-        tempT = new PathTile(tempMT->getPos(), !tempMT->getCollision(), GP.map_hierarchy);
+        //tempMT = getMapTileFromPoint(goalP);
+        tempT = new PathTile(goalP, GP.map_hierarchy);
         GP.map_hierarchy->addGoal(tempT);
         // connect to all cluster border transitions with A star
         p1 = { goalP.x % static_cast<__int32>(CLUSTER_TLENGTH), goalP.y % static_cast<__int32>(CLUSTER_TLENGTH) };

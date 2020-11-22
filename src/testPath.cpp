@@ -24,7 +24,6 @@ using namespace std;
 
 Path_Hierarchy* dummyPathHierarchy() {
 	Path_Hierarchy* ph = new Path_Hierarchy(CLUSTER_XNUM * CLUSTER_YNUM);
-	ph->buildClusterS();
 
 
 	return ph;
@@ -94,8 +93,9 @@ void testHierarchy() {
 
 void testMain() {
 	GP.setGlobals(dummyPathHierarchy(), dummyGraph());
-	testTile();
-	//testHierarchy();
+	abstractMap();
+	//testTile();
+	testHierarchy();
 }
 
 
