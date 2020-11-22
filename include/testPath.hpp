@@ -11,4 +11,5 @@ void printGraph();
 void printPathHierarchy();
 void printTile(PathTile* const t);
 void testTile();
-
+void testMain();
+void testHierarchy();

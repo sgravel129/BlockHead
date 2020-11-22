@@ -12,20 +12,25 @@
 #include <vector>
 
 
-#define X_MAX 1200
+#define X_MAX 2000
 #define Y_MAX 1200
+
+#define X_STEP 50   // x size of tile
+#define Y_STEP 50   // y size of tile
+
 // will change these depending on amount of pixels sprite occupies
 // #define CLUSTER_WIDTH 120
 // #define CLUSTER_HEIGHT 120
-#define CLUSTER_SLENGTH 120     // side length of cluster (square)
+#define CLUSTER_SLENGTH 400     // side length of cluster (square)
 #define CLUSTER_TLENGTH CLUSTER_SLENGTH / X_STEP
 #define CLUSTER_XNUM X_MAX/CLUSTER_SLENGTH
 #define CLUSTER_YNUM Y_MAX/CLUSTER_SLENGTH
 
-#define X_STEP 30   // x size of tile
-#define Y_STEP 30   // y size of tile
+
 #define MIN_ENTRANCE_LENGTH 3   // minimum tile lenght for entrance
 #define TRANSITION_INTERVAL 3   // number of tiles between transitions in single entrance
+
+using namespace std;
 
 const int dir = 8;  // number of possible directions to go in
 const int dx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };              // dx and dy representing 8 cardinal directions, starting East then proceeding clockwise
@@ -82,13 +87,13 @@ PathTile::PathTile(const Point& p, Path_Hierarchy* parentH, const int level, con
 PathTile::PathTile(const Point& p, const bool trav, Path_Hierarchy* parentH) : PathTile(p, trav, parentH, 0, 0) {}
 PathTile::PathTile(const Point& p, const bool trav, Path_Hierarchy* parentH, const int level, const int priority) {
     _mapRelPos = p;
-    _clusterRelPos = { _mapRelPos.x % CLUSTER_TLENGTH, _mapRelPos.y % CLUSTER_TLENGTH };
+    _clusterRelPos = { _mapRelPos.x % static_cast<__int32>(CLUSTER_TLENGTH), _mapRelPos.y % static_cast<__int32>(CLUSTER_TLENGTH) };
     _traversable = trav;
     _level = level;
     _priority = priority;    
     _parentH = parentH;
     _parentC = findParent();
-    
+    true;
 }
 PathTile::PathTile(const PathTile& t2) {        // Copy Constructor
     _mapRelPos = t2._mapRelPos; _clusterRelPos = t2._clusterRelPos; _traversable = t2._traversable;
@@ -102,7 +107,7 @@ PathTile::~PathTile() { // set pointer to hierarchy to null to avoid leaks
 // Member Functions
 // Called by constructor, finds parent cluster from tile point
 Cluster PathTile::findParent() {
-    Point p = { _mapRelPos.x / CLUSTER_TLENGTH , _mapRelPos.y / CLUSTER_TLENGTH };
+    Point p = { _mapRelPos.x / static_cast<__int32>(CLUSTER_TLENGTH) , _mapRelPos.y / static_cast<__int32>(CLUSTER_TLENGTH) };
     return _parentH->get_cluster(p);
 }
 // Update A * priority
@@ -338,7 +343,10 @@ std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster& c1, const Cluster& c2
 std::pair<PathTile, PathTile> Path_Hierarchy::get_transition(const int transNum) { 
     return std::make_pair(*_transitionS[transNum].first, *_transitionS[transNum].second); }
 std::vector<Cluster> Path_Hierarchy::get_clusterS() {return _clusterS;}
-Cluster Path_Hierarchy::get_cluster(const Point p) {return _clusterS[p.y*CLUSTER_YNUM + static_cast<__int64>(p.x)];}
+Cluster Path_Hierarchy::get_cluster(const Point p) {
+    Cluster c = _clusterS[p.y * CLUSTER_XNUM + static_cast<__int64>(p.x)];
+        return _clusterS[p.y * CLUSTER_XNUM + static_cast<__int64>(p.x)];
+}
 int Path_Hierarchy::get_numTrans() { return _numTrans; }
 int Path_Hierarchy::get_numClusters() { return _numClusters; }
 
@@ -378,7 +386,7 @@ void Path_Hierarchy::deleteStartAndGoal() {
 //////////////////////////////////////////////////////////////////////////
 // get cluster Point from Cluster Num
 Point getClusterPoint(const int clusterNum) {
-    int x = clusterNum % CLUSTER_YNUM;
+    int x = clusterNum % static_cast<__int32>(CLUSTER_YNUM);
     int y = (clusterNum - x) / CLUSTER_YNUM;
     return { x, y };
 }
@@ -568,7 +576,8 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
             if (GP.map_graph->getEdge(startV, goalV, tempEdge))
                 return tempEdge.path;
         }
-        intPath = pathFind({ startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH }, { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH }, cNum1);
+        intPath = pathFind({ startP.x % static_cast<__int32>(CLUSTER_TLENGTH), startP.y % static_cast<__int32>(CLUSTER_TLENGTH) },
+            { goalP.x % static_cast<__int32>(CLUSTER_TLENGTH), goalP.y % static_cast<__int32>(CLUSTER_TLENGTH) }, cNum1);
         if (intPath.size() > 0)
             return intPath;
     }
@@ -584,7 +593,7 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
         tempT = new PathTile(tempMT->getPos(), !tempMT->getCollision(), GP.map_hierarchy);
         GP.map_hierarchy->addStart(tempT);
         // connect to all cluster border transitions with A star
-        p1 = { startP.x % CLUSTER_TLENGTH, startP.y % CLUSTER_TLENGTH };
+        p1 = { startP.x % static_cast<__int32>(CLUSTER_TLENGTH), startP.y % static_cast<__int32>(CLUSTER_TLENGTH) };
         GP.map_graph->addVertex({ GP.map_graph->getVCNum(cNum1), cNum1, tempT, {}, {} }, cNum1);
         // add edges to graph
         for (int i = 0; i < GP.map_graph->getVCNum(cNum1) - 1; i++) {
@@ -604,7 +613,7 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
         tempT = new PathTile(tempMT->getPos(), !tempMT->getCollision(), GP.map_hierarchy);
         GP.map_hierarchy->addGoal(tempT);
         // connect to all cluster border transitions with A star
-        p1 = { goalP.x % CLUSTER_TLENGTH, goalP.y % CLUSTER_TLENGTH };
+        p1 = { goalP.x % static_cast<__int32>(CLUSTER_TLENGTH), goalP.y % static_cast<__int32>(CLUSTER_TLENGTH) };
         GP.map_graph->addVertex({ GP.map_graph->getVCNum(cNum2), cNum2, tempT, {}, {} }, cNum2);
         // add edges to graph
         for (int i = 0; i < GP.map_graph->getVCNum(cNum2) - 1; i++) {
