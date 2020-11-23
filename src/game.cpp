@@ -10,7 +10,7 @@
 
 Game::Game()
 		:	graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT),
-			player(graphics, "res/robot_sprites.png", 480, 500, 0.50F),
+			player(graphics, "res/robot_sprites.png", 2110, 2160, 0.10F),
 			zombie(graphics, "res/zombie.png", 30, 32, 4.0F),
 			map(Point{10,10}),
 			isRunning(false)
