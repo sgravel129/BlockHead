@@ -15,6 +15,7 @@
 Abstract_Graph::Abstract_Graph(const int numClusters) : _weightedAdj(nullptr) {
     _vertexS = std::vector<std::vector<Vertex>>(numClusters);
     _vNums = std::vector<int>(numClusters, 0);
+    _eNum = 0;
 };
 
 // Mutators
@@ -206,7 +207,7 @@ int Abstract_Graph::getVNum() const {
 // Memory Accessor
 
 Vertex* Abstract_Graph::getVertexAddress(const Point& p) {
-    int cNum = getClusterNum(p);
+    int cNum = getClusterNum(findParentCluster(p).clusterPos);
     Point tempP;
     for (int i = 0; i < _vNums[cNum]; i++) {
         tempP = _vertexS[cNum][i].t->get_mapRelPos();

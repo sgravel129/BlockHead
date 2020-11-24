@@ -1,4 +1,5 @@
 #include "testPath.hpp"
+#include <ctime>
 
 using namespace std;
 
@@ -35,10 +36,48 @@ Abstract_Graph* dummyGraph() {
 	return new Abstract_Graph(CLUSTER_XNUM * CLUSTER_YNUM);
 }
 
+std::vector<std::vector<bool>> dummyMap() {
+	std::vector<std::vector<bool>> m(X_MAX / X_STEP);
+	int randInt;
+	for (int i = 0; i < X_MAX / X_STEP; i++) {
+		for (int j = 0; j < Y_MAX / Y_STEP; j++) {
+			
+			randInt = rand() % 100;
+			if (randInt < 80)  m[i].push_back(true);
+			else m[i].push_back(false);
+			
+			//m[i].push_back(true);
+		}
+	}
+	return m;
+}
 
 
 
 
+void printMap(const int cNum) {
+	int i, j;
+	cout << "Map of Cluster " << cNum << endl;
+	cout << "\n  ";
+	for (j = 0; j < CLUSTER_TLENGTH; j++)
+		if (j < 10)
+			cout << " " << j << " ";
+		else
+			cout << j << " ";
+	cout << endl;
+	for (j = 0; j < CLUSTER_TLENGTH; j++) {
+		if (j < 10)
+			cout << " " << j << " ";
+		else
+			cout << j << " ";
+		for (i = 0; i < CLUSTER_TLENGTH; i++) {
+			if (GP._collisionM[i][j]) cout << "-" << "  ";
+			else cout << "O" << "  ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+} // end showJumble
 
 
 void testGraph() {
@@ -90,11 +129,26 @@ void testHierarchy() {
 	printPathHierarchy();
 }
 
+void testAstar() {
+	Point p1 = { 0,0 }, p2 = { 7,7 };
+	int cNum = 0;
+	std::vector<int> path = pathFind(p1, p2, cNum);
+	cout << "Path from (" << p1.x << ", " << p1.y << ") to (" << p2.x << ", " << p2.y << ") in Cluster " << cNum << std::endl;
+	for (int i = 0; i < path.size(); i++)
+		cout << path[i];
+
+}
 
 void testMain() {
-	GP.setGlobals(dummyPathHierarchy(), dummyGraph());
+	srand(time(NULL));
+	GP.setGlobals(dummyPathHierarchy(), dummyGraph(), dummyMap());
+	printMap(0);
 	abstractMap();
+	testAstar();
+	//buildGraph();
 	//testTile();
+	cout << endl << endl;
+	system("Pause");
 	testHierarchy();
 }
 

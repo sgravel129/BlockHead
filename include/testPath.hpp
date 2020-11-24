@@ -13,3 +13,5 @@ void printTile(PathTile* const t);
 void testTile();
 void testMain();
 void testHierarchy();
+void testAstar();
+void printMap(const int);

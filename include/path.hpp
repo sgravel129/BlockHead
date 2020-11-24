@@ -32,7 +32,7 @@ public:
 
     PathTile(const PathTile& t2);   // copy constructor
 
-    Cluster findParent();
+    
     void updatePriority(const int xDest, const int yDest);
     void nextLevel(const int i);
     const int estimate(const int xDest, const int yDest) const;
@@ -79,6 +79,7 @@ public:
     std::pair<PathTile, PathTile> get_transition(const int);
     std::vector<Cluster> get_clusterS();
     Cluster get_cluster(const Point);   // returns copy of cluster located at supplied x,y tile pos
+    Cluster get_cluster(const int); // returns copy of cluster for supplied cNum
 
     int get_numTrans();
     int get_numClusters();
@@ -102,12 +103,12 @@ private:
 
 };
 
-Point getClusterPoint(const int);
+Point getClusterPFromNum(const int);
 int getClusterNum(const Point&);
 void findTransitions(const Cluster& c1, const Cluster& c2);
 std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster&, const Cluster&, const int, const bool);
 PathTile* getPathTileFromPoint(const Point& p);
-MapTile* getMapTileFromPoint(const Point& p);
+//MapTile* getMapTileFromPoint(const Point& p);
 
 
 std::vector<int> searchForPath(const Point& startP, const Point& goalP);
@@ -130,3 +131,4 @@ struct neighbor {
 typedef std::vector<std::vector<neighbor> > adjacency_list_t;
 
 
+Cluster findParentCluster(const Point&);
