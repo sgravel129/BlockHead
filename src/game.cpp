@@ -108,9 +108,6 @@ void Game::handleUserInput()
 	}
 }
 
-int x = 200;
-int y = 200;
-
 void Game::exit()
 {
 	isRunning = false;
@@ -144,6 +141,7 @@ void Game::run()
 
 		// Update
 		handleUserInput();
+		Animation::updateTicks();
 		player.update(input);
 		zombie.update(player.getX(), player.getY());
 

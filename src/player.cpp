@@ -12,7 +12,6 @@ Player::Player()
 
 Player::Player(Graphics &graphics, const std::string &path,int w, int h, float scale)
 {
-    Log::debug("~Player\t| Sprite Called");
     _x = 200;
     _y = 200;
     _moveSpeed = 2;
