@@ -3,11 +3,6 @@
 #include "graphics.hpp"
 #include "input.hpp"
 
-// Game Objects
-#include "player.hpp"
-#include "zombie.hpp"
-#include "map.hpp"
-
 struct SDL_Window;
 struct SDL_Renderer;
 
@@ -17,7 +12,9 @@ public:
 	Game();
 	~Game();
 
-	bool init();
+	bool start_menu();
+	bool again_menu();
+	bool winner_menu();
 
 	/*
 		Destroy current renderer and render, unload textures from GPU
@@ -39,6 +36,9 @@ public:
 	void setFramerate(int framerate);
 
 private:
+
+	bool menu(const std::string &background_path, const std::string &exit_button, const std::string &play_button);
+
 	/*
 		Configure starting game conditions such as spawn point and labirinth
 	 */
@@ -52,28 +52,15 @@ private:
 	/*
 		Update all game objects
 	 */
-	void update();
 
-	/*
-		Render all game objects to screen
-	 */
-	void render();
-
-	/*
-		Process collisions between game objects
-	 */
 	void handleCollisions();
-	int _framerate;
+	int framerate;
+	bool isRunning;
 
-	bool _isRunning;
-	Graphics *_graphics;
-	Input _input;
-
-	SDL_Event _event;
+	Graphics graphics;
+	Input input;
+	SDL_Event event;
 
 	// Custom game classes
-	Player *_player;
-	Zombie *_zombie;
-	Map *_map;
 	// End of custom classes
 };

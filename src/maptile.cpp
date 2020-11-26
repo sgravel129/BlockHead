@@ -7,7 +7,7 @@ MapTile::MapTile() {}
 MapTile::~MapTile()
 {
     Log::destruct("MapTile\t| Destroy: " + std::to_string(_location.x) + " " + std::to_string(_location.y));
-    _sprite->~Sprite();
+    delete _sprite;
 }
 
 // Accessors

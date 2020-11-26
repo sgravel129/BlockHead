@@ -17,7 +17,7 @@ Map::~Map()
     Log::destruct("Map\t| Destroy MapTiles:");
     for (auto &tile : _tiles)
     {
-        tile->~MapTile();
+        delete tile;
     }
 }
 
