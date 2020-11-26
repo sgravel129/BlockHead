@@ -50,12 +50,13 @@ bool Game::menu(const std::string &background_path, const std::string &play_butt
 		if (input.wasKeyPressed(SDL_SCANCODE_N))
 			isRunning = false;
 
-	/* Custom class initialization */
-	_player = new Player(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-	_zombie = new Zombie(*_graphics, "res/zombie.png", 30, 32, 4.0F);
-	_map = new Map(Point{10, 10});
-	_map->loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-	_map->loadMapFile(*_graphics, "res/maps/test.map");
+		if (current - last >= (1000 / framerate))
+		{
+			// Render
+			graphics.fillBackground();
+			background.draw(graphics, 0, 100);
+			button_1.draw(graphics, 650, 340);
+			button_2.draw(graphics, 650, 420);
 
 			// Display
 			graphics.flip();
@@ -109,27 +110,6 @@ void Game::handleUserInput()
 
 int x = 200;
 int y = 200;
-
-void Game::update()
-{
-	/* Updating of game classes */
-	_player->update(_input);
-	_zombie->update(_player->getX(), _player->getY());
-	/* End of updating */
-}
-
-void Game::render()
-{
-	_graphics->fillBackground();
-
-	_map->draw(*_graphics);
-	/* Rendering of different classes */
-	_player->draw(*_graphics);
-	_zombie->draw(*_graphics);
-
-	/* End of rendering */
-	_graphics->flip();
-}
 
 void Game::exit()
 {
