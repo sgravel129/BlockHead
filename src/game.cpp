@@ -4,21 +4,20 @@
 #include "input.hpp"
 #include "constants.hpp"
 
+#include "player.hpp"
+#include "zombie.hpp"
+#include "map.hpp"
+
 // TODO: Framerate bug
 // TODO: Removed default constructors?
 // TODO: Log option just for destructors.
 
 Game::Game()
 		:	graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT),
-			player(graphics, "res/robot_sprites.png", 2110, 2160, 0.10F),
-			zombie(graphics, "res/zombie.png", 30, 32, 4.0F),
-			map(Point{10,10}),
+			framerate(30),
 			isRunning(false)
 {
 	Log::verbose("Game Constructor\t| SDL Subsystems initialized");
-	map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-	map.loadMapFile(graphics, "res/maps/test.map");
-
 	isRunning = true;
 }
 
@@ -37,28 +36,31 @@ bool Game::menu(const std::string &background_path, const std::string &play_butt
 	unsigned int current;
 
 	graphics.setRenderColor(Color("FFFFFF"));
-	graphics.fillBackground();
 
 	while (isRunning)
 	{
 		current = SDL_GetTicks();
 
-		if (current - last >= (1000 / framerate))
-		{
-			background.draw(graphics, 0, 100);
-			button_1.draw(graphics, 650, 340);
-			button_2.draw(graphics, 650, 420);
-			graphics.flip();
-			last = current;
-		}
-
+		// Update
 		handleUserInput();
-
 		if (input.wasKeyPressed(SDL_SCANCODE_Y))
 			break;
 
 		if (input.wasKeyPressed(SDL_SCANCODE_N))
-			isRunning = false;;
+			isRunning = false;
+
+		if (current - last >= (1000 / framerate))
+		{
+			// Render
+			graphics.fillBackground();
+			background.draw(graphics, 0, 100);
+			button_1.draw(graphics, 650, 340);
+			button_2.draw(graphics, 650, 420);
+
+			// Display
+			graphics.flip();
+			last = current;
+		}
 
 		SDL_Delay(10);
 	}
@@ -105,32 +107,6 @@ void Game::handleUserInput()
 	}
 }
 
-int x = 200;
-int y = 200;
-
-void Game::update()
-{
-	/* Updating of game classes */
-	player.update(input);
-	zombie.update(player.getX(), player.getY());
-	/* End of updating */
-}
-
-void Game::render()
-{
-
-	graphics.setRenderColor(Color("65846c"));
-	graphics.fillBackground();
-
-	map.draw(graphics);
-	/* Rendering of different classes */
-	player.draw(graphics);
-	zombie.draw(graphics);
-
-	/* End of rendering */
-	graphics.flip();
-}
-
 void Game::exit()
 {
 	isRunning = false;
@@ -141,21 +117,42 @@ bool Game::running()
 	return isRunning;
 }
 
+int x = 200;
+int y = 200;
+
 void Game::run()
 {
+	Player player = Player(graphics, "res/robot_sprites.png", 2110, 2160, 0.10F);
+	Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 4.0F);
+	Map map = Map(Point{10, 10});
+
+	map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
+	map.loadMapFile(graphics, "res/maps/test.map");
+
 	unsigned int last = SDL_GetTicks();
 	unsigned int current;
+
+	graphics.setRenderColor(Color("65846c"));
 
 	while (isRunning)
 	{
 		current = SDL_GetTicks();
 
+		// Update
 		handleUserInput();
-		update();
+		player.update(input);
+		zombie.update(player.getX(), player.getY());
 
 		if (current - last >= (1000 / framerate))
 		{
-			render();
+			// Render
+			graphics.fillBackground();
+			map.draw(graphics);
+			player.draw(graphics);
+			zombie.draw(graphics);
+
+			// Display
+			graphics.flip();
 			last = current;
 		}
 

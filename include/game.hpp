@@ -4,11 +4,6 @@
 #include "input.hpp"
 #include "color.hpp"
 
-// Game Objects
-#include "player.hpp"
-#include "zombie.hpp"
-#include "map.hpp"
-
 struct SDL_Window;
 struct SDL_Renderer;
 
@@ -42,7 +37,7 @@ public:
 	void setFramerate(int framerate);
 
 private:
-	
+
 	bool menu(const std::string &background_path, const std::string &exit_button, const std::string &play_button);
 
 	/*
@@ -58,28 +53,15 @@ private:
 	/*
 		Update all game objects
 	 */
-	void update();
 
-	/*
-		Render all game objects to screen
-	 */
-	void render();
-
-	/*
-		Process collisions between game objects
-	 */
 	void handleCollisions();
 	int framerate;
-
 	bool isRunning;
+
 	Graphics graphics;
 	Input input;
-
 	SDL_Event event;
 
 	// Custom game classes
-	Player player;
-	Zombie zombie;
-	Map map;
 	// End of custom classes
 };

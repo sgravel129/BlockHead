@@ -19,7 +19,8 @@ int main(int argc, char **argv)
         game.setFramerate(framerate);
 
         game.start_menu();
-        game.run();
+        if (game.running())
+            game.run();
         game.exit();
     }
     catch(std::runtime_error &err)
@@ -27,6 +28,6 @@ int main(int argc, char **argv)
         std::cerr << err.what() << std::endl;
     }
 
-    
+
     return 0;
 }

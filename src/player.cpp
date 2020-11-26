@@ -5,10 +5,13 @@
 
 Player::Player()
 {
+    Log::debug("~Player\t| Called");
+    delete _sprite;
 }
 
 Player::Player(Graphics &graphics, const std::string &path,int w, int h, float scale)
 {
+    Log::debug("~Player\t| Sprite Called");
     _x = 200;
     _y = 200;
     _moveSpeed = 2;
@@ -23,7 +26,6 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
 Player::~Player()
 {
     Log::debug("~Player\t| Called");
-    _sprite->~Sprite();
 }
 
 

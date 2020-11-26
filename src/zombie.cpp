@@ -10,7 +10,7 @@ Zombie::Zombie()
 Zombie::~Zombie()
 {
     Log::debug("~Zombie\t| Called");
-    _sprite->~Sprite();
+    delete _sprite;
 }
 
 Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale)
