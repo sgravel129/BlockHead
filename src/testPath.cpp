@@ -152,6 +152,21 @@ void testGraph() {
 
 }
 
+
+void testDijkstra() {
+	int V = GP.map_graph->getVNum();   // get number of vertices
+	GP.map_graph->setWeightedAdj();
+	std::vector<std::vector<neighbor>*>* weightedAdj = GP.map_graph->getWeightedAdj();     // gets from heap
+	std::vector<double>* min_distance = new std::vector<double>(V);
+	std::vector<int> previous(V);
+	int src = 0;
+	DijkstraComputePaths(src, weightedAdj, min_distance, previous);
+
+	cout << "Path distances from src = " << src << ":\n";
+	for (int i = 0; i < min_distance->size(); i++) cout << i << ":\t" << min_distance->at(i) << endl;
+}
+
+
 void testMain() {
 	
 	
@@ -159,20 +174,21 @@ void testMain() {
 	GP.setGlobals(dummyPathHierarchy(), dummyGraph(), dummyMap());
 	GlobalPathVars lmao = GP;
 	abstractMap();
-	
+	buildGraph();
 	
 	// testing A star aglo
-	Point p1 = { 0,0 }, p2 = { 7,7 };
-	Point clusterP = { 3, 2 };
-	printMap(clusterP);
-	testAstar(p1, p2, getClusterNum(clusterP));
-	cout << endl << endl;
-	buildGraph();
+	//Point p1 = { 0,0 }, p2 = { 7,7 };
+	//Point clusterP = { 3, 2 };
+	//printMap(clusterP);
+	//testAstar(p1, p2, getClusterNum(clusterP));
+	//cout << endl << endl;
+	
 	//testTile();
 	
-	testGraph();
+	//testGraph();
 	
-	
+	testDijkstra();
+
 	cout << endl << endl;
 
 

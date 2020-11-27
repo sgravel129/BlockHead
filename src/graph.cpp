@@ -12,9 +12,10 @@
 
 //////////////////////////////////
 // ABSTRACT_GRAPH Implementation
-Abstract_Graph::Abstract_Graph(const int numClusters) : _weightedAdj(nullptr) {
+Abstract_Graph::Abstract_Graph(const int numClusters) {
     _vertexS = std::vector<std::vector<Vertex*>>(numClusters);
     _vNums = std::vector<int>(numClusters, 0);
+    _weightedAdj = std::vector<std::vector<double>>{};
     _eNum = 0;
 };
 
@@ -101,31 +102,19 @@ std::vector<int> reverseIntPath(const std::vector<int>& path) {
 // set Weighted Adjacency Matrix with edge distances as weights
 void Abstract_Graph::setWeightedAdj() {
     int V = getVNum();
-    int** adjM = new intArrayPtr[V];
-
+    _weightedAdj.resize(V);
     for (int i = 0; i < V; i++)
-        adjM[i] = new int[V];
+        _weightedAdj[i].resize(V, 0);
     
-    if (adjM) {
-        for (int i = 0; i < V; i++) {
-            for (int j = 0; j < V; j++)
-                adjM[i][j] = 0;
-        }
 
-        Vertex* v1, * v2;
-        int k1, k2;
-        for (auto e : _edgeL) {
-            v1 = e->vPair.first; v2 = e->vPair.second;
-            k1 = keyToGlobalK(v1->key, v1->cNum); k2 = keyToGlobalK(v2->key, v2->cNum);
-            adjM[k1][k2] = e->distance;
-            adjM[k2][k1] = e->distance;
+    Vertex* v1, * v2;
+    int k1, k2;
+    for (auto e : _edgeL) {
+        v1 = e->vPair.first; v2 = e->vPair.second;
+        k1 = keyToGlobalK(v1->key, v1->cNum); k2 = keyToGlobalK(v2->key, v2->cNum);
+        _weightedAdj[k1][k2] = e->distance;
+        _weightedAdj[k2][k1] = e->distance;
         }
-        delete _weightedAdj;
-        _weightedAdj = adjM;
-    }
-    else {
-        Log::error("Failed to allocate memory for path finding");
-    }
 
 }
 
@@ -134,16 +123,17 @@ void Abstract_Graph::setWeightedAdj() {
 std::vector<std::vector<neighbor>*>* Abstract_Graph::getWeightedAdj() {
     int V = getVNum();
     std::vector<std::vector<neighbor>*>* adjM = new std::vector<std::vector<neighbor>*>(V);
-    std::vector<neighbor>* temp = new std::vector<neighbor>;
+    for (int i = 0; i < V; i++) adjM->at(i) = new std::vector<neighbor>;
+   // std::vector<neighbor>* temp = new std::vector<neighbor>;
 
     for (int i = 0; i < V; i++) {
         for (int j = 0; j < V; j++) {
-            if (_weightedAdj)
-                temp->push_back(neighbor(j, _weightedAdj[i][j]));
+            if (_weightedAdj[i][j])
+                adjM->at(i)->push_back(neighbor(j, _weightedAdj[i][j]));
         }
-        adjM->push_back(temp);
+        //adjM->push_back(temp);
     }
-    temp = nullptr;
+  //  temp = nullptr;
     return adjM;
 }
 
@@ -245,8 +235,7 @@ Vertex* Abstract_Graph::getVertexAddress(const Point& p) {
 // Destructor
 
 Abstract_Graph::~Abstract_Graph() {
-    delete _weightedAdj;
-    _weightedAdj = nullptr;
+
     
     // All on stack for now... might change later
 

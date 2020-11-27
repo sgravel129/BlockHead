@@ -92,7 +92,7 @@ public:
 private:
     std::vector<std::vector<Vertex*>> _vertexS;   // set of vertices, organized by Cluster
     std::vector<Edge*> _edgeL;                    // set of edges
-    int** _weightedAdj;
+    std::vector<std::vector<double>> _weightedAdj;
     std::vector<int> _vNums;    // number of vertices per cluster
     int _eNum;       // number of edges
 

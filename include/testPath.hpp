@@ -15,3 +15,4 @@ void testMain();
 void testHierarchy();
 void testAstar(const Point&, const Point&, const int);
 void printMap(const Point&);
+void testDijkstra();
