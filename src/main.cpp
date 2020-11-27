@@ -20,6 +20,7 @@ int main(int argc, char **argv)
 
         game.start_menu();
         if (game.running())
+            game.map_selector_menu();
             game.run();
         game.exit();
     }
