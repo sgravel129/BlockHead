@@ -55,9 +55,9 @@ std::vector<std::vector<bool>> dummyMap() {
 
 
 
-void printMap(const int cNum) {
+void printMap(const Point& cPoint) {
 	int i, j;
-	cout << "Map of Cluster " << cNum << endl;
+	cout << "Map of Cluster (" << cPoint.x << ", " << cPoint.y << ")\n";
 	cout << "\n  ";
 	for (j = 0; j < CLUSTER_TLENGTH; j++)
 		if (j < 10)
@@ -71,18 +71,13 @@ void printMap(const int cNum) {
 		else
 			cout << j << " ";
 		for (i = 0; i < CLUSTER_TLENGTH; i++) {
-			if (GP._collisionM[i][j]) cout << "-" << "  ";
+			if (GP._collisionM[(cPoint.x*CLUSTER_TLENGTH)+i][(cPoint.y * CLUSTER_TLENGTH)+j]) cout << "-" << "  ";
 			else cout << "O" << "  ";
 		}
 		cout << endl;
 	}
 	cout << endl;
 } // end showJumble
-
-
-void testGraph() {
-
-}
 
 
 
@@ -129,9 +124,7 @@ void testHierarchy() {
 	printPathHierarchy();
 }
 
-void testAstar() {
-	Point p1 = { 0,0 }, p2 = { 7,7 };
-	int cNum = 0;
+void testAstar(const Point& p1, const Point& p2, const int cNum) {
 	std::vector<int> path = pathFind(p1, p2, cNum);
 	cout << "Path from (" << p1.x << ", " << p1.y << ") to (" << p2.x << ", " << p2.y << ") in Cluster " << cNum << std::endl;
 	for (int i = 0; i < path.size(); i++)
@@ -139,15 +132,51 @@ void testAstar() {
 
 }
 
+void testGraph() {
+	cout << "Checking a random edge in our graph..." << endl;
+	int cNum = rand() % static_cast<__int32>(CLUSTER_XNUM * CLUSTER_YNUM);
+	int vCNum = GP.map_graph->getVCNum(cNum);
+	Vertex v1, v2;
+	Edge e;
+	do {
+		while (!GP.map_graph->getVertexCopy(rand() % vCNum, cNum, v1));
+		while (!GP.map_graph->getVertexCopy(rand() % vCNum, cNum, v2));
+	} while (!GP.map_graph->getEdge(v1, v2, e));
+
+	printMap(getClusterPFromNum(cNum));
+	testAstar(v1.t->get_clusterRelPos(), v2.t->get_clusterRelPos(), cNum);
+	cout << endl << "Should be same path as here:\t";
+	for (int i = 0; i < e.path.size(); i++)
+		cout << e.path[i];
+	cout << endl << "distance: " << e.distance << endl << endl;
+
+}
+
 void testMain() {
+	
+	
 	srand(time(NULL));
 	GP.setGlobals(dummyPathHierarchy(), dummyGraph(), dummyMap());
-	printMap(0);
+	GlobalPathVars lmao = GP;
 	abstractMap();
-	testAstar();
-	//buildGraph();
-	//testTile();
+	
+	
+	// testing A star aglo
+	Point p1 = { 0,0 }, p2 = { 7,7 };
+	Point clusterP = { 3, 2 };
+	printMap(clusterP);
+	testAstar(p1, p2, getClusterNum(clusterP));
 	cout << endl << endl;
+	buildGraph();
+	//testTile();
+	
+	testGraph();
+	
+	
+	cout << endl << endl;
+
+
+
 	system("Pause");
 	testHierarchy();
 }

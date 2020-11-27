@@ -12,6 +12,24 @@ enum edgeType {
 struct Edge;
 
 typedef struct Vertex {
+    Vertex() = default;
+    
+    Vertex(const Vertex& v) {
+        key = v.key;
+        cNum = v.cNum;
+        t = v.t;
+        for (int i = 0; i < v.adjList.size(); i++)
+            adjList.push_back(v.adjList[i]);
+        for (int i = 0; i < v.adjEdges.size(); i++)
+            adjEdges.push_back(v.adjEdges[i]);
+    }
+    
+    Vertex(int k, int c, PathTile* const pt) {
+        key = k;
+        cNum = c;
+        t = pt;
+    }
+
     int key{};
     int cNum{};
     PathTile* t{};
@@ -20,9 +38,24 @@ typedef struct Vertex {
 } Vertex;
 
 typedef struct Edge {
+    Edge() = default;
+    Edge(const Edge& e) {
+        vPair = std::make_pair(e.vPair.first, e.vPair.second);
+        eType = e.eType;
+        distance = e.distance;
+        for (int i = 0; i < e.path.size(); i++)
+            path.push_back(e.path[i]);
+    }
+    Edge(std::pair<Vertex*, Vertex*> vP, const edgeType eT, double d, std::vector<int> p) {
+        eType = eT;
+        distance = d;
+        for (int i = 0; i < p.size(); i++)
+            path.push_back(p[i]);
+        vPair = std::make_pair(vP.first, vP.second);
+    }
     std::pair<Vertex*, Vertex*> vPair{};
     edgeType eType{};
-    int distance{};
+    double distance{};
     std::vector<int> path{};
 } Edge;
 
@@ -31,7 +64,7 @@ class Abstract_Graph {
 public:
     Abstract_Graph(const int numClusters);
     void addVertex(const Vertex&, const int cNum);
-    bool addEdge(const Point&, const Point&, const int, const edgeType, const std::vector<int>&);
+    bool addEdge(const Point&, const Point&, const double, const edgeType, const std::vector<int>&);
 
     
     double searchForDistance(const Vertex&, const Vertex&, const int cNum);
@@ -57,13 +90,15 @@ public:
     void deleteStartAndGoal(const Vertex*, const int);
 
 private:
-    std::vector<std::vector<Vertex>> _vertexS;   // set of vertices, organized by Cluster
-    std::vector<Edge> _edgeL;                    // set of edges
+    std::vector<std::vector<Vertex*>> _vertexS;   // set of vertices, organized by Cluster
+    std::vector<Edge*> _edgeL;                    // set of edges
     int** _weightedAdj;
     std::vector<int> _vNums;    // number of vertices per cluster
     int _eNum;       // number of edges
 
 
 };
+
+std::vector<int> reverseIntPath(const std::vector<int>&);
 
 

@@ -142,7 +142,7 @@ bool operator<(const PathTile& LHS, const PathTile& RHS) {
 // A STAR ALGORITHM
 std::vector<int> pathFind(const Point startP, const Point finishP, const int cNum) {
     std::vector<std::vector<bool>> lmaoxd = GP._collisionM;
-    Point clusterP = GP.map_hierarchy->get_cluster(cNum).tilePos;
+    Cluster c = GP.map_hierarchy->get_cluster(cNum);
     const int xStart = startP.x, yStart = startP.y;         // x and y values in cluster relative terms
     const int xFinish = finishP.x, yFinish = finishP.y;
     int closed_nodes_map[CLUSTER_TLENGTH][CLUSTER_TLENGTH];
@@ -155,7 +155,6 @@ std::vector<int> pathFind(const Point startP, const Point finishP, const int cNu
     //MapTile* tempMT;
     int i, j, x, y, xdx, ydy;
     std::vector<int> path;
-    char c;
     // reset the node maps
     for (y = 0; y < CLUSTER_TLENGTH; y++)
     {
@@ -169,9 +168,18 @@ std::vector<int> pathFind(const Point startP, const Point finishP, const int cNu
     
     
     // create the start node and push into list of open nodes
-    Point p = { xStart + clusterP.x, yStart + clusterP.y };
+    Point p = { xStart + c.tilePos.x, yStart + c.tilePos.y };
     //tempMT = getMapTileFromPoint({ xStart + clusterP.x, yStart + clusterP.y });
     n0 = new PathTile(p, GP.map_hierarchy, 0, 0);
+    
+    // Check if start or goal tile is traversable;
+    if (!n0->get_traversable()) return {};
+    p = { xFinish + c.tilePos.x, yFinish + c.tilePos.y };
+    PathTile* goalT = new PathTile(p, GP.map_hierarchy, 0, 0);
+    if (!goalT->get_traversable()) return {};
+    delete goalT;
+    goalT = nullptr;
+
     n0->updatePriority(xFinish, yFinish);
     pq[pqi].push(*n0);
     open_nodes_map[xStart][yStart] = n0->get_priority(); // mark it on the open nodes map
@@ -218,14 +226,14 @@ std::vector<int> pathFind(const Point startP, const Point finishP, const int cNu
         {
             xdx = x + dx[i]; ydy = y + dy[i];
 
-            if (!(xdx<0 || xdx> CLUSTER_TLENGTH - 1 || ydy<0 || ydy > CLUSTER_TLENGTH - 1 || intMap[clusterP.x][clusterP.y][xdx][ydy] == 1
+            if (!(xdx<0 || xdx> CLUSTER_TLENGTH - 1 || ydy<0 || ydy > CLUSTER_TLENGTH - 1 || intMap[c.clusterPos.x][c.clusterPos.y][xdx][ydy] == 1
                 || closed_nodes_map[xdx][ydy] == 1))
             {
                 // generate a child node
                 //tempMT = getMapTileFromPoint({ clusterP.x+xdx, clusterP.y+ydy });     // get MapTile for new possible tile to move to
-                p = { clusterP.x + xdx, clusterP.y + ydy };
+                p = { c.tilePos.x + xdx, c.tilePos.y + ydy };
                 if (!getTileCol(p)) {                   // if an obstacle, update map data and go to next loop iteration
-                    intMap[clusterP.x][clusterP.y][xdx][ydy] = 1;
+                    intMap[c.clusterPos.x][c.clusterPos.y][xdx][ydy] = 1;
                     continue;
                 }
                 m0 = new PathTile(p, GP.map_hierarchy, n0->get_level(), n0->get_priority());
@@ -398,8 +406,8 @@ void Path_Hierarchy::deleteStartAndGoal() {
 //////////////////////////////////////////////////////////////////////////
 // get cluster Point from Cluster Num
 Point getClusterPFromNum(const int clusterNum) {
-    int x = clusterNum % static_cast<__int32>(CLUSTER_YNUM);
-    int y = (clusterNum - x) / CLUSTER_YNUM;
+    int x = clusterNum % static_cast<__int32>(CLUSTER_XNUM);
+    int y = (clusterNum - x) / static_cast<__int32>(CLUSTER_XNUM);
     return { x, y };
 }
 // gets cluster index in _clusterS vector
@@ -488,8 +496,8 @@ void buildGraph() {
             break;
         cNum1 = getClusterNum(t1->getParentCluster().clusterPos);
         cNum2 = getClusterNum(t2->getParentCluster().clusterPos);
-        v1 = { GP.map_graph->getVCNum(cNum1), cNum1, t1, {}, {} };
-        v2 = { GP.map_graph->getVCNum(cNum2), cNum2, t2, {}, {} };
+        v1 = Vertex(GP.map_graph->getVCNum(cNum1), cNum1, t1);
+        v2 = Vertex(GP.map_graph->getVCNum(cNum2), cNum2, t2);
         GP.map_graph->addVertex(v1, cNum1);
         GP.map_graph->addVertex(v2, cNum2);
         if(v1.t->getParentCluster().clusterPos.x == v2.t->getParentCluster().clusterPos.x)  // if v1 and v2 horizontally adjacent
@@ -518,7 +526,6 @@ void buildGraph() {
 }
 
 void buildGraphPaths() {
- 
     
     int V = GP.map_graph->getVNum();   // get number of vertices
     
@@ -611,7 +618,7 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
         GP.map_hierarchy->addStart(tempT);
         // connect to all cluster border transitions with A star
         p1 = { startP.x % static_cast<__int32>(CLUSTER_TLENGTH), startP.y % static_cast<__int32>(CLUSTER_TLENGTH) };
-        GP.map_graph->addVertex({ GP.map_graph->getVCNum(cNum1), cNum1, tempT, {}, {} }, cNum1);
+        GP.map_graph->addVertex(Vertex(GP.map_graph->getVCNum(cNum1), cNum1, tempT), cNum1);
         // add edges to graph
         for (int i = 0; i < GP.map_graph->getVCNum(cNum1) - 1; i++) {
             GP.map_graph->getVertexCopy(i, cNum1, v);
@@ -631,7 +638,7 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
         GP.map_hierarchy->addGoal(tempT);
         // connect to all cluster border transitions with A star
         p1 = { goalP.x % static_cast<__int32>(CLUSTER_TLENGTH), goalP.y % static_cast<__int32>(CLUSTER_TLENGTH) };
-        GP.map_graph->addVertex({ GP.map_graph->getVCNum(cNum2), cNum2, tempT, {}, {} }, cNum2);
+        GP.map_graph->addVertex(Vertex(GP.map_graph->getVCNum(cNum2), cNum2, tempT), cNum2);
         // add edges to graph
         for (int i = 0; i < GP.map_graph->getVCNum(cNum2) - 1; i++) {
             GP.map_graph->getVertexCopy(i, cNum2, v);

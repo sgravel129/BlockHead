@@ -13,32 +13,33 @@
 //////////////////////////////////
 // ABSTRACT_GRAPH Implementation
 Abstract_Graph::Abstract_Graph(const int numClusters) : _weightedAdj(nullptr) {
-    _vertexS = std::vector<std::vector<Vertex>>(numClusters);
+    _vertexS = std::vector<std::vector<Vertex*>>(numClusters);
     _vNums = std::vector<int>(numClusters, 0);
     _eNum = 0;
 };
 
 // Mutators
 void Abstract_Graph::addVertex(const Vertex& v, const int cNum) {
-    _vertexS[cNum].push_back(v); 
+    _vertexS[cNum].push_back(new Vertex(v));
     _vNums[cNum]++;
 }
 
 // Adds edge to graph connecting to vertices, with supplied distance as weight
-bool Abstract_Graph::addEdge(const Point& p1, const Point& p2, const int d, const edgeType eT, const std::vector<int>& path) {
+bool Abstract_Graph::addEdge(const Point& p1, const Point& p2, const double d, const edgeType eT, const std::vector<int>& path) {
     Vertex* v1 = getVertexAddress(p1);
     Vertex* v2 = getVertexAddress(p2);
     if (v1 == NULL || v2 == NULL)
         return false;
     Edge e = {{ v1, v2 }, eT, d, path};
-    _edgeL.push_back(e);
+    _edgeL.push_back(new Edge(e));
     
     v1->adjList.push_back(v2);
-    v1->adjEdges.push_back(&_edgeL.back());
+    v1->adjEdges.push_back(_edgeL.back());
     
     v2->adjList.push_back(v1);
-    v2->adjEdges.push_back(&_edgeL.back());
-    
+    v2->adjEdges.push_back(_edgeL.back());
+    v1 = nullptr;
+    v2 = nullptr;
     _eNum++;
     return true;
 }
@@ -84,8 +85,20 @@ std::vector<Vertex*> Abstract_Graph::searchForGraphPath(const Vertex* startV, co
     return Path;
 }
 
+// Reverses supplied int vector, returning by address
+std::vector<int> reverseIntPath(const std::vector<int>& path) {
+    int n = path.size(), temp;
+    std::vector<int> newP;
+    for (int i = 0; i < n; i++) {
+        temp = (path[n - i - 1] + 4) % 8;
+        newP.push_back(temp);
+    }
+    return newP;
+}
 
-// get Weighted Adjacency Matrix with edge distances as weights
+
+
+// set Weighted Adjacency Matrix with edge distances as weights
 void Abstract_Graph::setWeightedAdj() {
     int V = getVNum();
     int** adjM = new intArrayPtr[V];
@@ -102,10 +115,10 @@ void Abstract_Graph::setWeightedAdj() {
         Vertex* v1, * v2;
         int k1, k2;
         for (auto e : _edgeL) {
-            v1 = e.vPair.first; v2 = e.vPair.second;
+            v1 = e->vPair.first; v2 = e->vPair.second;
             k1 = keyToGlobalK(v1->key, v1->cNum); k2 = keyToGlobalK(v2->key, v2->cNum);
-            adjM[k1][k2] = e.distance;
-            adjM[k2][k1] = e.distance;
+            adjM[k1][k2] = e->distance;
+            adjM[k2][k1] = e->distance;
         }
         delete _weightedAdj;
         _weightedAdj = adjM;
@@ -159,8 +172,8 @@ int Abstract_Graph::keyToGlobalK(const int key, const int cNum) {
 bool Abstract_Graph::getVertexCopy(const int k, const int cNum, Vertex& v) const {
     
     for (int i = k; i < _vNums[cNum]; i++) {
-        if (_vertexS[cNum][k].key == k) {
-            v = _vertexS[cNum][k];
+        if (_vertexS[cNum][k]->key == k) {
+            v = *_vertexS[cNum][k];
             return true;
         }
     }
@@ -170,9 +183,9 @@ bool Abstract_Graph::getVertexCopy(const Point& p, Vertex& v) const {
     int cNum = getClusterNum(p);
     Point tempP;
     for (int i = 0; i < _vNums[cNum]; i++) {
-        tempP = _vertexS[cNum][i].t->get_mapRelPos();
+        tempP = _vertexS[cNum][i]->t->get_mapRelPos();
         if (tempP.x == p.x && tempP.y == p.y) {
-            v = _vertexS[cNum][i];
+            v = *_vertexS[cNum][i];
             return true;
         }
     }
@@ -182,12 +195,21 @@ bool Abstract_Graph::getVertexCopy(const Point& p, Vertex& v) const {
 
 bool Abstract_Graph::getEdge(const Vertex& v1, const Vertex& v2, Edge& e) const {
     Point p1, p2;
-    for (int i = 0; i < v1.adjList.size(); i++) {
+    if (v1.cNum == v2.cNum && v1.key == v2.key) return false;
+    
+    for (int i = 0; i < v1.adjList.size(); i++) {        
+        
         p1 = v1.adjList[i]->t->get_mapRelPos();
         p2 = v2.t->get_mapRelPos();
         if (p1.x == p2.x && p1.y == p2.y) {
             e = *v1.adjEdges[i];
-            return true;
+            if (e.vPair.first->key == v1.key && e.vPair.first->cNum == v1.cNum)
+                return true;
+            else {
+                e.path = reverseIntPath(e.path);
+                return true;
+            }
+                
         }
     }
     return false;
@@ -210,9 +232,9 @@ Vertex* Abstract_Graph::getVertexAddress(const Point& p) {
     int cNum = getClusterNum(findParentCluster(p).clusterPos);
     Point tempP;
     for (int i = 0; i < _vNums[cNum]; i++) {
-        tempP = _vertexS[cNum][i].t->get_mapRelPos();
+        tempP = _vertexS[cNum][i]->t->get_mapRelPos();
         if (tempP.x == p.x && tempP.y == p.y) {
-            return &_vertexS[cNum][i];
+            return _vertexS[cNum][i];
         }
     }
     return NULL;

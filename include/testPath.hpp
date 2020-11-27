@@ -13,5 +13,5 @@ void printTile(PathTile* const t);
 void testTile();
 void testMain();
 void testHierarchy();
-void testAstar();
-void printMap(const int);
+void testAstar(const Point&, const Point&, const int);
+void printMap(const Point&);
