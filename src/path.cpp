@@ -529,49 +529,39 @@ void buildGraphPaths() {
     
     int V = GP.map_graph->getVNum();   // get number of vertices
     
-    GP.map_graph->setWeightedAdj();   // encapsulates weightedAdj ptr to heap inside abstract_graph
+    GP.map_graph->setWeightedAdj();   // encapsulates weightedAdj  inside abstract_graph
+    GP.map_graph->setNeighborSet();
 
-    std::vector<std::vector<neighbor>*>* weightedAdj = GP.map_graph->getWeightedAdj();     // gets from heap
     
 
+    std::vector<std::vector<double>> distances;
     std::vector<double>* min_distance = new std::vector<double>(V);
     std::vector<int> previous(V);
 
-    std::vector<std::vector<double>*>* distances = new std::vector<std::vector<double>*>;
     
     std::vector<std::vector<std::vector<int>*>*>* paths = new std::vector<std::vector<std::vector<int>*>*>(V);
-    std::vector<std::vector<int>*>* pathsFromSrc = new std::vector<std::vector<int>*>;
+    std::vector<std::vector<int>*>* pathsFromSrc;
 
     for (int i = 0; i < V; i++) {
-        DijkstraComputePaths(i, weightedAdj, min_distance, previous);
+        pathsFromSrc = new std::vector<std::vector<int>*>;
+        DijkstraComputePaths(i, GP.map_graph->get_neighborSet(), min_distance, previous);
         for (int j = 0; j < V; j++) {
-            pathsFromSrc->push_back(DijkstraGetShortestPathTo(j, previous));
+            pathsFromSrc->push_back(DijkstraGetShortestPathTo(j, previous));    // gets from heap
         }
-        paths->push_back(pathsFromSrc);
+        paths->at(i) = pathsFromSrc;
+        distances.push_back(*min_distance);
     }
+    GP.map_graph->setPaths(paths);
+    GP.map_graph->setDistances(distances);
+    
+    // cleanup
     pathsFromSrc = nullptr;
-
-    
-
-
-    // STORE PATHS HERE
+    paths = nullptr;
+    delete min_distance;
+    min_distance = nullptr;
 
 
-
-    free(weightedAdj);
-    weightedAdj = nullptr;
-    
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -606,6 +596,10 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
             return intPath;
     }
 
+
+
+    //// TO CHANGE!!!!!
+    // can simply run A star from start goal to each transition in the cluster, and with min_distance info, pick the transition for which it's shortest path to goal
     /////////////
     // TODO
     // PUT THIS STUFF IN GRAPH.CPP
@@ -665,14 +659,12 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
 
 
 
+
 // Called by constructor, finds parent cluster from tile point
 Cluster findParentCluster(const Point& mapRelPos) {
     Point p = { mapRelPos.x / static_cast<__int32>(CLUSTER_TLENGTH) , mapRelPos.y / static_cast<__int32>(CLUSTER_TLENGTH) };
     return GP.map_hierarchy->get_cluster(p);
 }
-
-
-
 
 
 

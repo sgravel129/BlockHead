@@ -156,26 +156,39 @@ void testGraph() {
 void testDijkstra() {
 	int V = GP.map_graph->getVNum();   // get number of vertices
 	GP.map_graph->setWeightedAdj();
-	std::vector<std::vector<neighbor>*>* weightedAdj = GP.map_graph->getWeightedAdj();     // gets from heap
+	GP.map_graph->setNeighborSet();     // gets from heap
 	std::vector<double>* min_distance = new std::vector<double>(V);
 	std::vector<int> previous(V);
 	int src = 0;
-	DijkstraComputePaths(src, weightedAdj, min_distance, previous);
+	DijkstraComputePaths(src, GP.map_graph->get_neighborSet(), min_distance, previous);
+	
+	std::vector<std::vector<int>*> paths;
+	for(int i = 0; i < V; i++) paths.push_back(DijkstraGetShortestPathTo(i, previous));
 
 	cout << "Path distances from src = " << src << ":\n";
 	for (int i = 0; i < min_distance->size(); i++) cout << i << ":\t" << min_distance->at(i) << endl;
+	cout << endl << "Paths from src = " << src << ":\n";
+	for (int i = 0; i < V; i++) {
+		cout << src << " to " << i << ":\t";
+		for (int j = 0; j < paths[i]->size(); j++) {
+			cout << paths[i]->at(j) << " ";
+		}
+		cout << endl;
+	}
+
 }
 
 
 void testMain() {
-	
+	clock_t begin, end;
 	
 	srand(time(NULL));
 	GP.setGlobals(dummyPathHierarchy(), dummyGraph(), dummyMap());
 	GlobalPathVars lmao = GP;
 	abstractMap();
 	buildGraph();
-	
+	buildGraphPaths();
+
 	// testing A star aglo
 	//Point p1 = { 0,0 }, p2 = { 7,7 };
 	//Point clusterP = { 3, 2 };
@@ -186,10 +199,10 @@ void testMain() {
 	//testTile();
 	
 	//testGraph();
-	
-	testDijkstra();
-
-	cout << endl << endl;
+	//begin = clock();
+	//testDijkstra();
+	//end = clock();
+	//cout << endl << "Time elapsed: " << (end-begin) << endl;
 
 
 

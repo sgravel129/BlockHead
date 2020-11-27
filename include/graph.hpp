@@ -71,7 +71,9 @@ public:
     std::vector<Vertex*> searchForGraphPath(const Vertex*, const Vertex*);
     
     void setWeightedAdj();
-    std::vector<std::vector<neighbor>*>* getWeightedAdj();
+    void setNeighborSet();
+    void setPaths(std::vector<std::vector<std::vector<int>*>*>* const);
+    void setDistances(const std::vector<std::vector<double>>&);
 
     int keyToGlobalK(const int, const int);
     
@@ -82,19 +84,27 @@ public:
     int getVCNum(const int) const;        // return number of vertices in supplied cluster
     int getVNum() const;      // return total number of vertices in graph
 
+    
+
     // Destructor
     ~Abstract_Graph();
 
 
-    Vertex* getVertexAddress(const Point&);    // returns pointer to encapsulated vertex
+    Vertex* getVertexAddress(const Point&) const;    // returns pointer to encapsulated vertex
+    std::vector<std::vector<neighbor>*>* get_neighborSet() const;
     void deleteStartAndGoal(const Vertex*, const int);
 
 private:
     std::vector<std::vector<Vertex*>> _vertexS;   // set of vertices, organized by Cluster
     std::vector<Edge*> _edgeL;                    // set of edges
     std::vector<std::vector<double>> _weightedAdj;
+    std::vector<std::vector<neighbor>*>* _neighborSet;
+
     std::vector<int> _vNums;    // number of vertices per cluster
     int _eNum;       // number of edges
+
+    std::vector<std::vector<std::vector<int>*>*>* _paths;
+    std::vector<std::vector<double>> _distances;
 
 
 };

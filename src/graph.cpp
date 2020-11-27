@@ -12,11 +12,11 @@
 
 //////////////////////////////////
 // ABSTRACT_GRAPH Implementation
-Abstract_Graph::Abstract_Graph(const int numClusters) {
+Abstract_Graph::Abstract_Graph(const int numClusters) : _weightedAdj({}), _neighborSet(nullptr), _paths(nullptr), _distances({}) {
     _vertexS = std::vector<std::vector<Vertex*>>(numClusters);
     _vNums = std::vector<int>(numClusters, 0);
-    _weightedAdj = std::vector<std::vector<double>>{};
     _eNum = 0;
+
 };
 
 // Mutators
@@ -119,14 +119,16 @@ void Abstract_Graph::setWeightedAdj() {
 }
 
 
+// TO DO: ALLOCATE MORE SPACE TO ACCOUNT FOR ADDING START AND GOAL
 // get Weighted Adjacency Matrix with edge distances as weights
-std::vector<std::vector<neighbor>*>* Abstract_Graph::getWeightedAdj() {
+void Abstract_Graph::setNeighborSet() {
     int V = getVNum();
+    delete _neighborSet;
     std::vector<std::vector<neighbor>*>* adjM = new std::vector<std::vector<neighbor>*>(V);
-    for (int i = 0; i < V; i++) adjM->at(i) = new std::vector<neighbor>;
    // std::vector<neighbor>* temp = new std::vector<neighbor>;
 
     for (int i = 0; i < V; i++) {
+        adjM->at(i) = new std::vector<neighbor>;
         for (int j = 0; j < V; j++) {
             if (_weightedAdj[i][j])
                 adjM->at(i)->push_back(neighbor(j, _weightedAdj[i][j]));
@@ -134,12 +136,12 @@ std::vector<std::vector<neighbor>*>* Abstract_Graph::getWeightedAdj() {
         //adjM->push_back(temp);
     }
   //  temp = nullptr;
-    return adjM;
+    _neighborSet = adjM;
 }
 
 
-
-
+void Abstract_Graph::setPaths(std::vector<std::vector<std::vector<int>*>*>* const paths) { _paths = paths; }
+void Abstract_Graph::setDistances(const std::vector<std::vector<double>>& distances) { _distances = distances; }
 
 
 
@@ -218,7 +220,7 @@ int Abstract_Graph::getVNum() const {
 
 // Memory Accessor
 
-Vertex* Abstract_Graph::getVertexAddress(const Point& p) {
+Vertex* Abstract_Graph::getVertexAddress(const Point& p) const {
     int cNum = getClusterNum(findParentCluster(p).clusterPos);
     Point tempP;
     for (int i = 0; i < _vNums[cNum]; i++) {
@@ -230,6 +232,7 @@ Vertex* Abstract_Graph::getVertexAddress(const Point& p) {
     return NULL;
 }
 
+std::vector<std::vector<neighbor>*>* Abstract_Graph::get_neighborSet() const { return _neighborSet; };
 
 
 // Destructor
