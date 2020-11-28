@@ -23,5 +23,6 @@ public:
     ~Map();
     void loadTextures(const std::string &spriteSheet, const std::string &spritesProps);
     void loadMapFile(Graphics &graphics, const std::string &mapfile);
+    void update(Point delta);
     void draw(Graphics &graphics);
 };

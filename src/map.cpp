@@ -17,7 +17,7 @@ Map::~Map()
     Log::destruct("Map\t| Destroy MapTiles:");
     for (auto &tile : _tiles)
     {
-        tile->~MapTile();
+        delete tile;
     }
 }
 
@@ -107,12 +107,11 @@ void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath)
                                     _spriteSheet,
                                     _tileProps[stoi(idxSrc)-1],
                                     5.0,
-                                    false,
+                                    true, // every object hasCollision
                                     location));
 
                     Log::debug("map", "Created MapTile: " + idxSrc +
-                               " @ " + std::to_string(location.x) + " " +
-                               std::to_string(location.y));
+                               " @ " + location.to_string());
                 }
                 catch (const std::exception &e)
                 {
@@ -127,7 +126,12 @@ void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath)
         }
     }
 }
-
+void Map::update(Point delta){
+    for (auto &tile : _tiles)
+    {
+        tile->update(delta);
+    }
+}
 void Map::draw(Graphics &graphics)
 {
     for (auto &tile : _tiles)

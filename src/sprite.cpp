@@ -6,6 +6,16 @@
 #include <iostream>
 #include <algorithm>
 
+Point Point::operator -(const Point& b) {
+    return Point{this->x - b.x, this->y - b.y};
+}
+Point Point::operator +(const Point& b) {
+	return Point{this->x + b.x, this->y + b.y};
+}
+std::string Point::to_string() {
+	return "(" + std::to_string(this->x) + "," + std::to_string(this->y) + ")";
+}
+
 Sprite::Sprite()
 {
 }
