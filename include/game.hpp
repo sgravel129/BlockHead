@@ -40,7 +40,7 @@ private:
 
 	bool menu(const std::string &background_path, const std::string &exit_button, const std::string &play_button);
 
-	bool map_selector(const std::string &graveyard_map_btn_path, const std::string &grassland_map_btn_path);
+	bool map_selector(const std::string &graveyard_map_btn_path, const std::string &grassland_map_btn_path, const std::string &graveyard_1, const std::string &grassland_2);
 
 
 	/*

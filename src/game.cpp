@@ -29,10 +29,12 @@ Game::~Game()
 	Log::destruct("Game\t| Called ");
 }
 
-bool Game::map_selector(const std::string &graveyard_map_btn_path, const std::string &grassland_map_btn_path)
+bool Game::map_selector(const std::string &graveyard_map_btn_path, const std::string &grassland_map_btn_path, const std::string &graveyard_1, const std::string &grassland_2)
 {
 	Sprite graveyard_map_btn(graphics, graveyard_map_btn_path, {0, 0, 600, 600}, 0.7f);
 	Sprite grassland_map_btn(graphics, grassland_map_btn_path, {0, 0, 600, 600}, 0.7f);
+	Sprite graveyard1_btn(graphics, graveyard_1, {0, 0, 600, 100}, 0.7f);
+	Sprite grassland2_btn(graphics, grassland_2, {0, 0, 600, 100}, 0.7f);
 
 	unsigned int last = SDL_GetTicks();
 	unsigned int current;
@@ -48,18 +50,20 @@ bool Game::map_selector(const std::string &graveyard_map_btn_path, const std::st
 
 		handleUserInput();
 
-		if (input.wasKeyPressed(SDL_SCANCODE_1)){
+		if (input.wasKeyPressed(SDL_SCANCODE_2)){
 			isGrassland = true;
 			break;
 		}
-		if (input.wasKeyPressed(SDL_SCANCODE_2)){
+		if (input.wasKeyPressed(SDL_SCANCODE_1)){
 			isGrassland = false;
 			break;
 		}
 		if (current - last >= (1000 / framerate))
-		{
-			graveyard_map_btn.draw(graphics, 150, 120);
-			grassland_map_btn.draw(graphics, 750, 120);
+		{	
+			graveyard1_btn.draw(graphics, 120, 550);
+			grassland2_btn.draw(graphics, 720, 550);
+			graveyard_map_btn.draw(graphics, 120, 90);
+			grassland_map_btn.draw(graphics, 720, 90);
 			graphics.flip();
 			last = current;
 		}
@@ -124,7 +128,7 @@ bool Game::winner_menu() {
 }
 
 bool Game::map_selector_menu() {
-	return map_selector("res/assets/themes_forest.png", "res/assets/themes_graveyard.png");
+	return map_selector("res/assets/themes_graveyard.png", "res/assets/themes_forest.png", "res/assets/graveyard_theme_button.png", "res/assets/grassland_theme_button.png");
 }
 
 
