@@ -37,6 +37,8 @@ const int dx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };              // dx and dy rep
 const int dy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
 static int intMap[CLUSTER_XNUM][CLUSTER_YNUM][CLUSTER_TLENGTH][CLUSTER_TLENGTH];
 
+const weight_t max_weight = std::numeric_limits<double>::infinity();
+
 
 // TODO
 // Implement Destructor
@@ -603,9 +605,38 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
     /////////////
     // TODO
     // PUT THIS STUFF IN GRAPH.CPP
+
+    int startTransitionNum = GP.map_graph->getVCNum(cNum1);
+    int goalTransitionNum = GP.map_graph->getVCNum(cNum2);
+    std::vector<double> startDistances(startTransitionNum, max_weight);
+    std::vector<std::vector<int>>* startToTransPaths = new std::vector<std::vector<int>>(startTransitionNum);
+    std::vector<double> goalDistances(goalTransitionNum, max_weight);
+    std::vector<std::vector<int>>* goalToTransPaths = new std::vector<std::vector<int>>(goalTransitionNum);
+
     if (!GP.map_graph->getVertexCopy(startP, startV)) {
+       
+        
+        
+        
+        
+
+        
+        Vertex transV;
+
+        for (int i = 0; i < startTransitionNum; i++) {
+            if (!GP.map_graph->getVertexCopy(i, cNum1, transV)) continue;
+            startToTransPaths->at(i) = pathFind(startP, transV.t->get_clusterRelPos(), cNum1);
+            startDistances[i] = pathToDistance(startToTransPaths->at(i));
+        }
+
+        
+     
+       
+        
+        
         // set flag that we are adding start vertex to graph (for cleanup later)
         addStart = true;
+        /*
         // encapsulate vertex into graph
         //tempMT = getMapTileFromPoint(startP);
         tempT = new PathTile(startP, GP.map_hierarchy);
@@ -620,12 +651,34 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
             intPath = pathFind(p1, p2, cNum1);
             GP.map_graph->addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
         }
+        */
     }
-    startVP = GP.map_graph->getVertexAddress(startP);
+
+    //startVP = GP.map_graph->getVertexAddress(startP);
 
     if (!GP.map_graph->getVertexCopy(goalP, goalV)) {
+
+
+        
+
+        
+        Vertex transV;
+
+        for (int i = 0; i < goalTransitionNum; i++) {
+            if (!GP.map_graph->getVertexCopy(i, cNum2, transV)) continue;
+            goalToTransPaths->at(i) = pathFind(startP, transV.t->get_clusterRelPos(), cNum2);
+            goalDistances[i] = pathToDistance(goalToTransPaths->at(i));
+        }
+
+
+        
+
+
+
+        
         // set flag that we are adding goal vertex to graph (for cleanup later)
         addGoal = true;
+        /*
         // encapsulate vertex into graph
         //tempMT = getMapTileFromPoint(goalP);
         tempT = new PathTile(goalP, GP.map_hierarchy);
@@ -640,13 +693,95 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
             intPath = pathFind(p1, p2, cNum2);
             GP.map_graph->addEdge(p1, p2, pathToDistance(intPath), INTRA, intPath);
         }
+        */
     }
-    goalVP = GP.map_graph->getVertexAddress(goalP);
+    //goalVP = GP.map_graph->getVertexAddress(goalP);
     ////////////
 
-    // Start and Goal in abstract Graph: can now proceed with graph search
-    graphPath = GP.map_graph->searchForGraphPath(startVP, goalVP);
 
+    int minX=0, minY=0, x, y;
+    double temp = max_weight, transDist;
+    if (addStart && addGoal) {
+        for (int i = 0; i < startTransitionNum; i++) {
+            if (startDistances[i] == max_weight) continue;
+            for (int j = 0; j < goalTransitionNum; j++) {
+                if (goalDistances[j] == max_weight) continue;
+
+                x = GP.map_graph->keyToGlobalK(i, cNum1);
+                y = GP.map_graph->keyToGlobalK(j, cNum2);
+                if(GP.map_graph->getDistance(x, y) == max_weight) continue;
+                
+                transDist = startDistances[i] + goalDistances[j] + GP.map_graph->getDistance(x,y);
+                if (transDist < temp) {
+                    temp = transDist;
+                    minX = i; minY = j;
+                }
+            }
+        }
+    }
+    else if (addStart) {
+        minY = GP.map_graph->keyToGlobalK(goalV.key, cNum2);
+        for (int i = 0; i < startTransitionNum; i++) {
+            if (startDistances[i] == max_weight) continue;
+            
+            x = GP.map_graph->keyToGlobalK(i, cNum1);
+            if (GP.map_graph->getDistance(x, minY) == max_weight) continue;
+            
+            transDist = startDistances[i] + GP.map_graph->getDistance(x, minY);
+            if (transDist < temp) {
+                temp = transDist;
+                minX = i;
+            }
+        }
+
+
+    }
+    else if (addGoal) {
+        minX = GP.map_graph->keyToGlobalK(startV.key, cNum1);
+        for (int i = 0; i < goalTransitionNum; i++) {
+            if (goalDistances[i] == max_weight) continue;
+
+            y = GP.map_graph->keyToGlobalK(i, cNum2);
+            if (GP.map_graph->getDistance(minX, y) == max_weight) continue;
+
+            transDist = goalDistances[i] + GP.map_graph->getDistance(minX, y);
+            if (transDist < temp) {
+                temp = transDist;
+                minY = i;
+            }
+        }
+
+    }
+    else {
+        //minX = GP.map_graph->keyToGlobalK(startV.key, cNum1);
+        //minY = GP.map_graph->keyToGlobalK(goalV.key, cNum2);
+
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    // Start and Goal in abstract Graph: can now proceed with graph search
+    //graphPath = GP.map_graph->searchForGraphPath(startVP, goalVP);
+
+    
+    
+    
+    
+    
+    
+    
+    
     // Cleanup: delete extra tiles from Path_Hierarchy, and extra vertices and edges from Abstract_Graph
     GP.map_hierarchy->deleteStartAndGoal();
     if (addStart)
@@ -670,7 +805,23 @@ Cluster findParentCluster(const Point& mapRelPos) {
 
 
 void preprocessing() {
+    //need to reset GP and static intMap
+    
     abstractMap();
     buildGraph();
     buildGraphPaths();
+}
+
+
+void runtimeProcessing() {
+
+
+
+}
+
+void gameLoop() {
+    // check if player changed cluster
+    // check every zombie if changed cluster
+    // check every zombie if arrived to target
+    // check if new zombie
 }

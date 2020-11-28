@@ -68,7 +68,7 @@ public:
 
     
     double searchForDistance(const Vertex&, const Vertex&, const int cNum);
-    std::vector<Vertex*> searchForGraphPath(const Vertex*, const Vertex*);
+    std::vector<int> searchForGraphPath(const int, const int);
     
     void setWeightedAdj();
     void setNeighborSet();
@@ -83,6 +83,9 @@ public:
     bool getEdge(const Vertex&, const Vertex&, Edge&) const;          // returns copy of Edge between supplied vertices
     int getVCNum(const int) const;        // return number of vertices in supplied cluster
     int getVNum() const;      // return total number of vertices in graph
+
+    double getDistance(const int, const int);
+    std::vector<int> getPath(const int, const int);
 
     
 

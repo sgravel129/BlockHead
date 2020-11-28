@@ -74,16 +74,15 @@ double Abstract_Graph::searchForDistance(const Vertex& v1, const Vertex& v2, con
 
 
 
-std::vector<Vertex*> Abstract_Graph::searchForGraphPath(const Vertex* startV, const Vertex* goalV) {
-    std::vector<Vertex*> Path;
+std::vector<int> Abstract_Graph::searchForGraphPath(const int startGlobalK, const int goalGlobalK) {
+    std::vector<int> vertexPath;
+    std::vector<int> dirPath;
 
-    /*
+    vertexPath = getPath(startGlobalK, goalGlobalK);
 
-    Djikstra's on abstract graph
-    return path
     
-    */
-    return Path;
+
+    return dirPath;
 }
 
 // Reverses supplied int vector, returning by address
@@ -217,6 +216,10 @@ int Abstract_Graph::getVNum() const {
         sum += _vNums[i];
     return sum;
 }
+
+
+double Abstract_Graph::getDistance(const int x, const int y) { return _distances[x][y]; }
+std::vector<int> Abstract_Graph::getPath(const int x, const int y) { return *_paths->at(x)->at(y); }
 
 // Memory Accessor
 
