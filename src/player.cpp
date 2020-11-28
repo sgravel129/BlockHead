@@ -17,7 +17,7 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
 
     pos = Point{200, 200};
 
-    moveSpeed = 2;
+    moveSpeed = 3;
     angle = 0; // starting direction
     sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
     currAnim = 0;

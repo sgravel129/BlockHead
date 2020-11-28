@@ -36,8 +36,8 @@ Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float 
 void Zombie::update(Point delta)
 {
     // Do path finding. Euclidian Distance
-    pos.x -= delta.x;
-    pos.y -= delta.y;
+    pos = pos - delta;
+
     static const int DEADBAND = 5;
     static const Point target = Point{int(SCREEN_WIDTH/2) - int(PLAYER_WIDTH/2), int(SCREEN_HEIGHT/2) - int(PLAYER_HEIGHT/2)};
     if ((pos.y - target.y) > DEADBAND)
