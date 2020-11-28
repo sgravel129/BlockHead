@@ -19,9 +19,10 @@ int main(int argc, char **argv)
         game.setFramerate(framerate);
 
         game.start_menu();
-        if (game.running())
+        if (game.running()){
             game.map_selector_menu();
             game.run();
+        }
         game.exit();
     }
     catch(std::runtime_error &err)

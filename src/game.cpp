@@ -162,6 +162,7 @@ void Game::handleUserInput()
 void Game::exit()
 {
 	isRunning = false;
+	SDL_Quit();
 }
 
 bool Game::running()

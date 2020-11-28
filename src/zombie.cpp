@@ -21,6 +21,7 @@ Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float 
 {
     pos = Point{200, 200};
     angle = 0; // starting direction
+    currAnim = 0;
     moveSpeed = 1;
 
     sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
