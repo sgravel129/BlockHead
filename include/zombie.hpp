@@ -7,13 +7,13 @@
 class Zombie
 {
 private:
-    Sprite *_sprite;
-    std::vector<std::vector<SDL_Rect>> _anims;
-    int _currAnim;
-    int _x, _y;
-    int _angle; // for sprite info
-    int _health;
-    int _moveSpeed;
+    Sprite *sprite;
+    std::vector<std::vector<SDL_Rect>> anims;
+    int currAnim;
+    Point pos;
+    int angle; // for sprite info
+    int health;
+    int moveSpeed;
 
     // Path _pathToPlayer;  // tentative Path class, implemented with path finder algorithm
 

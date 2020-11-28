@@ -4,7 +4,11 @@
 
 #include <string>
 
-class Graphics;
+struct Point
+{
+	int x;
+	int y;
+};
 
 class Sprite
 {
