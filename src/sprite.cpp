@@ -22,8 +22,9 @@ Sprite::Sprite()
 
 Sprite::~Sprite()
 {
+	// Log::debug("~Sprite\t| Called");
 	Log::destruct("Sprite\t| Destroy Texture");
-	SDL_DestroyTexture(spriteSheet);
+	SDL_DestroyTexture(_spriteSheet);
 }
 
 // we will use a sprite sheet and then crop out the angle we want with a top
@@ -37,11 +38,11 @@ Sprite::Sprite(Graphics &graphics, const std::string &path, SDL_Rect src, float 
 		return;
 	}
 
-	scale = scale;
-	srcRect = src;
+	_scale = scale;
+	_srcRect = src;
 
-	spriteSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage(path));
-	if (spriteSheet == NULL)
+	_spriteSheet = SDL_CreateTextureFromSurface(graphics.getRenderer(), graphics.loadImage(path));
+	if (_spriteSheet == NULL)
 	{
 		Log::error("Sprite() | Failed at creating surface texture from path");
 	}
@@ -49,15 +50,15 @@ Sprite::Sprite(Graphics &graphics, const std::string &path, SDL_Rect src, float 
 
 void Sprite::change_src(SDL_Rect src)
 {
-	srcRect = src;
+	_srcRect = src;
 }
 void Sprite::change_scale(float scale)
 {
-	scale = scale;
+	_scale = scale;
 }
 
 void Sprite::draw(Graphics &graphics, int x, int y)
 {
-	SDL_Rect destRect = {x, y, Util::scale(srcRect.w, scale), Util::scale(srcRect.h, scale)};
-	graphics.blitSurface(spriteSheet, &srcRect, &destRect);
+	SDL_Rect destRect = {x, y, Util::scale(_srcRect.w, _scale), Util::scale(_srcRect.h, _scale)};
+	graphics.blitSurface(_spriteSheet, &_srcRect, &destRect);
 }

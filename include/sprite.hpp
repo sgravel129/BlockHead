@@ -35,7 +35,7 @@ public:
 	void draw(Graphics &graphics, int x, int y);
 
 private:
-	float scale;
-	SDL_Rect srcRect;
-	SDL_Texture *spriteSheet;
+	float _scale;
+	SDL_Rect _srcRect;
+	SDL_Texture *_spriteSheet;
 };
