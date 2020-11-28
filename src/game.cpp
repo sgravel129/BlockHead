@@ -16,15 +16,61 @@
 Game::Game()
 		:	graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT),
 			framerate(30),
-			isRunning(false)
+			isRunning(false),
+			isGrassland(false)
 {
 	Log::verbose("Game Constructor\t| SDL Subsystems initialized");
 	isRunning = true;
+	isGrassland = true;
 }
 
 Game::~Game()
 {
 	Log::destruct("Game\t| Called ");
+}
+
+bool Game::map_selector(const std::string &graveyard_map_btn_path, const std::string &grassland_map_btn_path, const std::string &graveyard_1, const std::string &grassland_2)
+{
+	Sprite graveyard_map_btn(graphics, graveyard_map_btn_path, {0, 0, 600, 600}, 0.7f);
+	Sprite grassland_map_btn(graphics, grassland_map_btn_path, {0, 0, 600, 600}, 0.7f);
+	Sprite graveyard1_btn(graphics, graveyard_1, {0, 0, 600, 100}, 0.7f);
+	Sprite grassland2_btn(graphics, grassland_2, {0, 0, 600, 100}, 0.7f);
+
+	unsigned int last = SDL_GetTicks();
+	unsigned int current;
+
+	graphics.setRenderColor(Color("FFFFFF"));
+	graphics.fillBackground();
+
+	Map map = Map(Point{10, 10});
+    int map_num;
+	while (isRunning)
+	{
+		current = SDL_GetTicks();
+
+		handleUserInput();
+
+		if (input.wasKeyPressed(SDL_SCANCODE_2)){
+			isGrassland = true;
+			break;
+		}
+		if (input.wasKeyPressed(SDL_SCANCODE_1)){
+			isGrassland = false;
+			break;
+		}
+		if (current - last >= (1000 / framerate))
+		{	
+			graveyard1_btn.draw(graphics, 120, 550);
+			grassland2_btn.draw(graphics, 720, 550);
+			graveyard_map_btn.draw(graphics, 120, 90);
+			grassland_map_btn.draw(graphics, 720, 90);
+			graphics.flip();
+			last = current;
+		}
+		SDL_Delay(10);
+	}
+
+	return isGrassland;
 }
 
 bool Game::menu(const std::string &background_path, const std::string &play_button_path, const std::string &exit_button_path)
@@ -81,6 +127,11 @@ bool Game::winner_menu() {
 	return menu("res/assets/winner.png", "res/assets/nextlevel_button.png", "res/assets/quit_button.png");
 }
 
+bool Game::map_selector_menu() {
+	return map_selector("res/assets/themes_graveyard.png", "res/assets/themes_forest.png", "res/assets/graveyard_theme_button.png", "res/assets/grassland_theme_button.png");
+}
+
+
 void Game::handleUserInput()
 {
 	input.beginNewFrame();
@@ -127,8 +178,14 @@ void Game::run()
 	Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 4.0F);
 	Map map = Map(Point{10, 10});
 
-	map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-	map.loadMapFile(graphics, "res/maps/test.map");
+	if (isGrassland){
+		map.loadTextures("res/maps/grassland/grassland.png", "res/maps/grassland/grassland.sprites");
+		map.loadMapFile(graphics, "res/maps/test.map");
+	} 
+	if (!isGrassland){
+		map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
+		map.loadMapFile(graphics, "res/maps/test.map");
+	}
 
 	unsigned int last = SDL_GetTicks();
 	unsigned int current;
