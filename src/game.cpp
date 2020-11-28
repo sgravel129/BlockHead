@@ -143,7 +143,7 @@ void Game::run()
 		handleUserInput();
 		Animation::updateTicks();
 		player.update(input);
-		zombie.update(player.getX(), player.getY());
+		zombie.update(player.getDeltaPos());
 
 		if (current - last >= (1000 / framerate))
 		{

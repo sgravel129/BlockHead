@@ -23,6 +23,6 @@ public:
     Zombie();
     Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale);
     ~Zombie();
-    void update(int, int);
+    void update(Point delta);
     void draw(Graphics &graphics);
 };

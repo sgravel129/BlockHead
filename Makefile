@@ -1,4 +1,4 @@
-CC=g++ -std=c++17
+CC=g++ -Wall
 CFLAGS=-I$(IDIR) -lSDL2main -lSDL2 -lSDL2_image
 
 IDIR =include
