@@ -12,18 +12,17 @@ Player::Player()
 
 Player::Player(Graphics &graphics, const std::string &path,int w, int h, float scale)
 {
-    _x = 200;
-    _y = 200;
-    _moveSpeed = 2;
-    _angle = 0; // starting direction
-    _sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
-    _currAnim = 0;
-    _anims.resize( NUM_DIR, std::vector<SDL_Rect>( MOVE_ANIMS ) );
+    pos = Point{200, 200};
+    moveSpeed = 2;
+    angle = 0; // starting direction
+    sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
+    currAnim = 0;
+    anims.resize( NUM_DIR, std::vector<SDL_Rect>( MOVE_ANIMS ) );
 
     for (int i = 0; i < NUM_DIR; i++)
     {
         for(int j = 0; j < MOVE_ANIMS; j++){
-            _anims[i][j] = SDL_Rect{w*j, h*i, w, h};
+            anims[i][j] = SDL_Rect{w*j, h*i, w, h};
         }
     }
 }
@@ -31,26 +30,26 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
 Player::~Player()
 {
     Log::destruct("Player\t| Called");
-    delete _sprite;
+    delete sprite;
 }
 
 int counter = 0;
 void Player::update(Input input){
     if(input.isKeyHeld(SDL_SCANCODE_W)){
-		_y -= _moveSpeed;
-        _angle = 3;
+		pos.y -= moveSpeed;
+        angle = 3;
     }
 	if(input.isKeyHeld(SDL_SCANCODE_S)){
-		_y += _moveSpeed;
-        _angle = 0;
+		pos.y += moveSpeed;
+        angle = 0;
     }
 	if(input.isKeyHeld(SDL_SCANCODE_D)){
-		_x += _moveSpeed;
-        _angle = 2;
+		pos.x += moveSpeed;
+        angle = 2;
     }
 	if(input.isKeyHeld(SDL_SCANCODE_A)){
-		_x -= _moveSpeed;
-        _angle = 1;
+		pos.x -= moveSpeed;
+        angle = 1;
     }
 
     if (input.isKeyHeld(SDL_SCANCODE_W) ||
@@ -58,8 +57,8 @@ void Player::update(Input input){
         input.isKeyHeld(SDL_SCANCODE_D) ||
         input.isKeyHeld(SDL_SCANCODE_A))
     {
-        if (Animation::getTicks() % int(20 / _moveSpeed) == 0) {
-            _currAnim = (_currAnim + 1) % MOVE_ANIMS;
+        if (Animation::getTicks() % int(20 / moveSpeed) == 0) {
+            currAnim = (currAnim + 1) % MOVE_ANIMS;
         }
     }
     if( input.wasKeyReleased(SDL_SCANCODE_W) ||
@@ -67,12 +66,12 @@ void Player::update(Input input){
         input.wasKeyReleased(SDL_SCANCODE_D) ||
         input.wasKeyReleased(SDL_SCANCODE_A))
     {
-        _currAnim = 0;
+        currAnim = 0;
     }
 }
 
 void Player::draw(Graphics &graphics){
-    _sprite->change_src(_anims[_angle][_currAnim]);
-    _sprite->draw(graphics, _x, _y);
+    sprite->change_src(anims[angle][currAnim]);
+    sprite->draw(graphics, pos.x, pos.y);
 }
 
