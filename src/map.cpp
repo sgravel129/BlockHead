@@ -107,7 +107,7 @@ void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath)
                                     _spriteSheet,
                                     _tileProps[stoi(idxSrc)-1],
                                     5.0,
-                                    false,
+                                    true, // every object hasCollision
                                     location));
 
                     Log::debug("map", "Created MapTile: " + idxSrc +
@@ -126,7 +126,12 @@ void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath)
         }
     }
 }
-
+void Map::update(Point delta){
+    for (auto &tile : _tiles)
+    {
+        tile->update(delta);
+    }
+}
 void Map::draw(Graphics &graphics)
 {
     for (auto &tile : _tiles)

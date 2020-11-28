@@ -1,6 +1,7 @@
 #include "player.hpp"
 #include "log.hpp"
 #include "animation.hpp"
+#include "constants.hpp"
 
 // TODO: Migrate to point system.
 const int MOVE_ANIMS = 3;
@@ -12,8 +13,11 @@ Player::Player()
 
 Player::Player(Graphics &graphics, const std::string &path,int w, int h, float scale)
 {
+    Log::verbose("Player\t| Called");
+
     pos = Point{200, 200};
-    moveSpeed = 2;
+
+    moveSpeed = 3;
     angle = 0; // starting direction
     sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
     currAnim = 0;
@@ -35,6 +39,8 @@ Player::~Player()
 
 int counter = 0;
 void Player::update(Input input){
+    prevPos = Point{pos.x, pos.y};
+
     if(input.isKeyHeld(SDL_SCANCODE_W)){
 		pos.y -= moveSpeed;
         angle = 3;
@@ -72,6 +78,6 @@ void Player::update(Input input){
 
 void Player::draw(Graphics &graphics){
     sprite->change_src(anims[angle][currAnim]);
-    sprite->draw(graphics, pos.x, pos.y);
+    sprite->draw(graphics, int(SCREEN_WIDTH/2) - int(PLAYER_WIDTH/2), int(SCREEN_HEIGHT/2) - int(PLAYER_HEIGHT/2));
 }
 

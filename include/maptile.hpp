@@ -15,6 +15,7 @@ public:
     MapTile(Graphics &graphics, const std::string &path, SDL_Rect src, float scale, bool hasCollision, Point location);
 
     ~MapTile();
+    void update(Point delta);
     void draw(Graphics &graphics);
 
     // Accessors

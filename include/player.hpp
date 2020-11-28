@@ -12,7 +12,7 @@ private:
     Sprite *sprite;
     std::vector<std::vector<SDL_Rect>> anims;
     int currAnim;
-    Point pos;
+    Point pos, prevPos;
     int angle;  // for the sprite sheet and shooting aim -> map to 6 cardinal points (make cardinal direction class)
     int health; // will need a numerical value assignmnet within TBD
     int moveSpeed;
@@ -27,4 +27,5 @@ public:
     void draw(Graphics &graphics);
     int getX() { return pos.x; }
     int getY() { return pos.y; }
+    Point getDeltaPos() { return pos - prevPos; }
 };

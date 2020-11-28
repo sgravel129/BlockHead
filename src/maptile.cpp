@@ -19,6 +19,9 @@ MapTile::MapTile(Graphics &graphics, const std::string &path, SDL_Rect src, floa
     _hasCollision = hasCollision;
     _location = location;
 }
+void MapTile::update(Point delta){
+    _location = _location - delta;
+}
 void MapTile::draw(Graphics &graphics)
 {
     _sprite->draw(graphics, _location.x, _location.y);
