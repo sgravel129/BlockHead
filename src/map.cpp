@@ -111,8 +111,7 @@ void Map::loadMapFile(Graphics &graphics, const std::string &mapfilePath)
                                     location));
 
                     Log::debug("map", "Created MapTile: " + idxSrc +
-                               " @ " + std::to_string(location.x) + " " +
-                               std::to_string(location.y));
+                               " @ " + location.to_string());
                 }
                 catch (const std::exception &e)
                 {
