@@ -5,6 +5,8 @@
 class GlobalPathVars {
 public:
     GlobalPathVars();
+    ~GlobalPathVars();
+    void reset(const int);
     void setGlobals(Path_Hierarchy* const, Abstract_Graph* const, const std::vector<std::vector<bool>>&);
 public:
     Path_Hierarchy* map_hierarchy;
@@ -13,5 +15,5 @@ public:
     std::vector<std::vector<bool>> _collisionM;
 };
 
-extern GlobalPathVars GP;
+extern GlobalPathVars* GP;
 

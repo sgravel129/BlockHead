@@ -110,6 +110,7 @@ void abstractMap();
 void buildGraph();
 void buildGraphPaths();
 void preprocessing();
+void resetIntMap();
 
 typedef int vertex_t;
 typedef double weight_t;

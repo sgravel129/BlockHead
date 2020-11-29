@@ -1,6 +1,5 @@
 #pragma once
 
-//#include "../include/path.hpp"
 #include "path.hpp"
 
 
@@ -109,7 +108,6 @@ public:
 
     Vertex* getVertexAddress(const Point&) const;    // returns pointer to encapsulated vertex
     std::vector<std::vector<neighbor>*>* get_neighborSet() const;
-    void deleteStartAndGoal(const Vertex*, const int);
 
 private:
     std::vector<std::vector<Vertex*>> _vertexS;   // set of vertices, organized by Cluster

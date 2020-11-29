@@ -1,8 +1,3 @@
-/*
-#include "../include/path.hpp"
-#include "../include/graph.hpp"
-*/
-//#include "path.cpp"
 #include "graph.hpp"
 #include "log.hpp"
 #define X_STEP 30   // x size of tile
@@ -282,22 +277,26 @@ Abstract_Graph::~Abstract_Graph() {
     for (int i = 0; i < _edgeL.size(); i++)
         delete _edgeL[i];
 
-    for (int i = 0; i < _neighborSet->size(); i++) {
-        delete _neighborSet->at(i);
-        _neighborSet->at(i) = nullptr;
-    }
-    delete _neighborSet;
-
-    for (int i = 0; i < _paths->size(); i++) {
-        for (int j = 0; j < _paths->at(i)->size(); j++) {
-            delete _paths->at(i)->at(j);
-            _paths->at(i)->at(j) = nullptr;
+    if (_neighborSet) {
+        for (int i = 0; i < _neighborSet->size(); i++) {
+            delete _neighborSet->at(i);
+            _neighborSet->at(i) = nullptr;
         }
-        delete _paths->at(i);
-        _paths->at(i) = nullptr;
+        delete _neighborSet;
     }
-    delete _paths;
-    _paths = nullptr;
+    if (_paths) {
+        for (int i = 0; i < _paths->size(); i++) {
+            for (int j = 0; j < _paths->at(i)->size(); j++) {
+                delete _paths->at(i)->at(j);
+                _paths->at(i)->at(j) = nullptr;
+            }
+            delete _paths->at(i);
+            _paths->at(i) = nullptr;
+        }
+        delete _paths;
+        _paths = nullptr;
+    }
+
 }
 
 

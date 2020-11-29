@@ -1,8 +1,3 @@
-/*
-#include "../include/path.hpp"
-#include "../include/constants.hpp"
-#include "../include/graph.hpp"
-*/
 #include "path.hpp"
 #include "graph.hpp"
 #include "dijkstra.hpp"
@@ -41,19 +36,12 @@ const weight_t max_weight = std::numeric_limits<double>::infinity();
 
 
 // TODO
-// Implement Destructor
-// Test
 // Integrate with rest of build
-// Define and add Zombie spawns to abstract graph
 
 
 // dummy global variable: might want to declare this in separate file, which is run when we load a map
 
-
-
-
-
-GlobalPathVars GP;
+GlobalPathVars* GP = new GlobalPathVars;
 /*
 Path_Hierarchy* map_hierarchy = new Path_Hierarchy(CLUSTER_XNUM * CLUSTER_YNUM);
 Abstract_Graph* map_graph = new Abstract_Graph( CLUSTER_XNUM * CLUSTER_YNUM );
@@ -63,14 +51,14 @@ Map* game_map = new Map();
 // accesses map info
 bool getTileCol(const Point& p) {
 
-    return GP._collisionM[p.x][p.y];
+    return GP->_collisionM[p.x][p.y];
 }
 
 
 PathTile* getPathTileFromPoint(const Point& p) {
     //return PathTile(game_map.get_tile(p), map_hierarchy);
     //MapTile mt;
-    return new PathTile(p, getTileCol(p), GP.map_hierarchy);    // dummy return for now
+    return new PathTile(p, getTileCol(p), GP->map_hierarchy);    // dummy return for now
 }
 /*
 MapTile* getMapTileFromPoint(const Point& p) {
@@ -84,7 +72,7 @@ MapTile* getMapTileFromPoint(const Point& p) {
 // PathTile class implementation
 ///////////////////////////////////////
 // Constructors
-PathTile::PathTile() : _mapRelPos{}, _clusterRelPos{}, _traversable{}, _level{}, _priority{}, _parentC{}, _parentH{} {};
+PathTile::PathTile() : _mapRelPos{}, _clusterRelPos{}, _traversable{}, _level{}, _priority{}, _parentC{}, _parentH(nullptr) {};
 PathTile::PathTile(const Point& p, Path_Hierarchy* parentH) : PathTile(p, getTileCol(p), parentH) {}
 PathTile::PathTile(const Point& p, Path_Hierarchy* parentH, const int level, const int priority) : PathTile(p, getTileCol(p), parentH, level, priority) {}
 PathTile::PathTile(const Point& p, const bool trav, Path_Hierarchy* parentH) : PathTile(p, trav, parentH, 0, 0) {}
@@ -143,8 +131,8 @@ bool operator<(const PathTile& LHS, const PathTile& RHS) {
 }
 // A STAR ALGORITHM
 std::vector<int> pathFind(const Point startP, const Point finishP, const int cNum) {
-    std::vector<std::vector<bool>> lmaoxd = GP._collisionM;
-    Cluster c = GP.map_hierarchy->get_cluster(cNum);
+    std::vector<std::vector<bool>> lmaoxd = GP->_collisionM;
+    Cluster c = GP->map_hierarchy->get_cluster(cNum);
     const int xStart = startP.x, yStart = startP.y;         // x and y values in cluster relative terms
     const int xFinish = finishP.x, yFinish = finishP.y;
     int closed_nodes_map[CLUSTER_TLENGTH][CLUSTER_TLENGTH];
@@ -172,12 +160,12 @@ std::vector<int> pathFind(const Point startP, const Point finishP, const int cNu
     // create the start node and push into list of open nodes
     Point p = { xStart + c.tilePos.x, yStart + c.tilePos.y };
     //tempMT = getMapTileFromPoint({ xStart + clusterP.x, yStart + clusterP.y });
-    n0 = new PathTile(p, GP.map_hierarchy, 0, 0);
+    n0 = new PathTile(p, GP->map_hierarchy, 0, 0);
     
     // Check if start or goal tile is traversable;
     if (!n0->get_traversable()) return {};
     p = { xFinish + c.tilePos.x, yFinish + c.tilePos.y };
-    PathTile* goalT = new PathTile(p, GP.map_hierarchy, 0, 0);
+    PathTile* goalT = new PathTile(p, GP->map_hierarchy, 0, 0);
     if (!goalT->get_traversable()) return {};
     delete goalT;
     goalT = nullptr;
@@ -238,7 +226,7 @@ std::vector<int> pathFind(const Point startP, const Point finishP, const int cNu
                     intMap[c.clusterPos.x][c.clusterPos.y][xdx][ydy] = 1;
                     continue;
                 }
-                m0 = new PathTile(p, GP.map_hierarchy, n0->get_level(), n0->get_priority());
+                m0 = new PathTile(p, GP->map_hierarchy, n0->get_level(), n0->get_priority());
                 m0->nextLevel(i);
                 m0->updatePriority(xFinish, yFinish);
 
@@ -396,18 +384,18 @@ int getClusterNum(const Point& p) {
 // divides map into clusters and defines transition points between them
 void abstractMap() {
 
-    GP.map_hierarchy->buildClusterS();
+    GP->map_hierarchy->buildClusterS();
 
     // Adding entrances between clusters for all adjacent clusters
     for(int i = 0; i < CLUSTER_XNUM; i++) {     // checking all vertically adjacent clusters
         for(int j =0; j < CLUSTER_YNUM -1; j++) {
-            findTransitions(GP.map_hierarchy->get_cluster({ i,j }), GP.map_hierarchy->get_cluster({ i, j + 1 }));
+            findTransitions(GP->map_hierarchy->get_cluster({ i,j }), GP->map_hierarchy->get_cluster({ i, j + 1 }));
         }
     }
     
     for(int i = 0; i < CLUSTER_XNUM - 1; i++) {     // checking all laterally adjacent clusters
         for(int j = 0; j < CLUSTER_YNUM; j++) {
-            findTransitions(GP.map_hierarchy->get_cluster({ i,j }), GP.map_hierarchy->get_cluster({ i + 1, j }));
+            findTransitions(GP->map_hierarchy->get_cluster({ i,j }), GP->map_hierarchy->get_cluster({ i + 1, j }));
         }
     }
     
@@ -416,8 +404,8 @@ void abstractMap() {
 // Function findTransitions
 // takes two adjacent clusters and finds transition points between them
 void findTransitions(const Cluster& c1, const Cluster& c2) {
-    Path_Hierarchy* p = GP.map_hierarchy;
-    std::vector<std::vector<bool>> m = GP._collisionM;
+    Path_Hierarchy* p = GP->map_hierarchy;
+    std::vector<std::vector<bool>> m = GP->_collisionM;
     std::pair<PathTile*, PathTile*> adjTiles;
     PathTile* l1, * l2;
     
@@ -442,16 +430,16 @@ void findTransitions(const Cluster& c1, const Cluster& c2) {
             validEnt = false;
             if (entStart == entEnd) {  // if single-tile entrance, define one transition point
                 
-                GP.map_hierarchy->addTransition(getAdjTiles(c1, c2, entStart, adjOrientation));
+                GP->map_hierarchy->addTransition(getAdjTiles(c1, c2, entStart, adjOrientation));
             }
             else if(entEnd - entStart < MIN_ENTRANCE_LENGTH) {  // if small entrance, define one transition point in middle
                 
-                GP.map_hierarchy->addTransition(getAdjTiles(c1, c2, entStart + static_cast<int>((entEnd-entStart)/2), adjOrientation));
+                GP->map_hierarchy->addTransition(getAdjTiles(c1, c2, entStart + static_cast<int>((entEnd-entStart)/2), adjOrientation));
             }
             else {      // otherwise define multiple transition points
                 for(int k = entStart; k < entEnd+1; k += TRANSITION_INTERVAL)
                     
-                    GP.map_hierarchy->addTransition(getAdjTiles(c1, c2, k, adjOrientation));
+                    GP->map_hierarchy->addTransition(getAdjTiles(c1, c2, k, adjOrientation));
             }
         
         }
@@ -466,45 +454,45 @@ void buildGraph() {
     int cNum1, cNum2;
     Vertex v1, v2;
     PathTile* t1; PathTile* t2;
-    int numTrans = GP.map_hierarchy->get_numTrans();
-    int numClusters = GP.map_hierarchy->get_numClusters();
+    int numTrans = GP->map_hierarchy->get_numTrans();
+    int numClusters = GP->map_hierarchy->get_numClusters();
     for (int i = 0; i < numTrans; i++) {
-        if (!GP.map_hierarchy->getTransitionTileAddresses(i, t1, t2))
+        if (!GP->map_hierarchy->getTransitionTileAddresses(i, t1, t2))
             break;
         cNum1 = getClusterNum(t1->getParentCluster().clusterPos);
         cNum2 = getClusterNum(t2->getParentCluster().clusterPos);
-        v1 = Vertex(GP.map_graph->getVCNum(cNum1), cNum1, t1);
-        v2 = Vertex(GP.map_graph->getVCNum(cNum2), cNum2, t2);
-        GP.map_graph->addVertex(v1, cNum1);
-        GP.map_graph->addVertex(v2, cNum2);
+        v1 = Vertex(GP->map_graph->getVCNum(cNum1), cNum1, t1);
+        v2 = Vertex(GP->map_graph->getVCNum(cNum2), cNum2, t2);
+        GP->map_graph->addVertex(v1, cNum1);
+        GP->map_graph->addVertex(v2, cNum2);
         if (v1.t->getParentCluster().clusterPos.x == v2.t->getParentCluster().clusterPos.x) {  // if v1 and v2 vertically adjacent
             if(v1.t->get_mapRelPos().y < v2.t->get_mapRelPos().y )
-                GP.map_graph->addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 2 });     // {0} is the path of going down once
+                GP->map_graph->addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 2 });     // {0} is the path of going down once
             else
-                GP.map_graph->addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 6 });     // {0} is the path of going up once
+                GP->map_graph->addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 6 });     // {0} is the path of going up once
         }
         else { // if v1 and v2 horizontally adjacent
             if(v1.t->get_mapRelPos().x < v2.t->get_mapRelPos().x)
-                GP.map_graph->addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 0 });     // {2} is the path of going right once
+                GP->map_graph->addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 0 });     // {2} is the path of going right once
             else
-                GP.map_graph->addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 4 });     // {2} is the path of going left once
+                GP->map_graph->addEdge(t1->get_mapRelPos(), t2->get_mapRelPos(), 1, INTER, { 4 });     // {2} is the path of going left once
         }
     }
     int numVC;
     double distance;
     std::vector<int> path;
     for (int cNum = 0; cNum < numClusters; cNum++) {
-        numVC = GP.map_graph->getVCNum(cNum);
+        numVC = GP->map_graph->getVCNum(cNum);
         for (int i = 0; i < numVC; i++) {
             for (int j = 0; j < numVC; j++) {
                 if (i == j)
                     continue;
-                if (!(GP.map_graph->getVertexCopy(i, cNum, v1) && GP.map_graph->getVertexCopy(j, cNum, v2)))
+                if (!(GP->map_graph->getVertexCopy(i, cNum, v1) && GP->map_graph->getVertexCopy(j, cNum, v2)))
                     break;
                 path = pathFind(v1.t->get_clusterRelPos(), v2.t->get_clusterRelPos(), cNum);
                 distance = pathToDistance(path);
                 if (distance != HUGE_VAL)
-                    GP.map_graph->addEdge(v1.t->get_mapRelPos(), v2.t->get_mapRelPos(), distance, INTRA, path);
+                    GP->map_graph->addEdge(v1.t->get_mapRelPos(), v2.t->get_mapRelPos(), distance, INTRA, path);
             }
         }
     }
@@ -512,10 +500,10 @@ void buildGraph() {
 
 void buildGraphPaths() {
     
-    int V = GP.map_graph->getVNum();   // get number of vertices
+    int V = GP->map_graph->getVNum();   // get number of vertices
     
-    GP.map_graph->setWeightedAdj();   // encapsulates weightedAdj  inside abstract_graph
-    GP.map_graph->setNeighborSet();
+    GP->map_graph->setWeightedAdj();   // encapsulates weightedAdj  inside abstract_graph
+    GP->map_graph->setNeighborSet();
 
     
 
@@ -529,15 +517,15 @@ void buildGraphPaths() {
 
     for (int i = 0; i < V; i++) {
         pathsFromSrc = new std::vector<std::vector<int>*>;
-        DijkstraComputePaths(i, GP.map_graph->get_neighborSet(), min_distance, previous);
+        DijkstraComputePaths(i, GP->map_graph->get_neighborSet(), min_distance, previous);
         for (int j = 0; j < V; j++) {
             pathsFromSrc->push_back(DijkstraGetShortestPathTo(j, previous));    // gets from heap
         }
         paths->at(i) = pathsFromSrc;
         distances.push_back(*min_distance);
     }
-    GP.map_graph->setPaths(paths);
-    GP.map_graph->setDistances(distances);
+    GP->map_graph->setPaths(paths);
+    GP->map_graph->setDistances(distances);
     
     // cleanup
     pathsFromSrc = nullptr;
@@ -570,8 +558,8 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
             return path
     */
     if (cNum1 == cNum2) {            // start and goal in same cluster
-        if (GP.map_graph->getVertexCopy(startP, startV) && GP.map_graph->getVertexCopy(goalP, goalV)) {     // start and goal vertices already in graph
-            if (GP.map_graph->getEdge(startV, goalV, tempEdge))
+        if (GP->map_graph->getVertexCopy(startP, startV) && GP->map_graph->getVertexCopy(goalP, goalV)) {     // start and goal vertices already in graph
+            if (GP->map_graph->getEdge(startV, goalV, tempEdge))
                 return tempEdge.path;
         }
         intPath = pathFind({ startP.x % static_cast<__int32>(CLUSTER_TLENGTH), startP.y % static_cast<__int32>(CLUSTER_TLENGTH) },
@@ -581,18 +569,18 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
     }
 
 
-    int startTransitionNum = GP.map_graph->getVCNum(cNum1);
-    int goalTransitionNum = GP.map_graph->getVCNum(cNum2);
+    int startTransitionNum = GP->map_graph->getVCNum(cNum1);
+    int goalTransitionNum = GP->map_graph->getVCNum(cNum2);
     std::vector<double> startDistances;
     std::vector<std::vector<int>> startToTransPaths;
     std::vector<double> goalDistances;
     std::vector<std::vector<int>> goalToTransPaths;
 
     // Connecting start and goal to cluster border transitions, and finding shortest path index
-    if (!GP.map_graph->getVertexCopy(startP, startV)) {
+    if (!GP->map_graph->getVertexCopy(startP, startV)) {
         Point sP = { startP.x % static_cast<__int32>(CLUSTER_TLENGTH), startP.y % static_cast<__int32>(CLUSTER_TLENGTH) };
         for (int i = 0; i < startTransitionNum; i++) {
-            if (!GP.map_graph->getVertexCopy(i, cNum1, transV)) {
+            if (!GP->map_graph->getVertexCopy(i, cNum1, transV)) {
                 startToTransPaths.push_back({});
                 startDistances.push_back(max_weight);
                 continue;
@@ -605,10 +593,10 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
 
     }
 
-    if (!GP.map_graph->getVertexCopy(goalP, goalV)) {
+    if (!GP->map_graph->getVertexCopy(goalP, goalV)) {
         Point gP = { goalP.x % static_cast<__int32>(CLUSTER_TLENGTH), goalP.y % static_cast<__int32>(CLUSTER_TLENGTH) };
         for (int i = 0; i < goalTransitionNum; i++) {
-            if (!GP.map_graph->getVertexCopy(i, cNum2, transV)) {
+            if (!GP->map_graph->getVertexCopy(i, cNum2, transV)) {
                 goalToTransPaths.push_back({});
                 goalDistances.push_back(max_weight);
                 continue;
@@ -633,11 +621,11 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
             for (int j = 0; j < goalTransitionNum; j++) {
                 if (goalDistances[j] == max_weight) continue;
 
-                x = GP.map_graph->keyToGlobalK(i, cNum1);
-                y = GP.map_graph->keyToGlobalK(j, cNum2);
-                if (GP.map_graph->getDistance(x, y) == max_weight) continue;
+                x = GP->map_graph->keyToGlobalK(i, cNum1);
+                y = GP->map_graph->keyToGlobalK(j, cNum2);
+                if (GP->map_graph->getDistance(x, y) == max_weight) continue;
 
-                transDist = startDistances[i] + goalDistances[j] + GP.map_graph->getDistance(x, y);
+                transDist = startDistances[i] + goalDistances[j] + GP->map_graph->getDistance(x, y);
                 if (transDist < temp) {
                     temp = transDist;
                     minI = i; minJ = j;
@@ -646,55 +634,55 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
             }
         }
 
-        intPath = GP.map_graph->getIntPathFromGraph(minX, minY);
+        intPath = GP->map_graph->getIntPathFromGraph(minX, minY);
         std::vector<int> goalPath = reverseIntPath(goalToTransPaths[minJ]);
         std::vector<int> startPath = startToTransPaths[minI];
         intPath.insert(intPath.begin(), startPath.begin(), startPath.end());
         intPath.insert(intPath.end(), goalPath.begin(), goalPath.end());
     }
     else if (addStart) {
-        minY = GP.map_graph->keyToGlobalK(goalV.key, cNum2);
+        minY = GP->map_graph->keyToGlobalK(goalV.key, cNum2);
         for (int i = 0; i < startTransitionNum; i++) {
             if (startDistances[i] == max_weight) continue;
 
-            x = GP.map_graph->keyToGlobalK(i, cNum1);
-            if (GP.map_graph->getDistance(x, minY) == max_weight) continue;
+            x = GP->map_graph->keyToGlobalK(i, cNum1);
+            if (GP->map_graph->getDistance(x, minY) == max_weight) continue;
 
-            transDist = startDistances[i] + GP.map_graph->getDistance(x, minY);
+            transDist = startDistances[i] + GP->map_graph->getDistance(x, minY);
             if (transDist < temp) {
                 temp = transDist;
                 minI = i;  minX = x;
             }
         }
-        intPath = GP.map_graph->getIntPathFromGraph(minX, minY);
+        intPath = GP->map_graph->getIntPathFromGraph(minX, minY);
         std::vector<int> startPath = startToTransPaths[minI];
         intPath.insert(intPath.begin(), startPath.begin(), startPath.end());
 
     }
     else if (addGoal) {
-        minX = GP.map_graph->keyToGlobalK(startV.key, cNum1);
+        minX = GP->map_graph->keyToGlobalK(startV.key, cNum1);
         for (int i = 0; i < goalTransitionNum; i++) {
             if (goalDistances[i] == max_weight) continue;
 
-            y = GP.map_graph->keyToGlobalK(i, cNum2);
-            if (GP.map_graph->getDistance(minX, y) == max_weight) continue;
+            y = GP->map_graph->keyToGlobalK(i, cNum2);
+            if (GP->map_graph->getDistance(minX, y) == max_weight) continue;
 
-            transDist = goalDistances[i] + GP.map_graph->getDistance(minX, y);
+            transDist = goalDistances[i] + GP->map_graph->getDistance(minX, y);
             if (transDist < temp) {
                 temp = transDist;
                 minY = y; minJ = i;
             }
         }
 
-        intPath = GP.map_graph->getIntPathFromGraph(minX, minY);
+        intPath = GP->map_graph->getIntPathFromGraph(minX, minY);
         std::vector<int> goalPath = reverseIntPath(goalToTransPaths[minJ]);
         intPath.insert(intPath.end(), goalPath.begin(), goalPath.end());
 
     }
     else {
-        minX = GP.map_graph->keyToGlobalK(startV.key, cNum1);
-        minY = GP.map_graph->keyToGlobalK(goalV.key, cNum2);
-        intPath = GP.map_graph->getIntPathFromGraph(minX, minY);
+        minX = GP->map_graph->keyToGlobalK(startV.key, cNum1);
+        minY = GP->map_graph->keyToGlobalK(goalV.key, cNum2);
+        intPath = GP->map_graph->getIntPathFromGraph(minX, minY);
     }
 
 
@@ -709,15 +697,27 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
 // Called by constructor, finds parent cluster from tile point
 Cluster findParentCluster(const Point& mapRelPos) {
     Point p = { mapRelPos.x / static_cast<__int32>(CLUSTER_TLENGTH) , mapRelPos.y / static_cast<__int32>(CLUSTER_TLENGTH) };
-    return GP.map_hierarchy->get_cluster(p);
+    return GP->map_hierarchy->get_cluster(p);
 }
 
-
+void resetIntMap() {
+    //static int intMap[CLUSTER_XNUM][CLUSTER_YNUM][CLUSTER_TLENGTH][CLUSTER_TLENGTH]
+    for (int i = 0; i < CLUSTER_XNUM; i++) {
+        for (int j = 0; j < CLUSTER_YNUM; j++) {
+            for (int k = 0; k < CLUSTER_TLENGTH; k++) {
+                for (int l = 0; l < CLUSTER_TLENGTH; l++) {
+                    intMap[i][j][k][l] = -1;
+                }
+            }
+        }
+    }
+}
 
 
 void preprocessing() {
     //need to reset GP and static intMap
-    
+    GP->reset(CLUSTER_XNUM*CLUSTER_YNUM);
+    resetIntMap();
     abstractMap();
     buildGraph();
     buildGraphPaths();

@@ -14,7 +14,7 @@ int main(int argc, char **argv)
         framerate = atoi(argv[2]);
     }
 
-    testMain();
+    //testMain();
 
     try
     {

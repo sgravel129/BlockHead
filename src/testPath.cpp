@@ -71,7 +71,7 @@ void printMap(const Point& cPoint) {
 		else
 			cout << j << " ";
 		for (i = 0; i < CLUSTER_TLENGTH; i++) {
-			if (GP._collisionM[(cPoint.x*CLUSTER_TLENGTH)+i][(cPoint.y * CLUSTER_TLENGTH)+j]) cout << "-" << "  ";
+			if (GP->_collisionM[(cPoint.x*CLUSTER_TLENGTH)+i][(cPoint.y * CLUSTER_TLENGTH)+j]) cout << "-" << "  ";
 			else cout << "O" << "  ";
 		}
 		cout << endl;
@@ -97,7 +97,7 @@ void printMap() {
 		else
 			cout << j << " ";
 		for (i = 0; i < CLUSTER_TLENGTH*CLUSTER_XNUM; i++) {
-			if (GP._collisionM[i][j]) cout << "-" << "  ";
+			if (GP->_collisionM[i][j]) cout << "-" << "  ";
 			else cout << "O" << "  ";
 		}
 		cout << endl;
@@ -112,7 +112,7 @@ void printGraph() {
 }
 
 void printPathHierarchy() {
-	Path_Hierarchy temp = *GP.map_hierarchy;
+	Path_Hierarchy temp = *GP->map_hierarchy;
 	cout << "================\nPath Hierarchy Info:\n=========\n" << endl;
 	cout << "Clusters:\n";
 	for (int i = 0; i < CLUSTER_XNUM; i++) {
@@ -122,7 +122,7 @@ void printPathHierarchy() {
 		}
 	}
 	/*
-	for (int i = 0; i < GP.map_hierarchy->get_numTrans(); i++) {
+	for (int i = 0; i < GP->map_hierarchy->get_numTrans(); i++) {
 		printTile(temp.get_transition(i).first);
 		printTile(temp.get_transition(i).second);
 
@@ -141,7 +141,7 @@ void printTile(const PathTile& t) {
 }
 
 void testTile() {
-	PathTile* tile = new PathTile({ 20,9 }, true, GP.map_hierarchy);
+	PathTile* tile = new PathTile({ 20,9 }, true, GP->map_hierarchy);
 	printTile(*tile);
 
 }
@@ -161,13 +161,13 @@ void testAstar(const Point& p1, const Point& p2, const int cNum) {
 void testGraph() {
 	cout << "Checking a random edge in our graph..." << endl;
 	int cNum = rand() % static_cast<__int32>(CLUSTER_XNUM * CLUSTER_YNUM);
-	int vCNum = GP.map_graph->getVCNum(cNum);
+	int vCNum = GP->map_graph->getVCNum(cNum);
 	Vertex v1, v2;
 	Edge e;
 	do {
-		while (!GP.map_graph->getVertexCopy(rand() % vCNum, cNum, v1));
-		while (!GP.map_graph->getVertexCopy(rand() % vCNum, cNum, v2));
-	} while (!GP.map_graph->getEdge(v1, v2, e));
+		while (!GP->map_graph->getVertexCopy(rand() % vCNum, cNum, v1));
+		while (!GP->map_graph->getVertexCopy(rand() % vCNum, cNum, v2));
+	} while (!GP->map_graph->getEdge(v1, v2, e));
 
 	printMap(getClusterPFromNum(cNum));
 	testAstar(v1.t->get_clusterRelPos(), v2.t->get_clusterRelPos(), cNum);
@@ -180,13 +180,13 @@ void testGraph() {
 
 
 void testDijkstra() {
-	int V = GP.map_graph->getVNum();   // get number of vertices
-	GP.map_graph->setWeightedAdj();
-	GP.map_graph->setNeighborSet();     // gets from heap
+	int V = GP->map_graph->getVNum();   // get number of vertices
+	GP->map_graph->setWeightedAdj();
+	GP->map_graph->setNeighborSet();     // gets from heap
 	std::vector<double>* min_distance = new std::vector<double>(V);
 	std::vector<int> previous(V);
 	int src = 0;
-	DijkstraComputePaths(src, GP.map_graph->get_neighborSet(), min_distance, previous);
+	DijkstraComputePaths(src, GP->map_graph->get_neighborSet(), min_distance, previous);
 	
 	std::vector<std::vector<int>*> paths;
 	for(int i = 0; i < V; i++) paths.push_back(DijkstraGetShortestPathTo(i, previous));
@@ -210,12 +210,12 @@ void testFindPath() {
 	do {
 		x = rand() % (CLUSTER_TLENGTH * CLUSTER_XNUM);
 		y = rand() % (CLUSTER_TLENGTH * CLUSTER_YNUM);
-	} while (!GP._collisionM[x][y]);
+	} while (!GP->_collisionM[x][y]);
 	p1 = { x, y };
 	do {
 		x = rand() % (CLUSTER_TLENGTH * CLUSTER_XNUM);
 		y = rand() % (CLUSTER_TLENGTH * CLUSTER_YNUM);
-	} while (!GP._collisionM[x][y] || p1.x == x && p1.y == y);
+	} while (!GP->_collisionM[x][y] || p1.x == x && p1.y == y);
 	p2 = { x, y };
 
 	cout << endl << endl;
@@ -240,8 +240,8 @@ void testMain() {
 	clock_t begin, end;
 	
 	srand(time(NULL));
-	GP.setGlobals(dummyPathHierarchy(), dummyGraph(), dummyMap());
-	GlobalPathVars lmao = GP;
+	GP->setGlobals(dummyPathHierarchy(), dummyGraph(), dummyMap());
+	GlobalPathVars* lmao = GP;
 
 	preprocessing();
 	
@@ -261,10 +261,8 @@ void testMain() {
 	//end = clock();
 	//cout << endl << "Time elapsed: " << (end-begin) << endl;
 
-	delete GP.map_hierarchy;
-	delete GP.map_graph;
 
-	//testFindPath();
+	testFindPath();
 	system("Pause");
 	//testHierarchy();
 }
