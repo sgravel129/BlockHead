@@ -59,7 +59,7 @@ bool Game::map_selector(const std::string &graveyard_map_btn_path, const std::st
 			break;
 		}
 		if (current - last >= (1000 / framerate))
-		{	
+		{
 			graveyard1_btn.draw(graphics, 120, 550);
 			grassland2_btn.draw(graphics, 720, 550);
 			graveyard_map_btn.draw(graphics, 120, 90);
@@ -170,19 +170,16 @@ bool Game::running()
 	return isRunning;
 }
 
-int x = 200;
-int y = 200;
-
 void Game::run()
 {
-	Player player = Player(graphics, "res/robot_sprites.png", 2110, 2160, 0.10F);
+	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
 	Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 4.0F);
 	Map map = Map(Point{10, 10});
 
 	if (isGrassland){
 		map.loadTextures("res/maps/grassland/grassland.png", "res/maps/grassland/grassland.sprites");
 		map.loadMapFile(graphics, "res/maps/test.map");
-	} 
+	}
 	if (!isGrassland){
 		map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
 		map.loadMapFile(graphics, "res/maps/test.map");
@@ -204,13 +201,18 @@ void Game::run()
 		map.update(player.getDeltaPos());
 		zombie.update(player.getDeltaPos());
 
+		// Check collision between:
+		// player & zombies
+		// player & map
+		// bullets & zombies
+
 		if (current - last >= (1000 / framerate))
 		{
 			// Render
 			graphics.fillBackground();
 			map.draw(graphics);
-			player.draw(graphics);
 			zombie.draw(graphics);
+			player.draw(graphics);
 
 			// Display
 			graphics.flip();

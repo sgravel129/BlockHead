@@ -1,5 +1,6 @@
 #include "zombie.hpp"
 #include "log.hpp"
+#include "util.hpp"
 #include "animation.hpp"
 #include "constants.hpp"
 
@@ -19,7 +20,7 @@ Zombie::~Zombie()
 
 Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale)
 {
-    pos = Point{200, 200};
+    pos = Point{Util::randInt(0, SCREEN_WIDTH), Util::randInt(0, SCREEN_HEIGHT)};
     angle = 0; // starting direction
     currAnim = 0;
     moveSpeed = 1;
