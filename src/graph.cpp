@@ -45,21 +45,6 @@ bool Abstract_Graph::addEdge(const Point& p1, const Point& p2, const double d, c
     return true;
 }
 
-// DELETE Start/Goal Vertex
-void Abstract_Graph::deleteStartAndGoal(const Vertex* v, const int cNum) {
-    Vertex* vTemp;
-    // first iterate through neighbors, and delete all edge information in neighbour vertices
-    int numNeighbours = v->adjList.size();
-    for (int i = 0; i < numNeighbours; i++) {
-        vTemp = getVertexAddress(v->adjList[i]->t->get_mapRelPos());
-        vTemp->adjList.pop_back();      // we know that the start/goal vertices were the last ones inserted, so just need to pop back
-        vTemp->adjEdges.pop_back();
-    }
-    _vertexS[cNum].pop_back();
-    _edgeL.pop_back();
-    _vNums[cNum]--;
-    _eNum--;
-}
 
 
 //////////////
@@ -289,17 +274,30 @@ std::vector<std::vector<neighbor>*>* Abstract_Graph::get_neighborSet() const { r
 
 Abstract_Graph::~Abstract_Graph() {
 
-    
-    // All on stack for now... might change later
-
-    /*
     for (int i = 0; i < _vertexS.size(); i++) {
         for (int j = 0; j < _vertexS[i].size(); j++) {
-            delete _vertexS[i][j]
+            delete _vertexS[i][j];
         }
     }
-    */
+    for (int i = 0; i < _edgeL.size(); i++)
+        delete _edgeL[i];
 
+    for (int i = 0; i < _neighborSet->size(); i++) {
+        delete _neighborSet->at(i);
+        _neighborSet->at(i) = nullptr;
+    }
+    delete _neighborSet;
+
+    for (int i = 0; i < _paths->size(); i++) {
+        for (int j = 0; j < _paths->at(i)->size(); j++) {
+            delete _paths->at(i)->at(j);
+            _paths->at(i)->at(j) = nullptr;
+        }
+        delete _paths->at(i);
+        _paths->at(i) = nullptr;
+    }
+    delete _paths;
+    _paths = nullptr;
 }
 
 

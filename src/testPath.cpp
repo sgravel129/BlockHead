@@ -261,10 +261,12 @@ void testMain() {
 	//end = clock();
 	//cout << endl << "Time elapsed: " << (end-begin) << endl;
 
+	delete GP.map_hierarchy;
+	delete GP.map_graph;
 
-	testFindPath();
+	//testFindPath();
 	system("Pause");
-	testHierarchy();
+	//testHierarchy();
 }
 
 

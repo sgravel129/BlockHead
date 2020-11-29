@@ -29,6 +29,14 @@ typedef struct Vertex {
         cNum = c;
         t = pt;
     }
+     
+    ~Vertex() {
+        for (auto ptr : adjList)
+            ptr = nullptr;
+        for (auto ptr : adjEdges)
+            ptr = nullptr;
+        t = nullptr;
+    }
 
     int key{};
     int cNum{};
@@ -52,6 +60,10 @@ typedef struct Edge {
         for (int i = 0; i < p.size(); i++)
             path.push_back(p[i]);
         vPair = std::make_pair(vP.first, vP.second);
+    }
+    ~Edge() {
+        vPair.first = nullptr;
+        vPair.second = nullptr;
     }
     std::pair<Vertex*, Vertex*> vPair{};
     edgeType eType{};
