@@ -77,7 +77,33 @@ void printMap(const Point& cPoint) {
 		cout << endl;
 	}
 	cout << endl;
-} // end showJumble
+}
+
+
+
+void printMap() {
+	int i, j;
+	cout << "Map\n";
+	cout << "\n  ";
+	for (j = 0; j < CLUSTER_TLENGTH*CLUSTER_XNUM; j++)
+		if (j < 10)
+			cout << " " << j << " ";
+		else
+			cout << j << " ";
+	cout << endl;
+	for (j = 0; j < CLUSTER_TLENGTH*CLUSTER_YNUM; j++) {
+		if (j < 10)
+			cout << " " << j << " ";
+		else
+			cout << j << " ";
+		for (i = 0; i < CLUSTER_TLENGTH*CLUSTER_XNUM; i++) {
+			if (GP._collisionM[i][j]) cout << "-" << "  ";
+			else cout << "O" << "  ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+}
 
 
 
@@ -178,6 +204,37 @@ void testDijkstra() {
 
 }
 
+void testFindPath() {
+	Point p1, p2;
+	int x, y;
+	do {
+		x = rand() % (CLUSTER_TLENGTH * CLUSTER_XNUM);
+		y = rand() % (CLUSTER_TLENGTH * CLUSTER_YNUM);
+	} while (!GP._collisionM[x][y]);
+	p1 = { x, y };
+	do {
+		x = rand() % (CLUSTER_TLENGTH * CLUSTER_XNUM);
+		y = rand() % (CLUSTER_TLENGTH * CLUSTER_YNUM);
+	} while (!GP._collisionM[x][y] || p1.x == x && p1.y == y);
+	p2 = { x, y };
+
+	cout << endl << endl;
+	printMap();
+	printMap(findParentCluster(p1).clusterPos);
+	printMap(findParentCluster(p2).clusterPos);
+	cout << "=============" << endl << "Path from "; printPoint(p1); cout << " to "; printPoint(p2);
+	std::vector<int> dirPath = searchForPath(p1, p2);
+	cout << endl << "Directions:";
+	for (int i = 0; i < dirPath.size(); i++) {
+		if (i % 15 == 0) cout << endl;
+		cout << dirPath[i] << " ";
+		
+	}
+}
+
+void printPoint(const Point& p) {
+	cout << "(" << p.x << ", " << p.y << ")";
+}
 
 void testMain() {
 	clock_t begin, end;
@@ -185,9 +242,9 @@ void testMain() {
 	srand(time(NULL));
 	GP.setGlobals(dummyPathHierarchy(), dummyGraph(), dummyMap());
 	GlobalPathVars lmao = GP;
-	abstractMap();
-	buildGraph();
-	buildGraphPaths();
+
+	preprocessing();
+	
 
 	// testing A star aglo
 	//Point p1 = { 0,0 }, p2 = { 7,7 };
@@ -205,7 +262,7 @@ void testMain() {
 	//cout << endl << "Time elapsed: " << (end-begin) << endl;
 
 
-
+	testFindPath();
 	system("Pause");
 	testHierarchy();
 }

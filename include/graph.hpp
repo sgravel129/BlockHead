@@ -68,7 +68,7 @@ public:
 
     
     double searchForDistance(const Vertex&, const Vertex&, const int cNum);
-    std::vector<int> searchForGraphPath(const int, const int);
+    std::vector<int> getIntPathFromGraph(const int, const int);
     
     void setWeightedAdj();
     void setNeighborSet();
@@ -76,11 +76,13 @@ public:
     void setDistances(const std::vector<std::vector<double>>&);
 
     int keyToGlobalK(const int, const int);
+    std::pair<int,int> globalToKey(int);
     
     // Accessors
     bool getVertexCopy(const int k, const int cNum, Vertex& v) const;
     bool getVertexCopy(const Point&, Vertex&) const;  // returns copy of Vertex containing tile of supplied point
     bool getEdge(const Vertex&, const Vertex&, Edge&) const;          // returns copy of Edge between supplied vertices
+    bool getEdge(int, int, Edge&);
     int getVCNum(const int) const;        // return number of vertices in supplied cluster
     int getVNum() const;      // return total number of vertices in graph
 

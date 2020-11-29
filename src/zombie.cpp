@@ -75,12 +75,6 @@ void Zombie::update(Point delta)
 
 void Zombie::draw(Graphics &graphics)
 {
-<<<<<<< HEAD
-    _sprite->change_src(_anims[_angle][_currAnim]);
-    _sprite->draw(graphics, _x, _y);
-}
-=======
     sprite->change_src(anims[angle][currAnim]);
     sprite->draw(graphics, pos.x, pos.y);
 }
->>>>>>> origin/master

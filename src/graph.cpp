@@ -74,12 +74,17 @@ double Abstract_Graph::searchForDistance(const Vertex& v1, const Vertex& v2, con
 
 
 
-std::vector<int> Abstract_Graph::searchForGraphPath(const int startGlobalK, const int goalGlobalK) {
+std::vector<int> Abstract_Graph::getIntPathFromGraph(const int startGlobalK, const int goalGlobalK) {
     std::vector<int> vertexPath;
     std::vector<int> dirPath;
+    Edge e;
 
     vertexPath = getPath(startGlobalK, goalGlobalK);
-
+    
+    for (int i = 0; i < vertexPath.size() - 1; i++) {
+        if (!getEdge(vertexPath[i], vertexPath[i+1], e)) break;
+        dirPath.insert(dirPath.end(), e.path.begin(), e.path.end());
+    }
     
 
     return dirPath;
@@ -157,21 +162,37 @@ int Abstract_Graph::keyToGlobalK(const int key, const int cNum) {
     return globalKey + key;
 }
 
+std::pair<int, int> Abstract_Graph::globalToKey(int gKey) {
+    int cNum = -1;
+    while (gKey >= 0) {
+        gKey -= _vNums[++cNum];
+    }
+    return std::make_pair(_vNums[cNum]+gKey, cNum);
+}
+
 
 // Accessors
 
 bool Abstract_Graph::getVertexCopy(const int k, const int cNum, Vertex& v) const {
-    
+    try {
+        v = *_vertexS.at(cNum).at(k);
+        return true;
+    }
+    catch (const std::out_of_range& e) { 
+        std::cout << std::endl << std::endl << "LMAO U RETARD" << std::endl << std::endl; }
+    return false;
+    /*
     for (int i = k; i < _vNums[cNum]; i++) {
-        if (_vertexS[cNum][k]->key == k) {
-            v = *_vertexS[cNum][k];
+        if (_vertexS[cNum][i]->key == k) {
+            v = *_vertexS[cNum][i];
             return true;
         }
     }
     return false;
+    */
 }
 bool Abstract_Graph::getVertexCopy(const Point& p, Vertex& v) const {
-    int cNum = getClusterNum(p);
+    int cNum = getClusterNum(findParentCluster(p).clusterPos);
     Point tempP;
     for (int i = 0; i < _vNums[cNum]; i++) {
         tempP = _vertexS[cNum][i]->t->get_mapRelPos();
@@ -205,6 +226,32 @@ bool Abstract_Graph::getEdge(const Vertex& v1, const Vertex& v2, Edge& e) const 
     }
     return false;
 }
+
+
+bool Abstract_Graph::getEdge(int gKey1, int gKey2, Edge& e) {
+    Point p1, p2;
+    if (gKey1 == gKey2) return false;
+    std::pair<int, int> v1Key = globalToKey(gKey1), v2Key = globalToKey(gKey2);
+    Vertex v1, v2;
+    if (!getVertexCopy(v1Key.first, v1Key.second, v1) || !getVertexCopy(v2Key.first, v2Key.second, v2)) return false;
+    for (int i = 0; i < v1.adjList.size(); i++) {
+
+        p1 = v1.adjList[i]->t->get_mapRelPos();
+        p2 = v2.t->get_mapRelPos();
+        if (p1.x == p2.x && p1.y == p2.y) {
+            e = *v1.adjEdges[i];
+            if (e.vPair.first->key == v1.key && e.vPair.first->cNum == v1.cNum)
+                return true;
+            else {
+                e.path = reverseIntPath(e.path);
+                return true;
+            }
+
+        }
+    }
+    return false;
+}
+
 
 int Abstract_Graph::getVCNum(const int cNum) const {
     return _vNums[cNum];

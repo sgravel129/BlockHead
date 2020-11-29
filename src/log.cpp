@@ -3,13 +3,11 @@
 using namespace std;
 
 bool Log::_isDebugMode = true;
-<<<<<<< HEAD
-string Log::_debugClasses[1] = {""};
-=======
-string Log::_debugClasses[] = {
+
+string Log::_debugClasses[1] = {
 	// "map"
 };
->>>>>>> origin/master
+
 bool Log::_isVerboseMode = true;
 bool Log::_showDestructors = false;
 
