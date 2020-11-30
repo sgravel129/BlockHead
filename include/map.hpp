@@ -26,4 +26,5 @@ public:
     void loadMapFile(Graphics &graphics, const std::string &mapfile);
     void update(Point delta);
     void draw(Graphics &graphics);
+    std::vector<SDL_Rect> getDestRects();
 };

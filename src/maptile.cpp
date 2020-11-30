@@ -1,7 +1,7 @@
 #include "maptile.hpp"
 #include "log.hpp"
 
-// TODO: Support multiple lines for mapfiles. fix commas.
+// TODO: Support multiple lines for mapfiles
 
 MapTile::MapTile() {}
 MapTile::~MapTile()
@@ -18,11 +18,17 @@ MapTile::MapTile(Graphics &graphics, const std::string &path, SDL_Rect src, floa
     _sprite = new Sprite(graphics, path, src, scale);
     _hasCollision = hasCollision;
     _location = location;
+    rPos = location;
 }
 void MapTile::update(Point delta){
-    _location = _location - delta;
+    rPos = rPos - delta;
 }
 void MapTile::draw(Graphics &graphics)
 {
-    _sprite->draw(graphics, _location.x, _location.y);
+    _sprite->draw(graphics, rPos.x, rPos.y);
+}
+
+SDL_Rect MapTile::getDestRect(){
+    Point dim = _sprite->getDim();
+    return SDL_Rect{rPos.x, rPos.y, dim.x, dim.y};
 }

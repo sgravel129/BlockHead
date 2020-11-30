@@ -228,9 +228,43 @@ void Game::run()
 		}
 
 		// Check collision between:
+		std::vector<SDL_Rect> playerRects = player.getDestRects();
+		std::vector<SDL_Rect> mapRects = map.getDestRects();
+		std::vector<SDL_Rect> zombieRects;
+		for (auto& zombie : zombies){
+			zombieRects.push_back(zombie->getDestRect());
+		}
 		// player & zombies
+		// zombies wrt each other
+		for (auto& zombieRect : zombieRects)
+		{
+			if (SDL_HasIntersection(&playerRects[0], &zombieRect) == SDL_TRUE)
+			{
+				// Log::verbose("Hit Detected: Game Over");
+				// Destroy Zombies
+				for (auto& zombie : zombies){
+					delete zombie;
+				}
+				winner_menu();
+				return;
+			}
+		}
 		// player & map
+		for (auto& mapRect : mapRects)
+		{
+			if (SDL_HasIntersection(&playerRects[0], &mapRect) == SDL_TRUE)
+			{
+				Log::verbose("Collision Detected: Map");
+				player.update(player.getDeltaPos());
+				map.update(player.getDeltaPos());
+				for (auto& zombie : zombies){
+					zombie->updateCamera(player.getDeltaPos());
+				}
+
+			}
+		}
 		// bullets & zombies
+
 
 		if (current - last >= (1000 / framerate))
 		{
@@ -260,7 +294,6 @@ void Game::run()
 }
 
 // Getters and Setters
-
 void Game::setFramerate(int framerate)
 {
 	this->framerate = framerate;
