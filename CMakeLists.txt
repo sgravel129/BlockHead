@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.1...3.16)
 
 project(blockhead)
@@ -34,7 +35,7 @@ file(GLOB SRC
 )
 
 # Compile SRC
-add_executable(blockhead ${SRC})
+add_executable(blockhead ${SRC} "include/Collision.hpp" "src/collision.cpp")
 
 # Link SDL2 libs
 target_link_libraries(blockhead ${LIBRARIES})

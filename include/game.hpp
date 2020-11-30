@@ -64,6 +64,22 @@ private:
 		Process collisions between game objects
 	 */
 	void handleCollisions();
+	
+	// collision detection(this is where i call my aabb colision check to see if the maptile has collision component and if collision occoured 
+	// if yes player spped is set to negative one, sendin them backwards)
+	// if (Collision::AABB(player<Collision_Component>, maptile <Colider_componet>))
+	//{
+	//	player._moveSpeed=-1
+	
+	//}
+	// this function gets called again for zombies collision 
+	// if collsion occours health decreases
+	// if (Collision::AABB(player, zombie)
+	//{
+	//	player._moveSpeed=-1
+	//	player._health--
+	//}
+}
 	int _framerate;
 
 	bool _isRunning;
