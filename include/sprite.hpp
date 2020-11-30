@@ -13,6 +13,7 @@ struct Point
 	Point operator +(const Point& b);
 	std::string to_string();
 };
+std::string to_string(SDL_Rect);
 
 
 class Sprite
@@ -28,6 +29,7 @@ public:
 	 */
 	void change_src(SDL_Rect src);
 	void change_scale(float scale);
+	Point getDim();
 
 	/*
 		Renders the sprite to screen

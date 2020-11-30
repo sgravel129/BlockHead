@@ -28,4 +28,5 @@ public:
     int getX() { return pos.x; }
     int getY() { return pos.y; }
     Point getDeltaPos() { return pos - prevPos; }
+    std::vector<SDL_Rect> getDestRects();
 };
