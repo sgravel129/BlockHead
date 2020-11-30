@@ -14,6 +14,8 @@ struct Point
 	std::string to_string();
 };
 
+bool operator==(const Point&, const Point&);
+bool operator!=(const Point&, const Point&);
 
 class Sprite
 {

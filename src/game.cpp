@@ -9,6 +9,7 @@
 #include "player.hpp"
 #include "zombie.hpp"
 #include "map.hpp"
+#include "path.hpp"
 
 // TODO: Framerate bug
 // TODO: Removed default constructors?
@@ -173,7 +174,7 @@ bool Game::running()
 void Game::run()
 {
 	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
-	Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 4.0F);
+	Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 4.0F, player.getPos());
 	Map map = Map(Point{10, 10});
 
 	if (isGrassland){
@@ -182,8 +183,12 @@ void Game::run()
 	}
 	if (!isGrassland){
 		map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-		map.loadMapFile(graphics, "res/maps/test.map");
+		map.loadMapFile(graphics, "res/maps/graveyard/graveyard.map");
+		//map.loadMapFile(graphics, "res/maps/test2.map");
 	}
+
+	// Path Abstraction
+	pathPreprocessing(5 * 3, map);
 
 	unsigned int last = SDL_GetTicks();
 	unsigned int current;
@@ -199,7 +204,11 @@ void Game::run()
 		Animation::updateTicks();
 		player.update(input);
 		map.update(player.getDeltaPos());
-		zombie.update(player.getDeltaPos());
+		
+		pathCheck(zombie, player);
+
+		zombie.update(player.getDeltaPos(), player.getPos());
+		//zombie.update(player.getDeltaPos());
 
 		// Check collision between:
 		// player & zombies
@@ -228,4 +237,31 @@ void Game::run()
 void Game::setFramerate(int framerate)
 {
 	this->framerate = framerate;
+}
+
+
+void Game::pathCheck(Zombie& zombie, const Player& player) {
+	Point zombieP = mapToTPos(zombie.getPos());
+	Point playerP = mapToTPos(player.getPos());
+
+	Point zombiePR = mapToTPos(zombie.getRenderPos());
+	//Log::verbose("Player pos:" + playerP.to_string());
+	Log::verbose("Zombie pos:" + zombieP.to_string());
+	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
+	
+	// if zombie path variable empty, update path
+// (also takes care of new zombie, which is initialized with empty path)
+	if (zombie.getPath().empty())
+		zombie.setPath(searchForPath(zombieP, playerP));
+
+	// check if player and zombie in same cluster
+	// if so update path
+	else if (findParentCluster(zombieP).clusterPos == findParentCluster(playerP).clusterPos)
+		zombie.setPath(searchForPath(zombieP, playerP));
+
+	// check if player changed cluster
+	// if so, recalculate cluster path
+	else if (findParentCluster(playerP).clusterPos == findParentCluster(mapToTPos(player.getPrevPos())).clusterPos)
+		zombie.setPath(searchForPath(zombieP, playerP));
+	
 }

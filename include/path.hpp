@@ -109,7 +109,7 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP);
 void abstractMap();
 void buildGraph();
 void buildGraphPaths();
-void preprocessing();
+void pathPreprocessing(const int, const Map&);
 void resetIntMap();
 
 typedef int vertex_t;
@@ -124,5 +124,6 @@ struct neighbor {
 
 typedef std::vector<std::vector<neighbor> > adjacency_list_t;
 
-
+Point mapToTPos(const Point& p);
 Cluster findParentCluster(const Point&);
+void printMAP();

@@ -28,4 +28,6 @@ public:
     int getX() { return pos.x; }
     int getY() { return pos.y; }
     Point getDeltaPos() { return pos - prevPos; }
+    Point getPos() const { return pos; }
+    Point getPrevPos() const { return prevPos; }
 };

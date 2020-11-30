@@ -243,7 +243,7 @@ void testMain() {
 	GP->setGlobals(dummyPathHierarchy(), dummyGraph(), dummyMap());
 	GlobalPathVars* lmao = GP;
 
-	preprocessing();
+	//preprocessing();
 	
 
 	// testing A star aglo

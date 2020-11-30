@@ -7,19 +7,14 @@
 #include <vector>
 
 
-#define X_MAX 2000
-#define Y_MAX 1200
+#define TLENGTH 75
 
-#define X_STEP 50   // x size of tile
-#define Y_STEP 50   // y size of tile
+#define X_MAX 3000
+#define Y_MAX 1800
 
-// will change these depending on amount of pixels sprite occupies
-// #define CLUSTER_WIDTH 120
-// #define CLUSTER_HEIGHT 120
-#define CLUSTER_SLENGTH 400     // side length of cluster (square)
-#define CLUSTER_TLENGTH CLUSTER_SLENGTH / X_STEP
-#define CLUSTER_XNUM X_MAX/CLUSTER_SLENGTH
-#define CLUSTER_YNUM Y_MAX/CLUSTER_SLENGTH
+#define CLUSTER_TLENGTH 8
+#define CLUSTER_XNUM 5
+#define CLUSTER_YNUM 3
 
 
 #define MIN_ENTRANCE_LENGTH 3   // minimum tile lenght for entrance
@@ -686,11 +681,15 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
     }
 
 
-
+    //printMAP();
     return intPath;
 
 }
 
+
+Point mapToTPos(const Point& p) {
+    return { p.x / static_cast<__int32>(TLENGTH), p.y / static_cast<__int32>(TLENGTH) };
+}
 
 
 
@@ -714,31 +713,42 @@ void resetIntMap() {
 }
 
 
-void preprocessing() {
+void pathPreprocessing(const int numClusters, const Map& map) {
     //need to reset GP and static intMap
-    GP->reset(CLUSTER_XNUM*CLUSTER_YNUM);
+    GP->reset(numClusters, map);
     resetIntMap();
+    Log::verbose("Path variables initialized");
     abstractMap();
+    Log::verbose("Map abstracted");
     buildGraph();
+    Log::verbose("Graph built");
     buildGraphPaths();
+    Log::verbose("Graph Paths built");
+    //printMAP();
+}
+
+void printMAP() {
+    int i, j;
+    cout << "Map\n";
+    cout << "\n  ";
+    for (j = 0; j < CLUSTER_TLENGTH * CLUSTER_XNUM; j++)
+        if (j < 10)
+            cout << " " << j << " ";
+        else
+            cout << j << " ";
+    cout << endl;
+    for (j = 0; j < CLUSTER_TLENGTH * CLUSTER_YNUM; j++) {
+        if (j < 10)
+            cout << " " << j << " ";
+        else
+            cout << j << " ";
+        for (i = 0; i < CLUSTER_TLENGTH * CLUSTER_XNUM; i++) {
+            if (GP->_collisionM[i][j]) cout << "-" << "  ";
+            else cout << "O" << "  ";
+        }
+        cout << endl;
+    }
+    cout << endl;
 }
 
 
-void runtimeProcessing() {
-
-
-
-}
-
-void gameLoop() {
-    // check if player and zombie in same cluster
-    // if so update path
-    
-    // check if player changed cluster
-    // if so, recalculate cluster path
-
-
-    // if zombie path variable empty, update path
-    // (also takes care of new zombie, which is initialized with empty path)
-
-}

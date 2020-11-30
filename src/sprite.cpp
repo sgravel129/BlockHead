@@ -12,6 +12,8 @@ Point Point::operator -(const Point& b) {
 Point Point::operator +(const Point& b) {
 	return Point{this->x + b.x, this->y + b.y};
 }
+bool operator==(const Point& LHS, const Point& RHS) { return (LHS.x == RHS.x && LHS.y == RHS.y); }
+bool operator!=(const Point& LHS, const Point& RHS) { return !(LHS == RHS); }
 std::string Point::to_string() {
 	return "(" + std::to_string(this->x) + "," + std::to_string(this->y) + ")";
 }

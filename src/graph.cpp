@@ -1,8 +1,7 @@
 #include "graph.hpp"
 #include "log.hpp"
-#define X_STEP 30   // x size of tile
-#define CLUSTER_SLENGTH 120     // side length of cluster (square)
-#define CLUSTER_TLENGTH CLUSTER_SLENGTH / X_STEP
+#define TLENGTH 75   // x size of tile
+#define CLUSTER_TLENGTH 8
 
 
 //////////////////////////////////
