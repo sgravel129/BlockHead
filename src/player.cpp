@@ -37,7 +37,6 @@ Player::~Player()
     delete sprite;
 }
 
-int counter = 0;
 void Player::update(Input input){
     prevPos = Point{pos.x, pos.y};
 
@@ -75,6 +74,12 @@ void Player::update(Input input){
     {
         currAnim = 0;
     }
+}
+
+void Player::update(Point delta){
+    prevPos = Point{pos.x, pos.y};
+    pos.x = pos.x - delta.x;
+    pos.y = pos.y - delta.y;
 }
 
 void Player::draw(Graphics &graphics){

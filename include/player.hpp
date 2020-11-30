@@ -24,6 +24,7 @@ public:
     Player(Graphics &graphics, const std::string &path, int w, int h, float scale);
     ~Player();
     void update(Input input);
+    void update(Point delta);
     void draw(Graphics &graphics);
     int getX() { return pos.x; }
     int getY() { return pos.y; }

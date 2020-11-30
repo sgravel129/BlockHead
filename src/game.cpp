@@ -239,6 +239,12 @@ void Game::run()
 			if (SDL_HasIntersection(&playerRects[0], &mapRect) == SDL_TRUE)
 			{
 				Log::verbose("Collision Detected: Map");
+				player.update(player.getDeltaPos());
+				map.update(player.getDeltaPos());
+				for (auto& zombie : zombies){
+					zombie->updateCamera(player.getDeltaPos());
+				}
+
 			}
 		}
 		// bullets & zombies

@@ -54,7 +54,7 @@ Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float 
 void Zombie::update(Point delta)
 {
     // Do path finding. Euclidian Distance
-    rPos = rPos - delta; // delta caused by player movement
+    updateCamera(delta); // delta caused by player movement
     Point prevPos = pos;
 
     static const int DEADBAND = 5;
@@ -91,6 +91,12 @@ void Zombie::update(Point delta)
         currAnim = (currAnim + 1) % MOVE_ANIMS;
         // Log::verbose(std::to_string((pos.x / 75)) + " " + std::to_string((pos.y / 75)));
     }
+}
+
+void Zombie::updateCamera(Point delta)
+{
+    // Do path finding. Euclidian Distance
+    rPos = rPos - delta; // delta caused by player movement
 }
 
 void Zombie::draw(Graphics &graphics)
