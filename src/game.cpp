@@ -220,11 +220,12 @@ void Game::run()
 			zombieRects.push_back(zombie->getDestRect());
 		}
 		// player & zombies
+		// zombies wrt each other
 		for (auto& zombieRect : zombieRects)
 		{
 			if (SDL_HasIntersection(&playerRects[0], &zombieRect) == SDL_TRUE)
 			{
-				Log::verbose("Hit Detected: Game Over");
+				// Log::verbose("Hit Detected: Game Over");
 				// Destroy Zombies
 				for (auto& zombie : zombies){
 					delete zombie;
@@ -248,6 +249,7 @@ void Game::run()
 			}
 		}
 		// bullets & zombies
+
 
 		if (current - last >= (1000 / framerate))
 		{
