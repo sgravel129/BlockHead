@@ -245,8 +245,8 @@ void Game::pathCheck(Zombie& zombie, const Player& player) {
 	Point playerP = mapToTPos(player.getPos());
 
 	Point zombiePR = mapToTPos(zombie.getRenderPos());
-	//Log::verbose("Player pos:" + playerP.to_string());
-	Log::verbose("Zombie pos:" + zombieP.to_string());
+	Log::verbose("Player pos:" + playerP.to_string());
+	//Log::verbose("Zombie pos:" + zombieP.to_string());
 	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
 	
 	// if zombie path variable empty, update path

@@ -5,7 +5,7 @@
 #include "log.hpp"
 
 #include <vector>
-
+#include <cmath>
 
 #define TLENGTH 75
 
@@ -688,7 +688,9 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
 
 
 Point mapToTPos(const Point& p) {
-    return { p.x / static_cast<__int32>(TLENGTH), p.y / static_cast<__int32>(TLENGTH) };
+    double x = static_cast<double>(p.x) / static_cast<double>(TLENGTH);
+    double y = static_cast<double>(p.y) / static_cast<double>(TLENGTH);
+    return { static_cast<int>(round(x)), static_cast<int>(round(y)) };
 }
 
 

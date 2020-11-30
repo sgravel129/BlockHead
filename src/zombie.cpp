@@ -126,5 +126,7 @@ void Zombie::draw(Graphics &graphics)
 void Zombie::setPath(const std::vector<int>& path) { _pathToPlayer = path; }
 
 Point mapToPos(const Point& p) {
-    return { p.x / static_cast<__int32>(TLENGTH), p.y / static_cast<__int32>(TLENGTH) };
+    double x = static_cast<double>(p.x) / static_cast<double>(TLENGTH);
+    double y = static_cast<double>(p.y) / static_cast<double>(TLENGTH);
+    return { static_cast<int>(round(x)), static_cast<int>(round(y)) };
 }
