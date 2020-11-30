@@ -10,8 +10,14 @@
 #include "zombie.hpp"
 #include "map.hpp"
 #include "path.hpp"
+#include "music.hpp"
 
 #define NUM_ZOMBIES 5
+
+Mix_Music* introMusic = NULL;
+Mix_Music* loopMusic = NULL;
+
+
 
 Game::Game()
 		:	graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT),
@@ -199,19 +205,30 @@ void Game::run()
 		//map.loadMapFile(graphics, "res/maps/test2.map");
 	}
 
+
 	// Path Abstraction
 	pathPreprocessing(5 * 3, map);
+	// Music
+	initMusic();
+	loadMedia();
+	Mix_PlayMusic(introMusic, 0);
+
 
 	unsigned int last = SDL_GetTicks();
 	unsigned int current;
 
 	graphics.setRenderColor(Color("65846c"));
 
+
+
 	while (isRunning)
 	{
 		current = SDL_GetTicks();
 
 		// Update
+		if (Mix_PlayingMusic() == 0)
+			Mix_PlayMusic(loopMusic, -1);
+		
 		handleUserInput();
 		Animation::updateTicks();
 		player.update(input);
@@ -248,6 +265,7 @@ void Game::run()
 
 		SDL_Delay(10);
 	}
+	Mix_HaltMusic();
 
 	// Destroy Zombies
 	for (auto& zombie : zombies){
