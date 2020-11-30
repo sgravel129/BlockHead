@@ -20,7 +20,7 @@ Zombie::~Zombie()
 
 Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale)
 {
-    pos = Point{Util::randInt(0, SCREEN_WIDTH), Util::randInt(0, SCREEN_HEIGHT)};
+    pos = Point{Util::randInt(-100, SCREEN_WIDTH), Util::randInt(-100, SCREEN_HEIGHT)};
     rPos = pos;
     angle = 0; // starting direction
     currAnim = 0;

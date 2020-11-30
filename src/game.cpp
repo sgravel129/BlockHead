@@ -10,8 +10,7 @@
 #include "zombie.hpp"
 #include "map.hpp"
 
-// TODO: Framerate bug
-// TODO: Removed default constructors?
+#define NUM_ZOMBIES 5
 
 Game::Game()
 		:	graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT),
@@ -173,7 +172,16 @@ bool Game::running()
 void Game::run()
 {
 	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
-	Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 4.0F);
+
+	// Create Zombies
+	Log::verbose("Creating zombies");
+	std::vector<Zombie*> zombies;
+	for (int i = 0; i < NUM_ZOMBIES; i++)
+	{
+		zombies.push_back(new Zombie(graphics, "res/zombie.png", 30, 32, 4.0F));
+	}
+
+	// Create Map
 	Map map = Map(Point{10, 10});
 
 	if (isGrassland){
@@ -199,7 +207,10 @@ void Game::run()
 		Animation::updateTicks();
 		player.update(input);
 		map.update(player.getDeltaPos());
-		zombie.update(player.getDeltaPos());
+
+		for (auto& zombie : zombies){
+			zombie->update(player.getDeltaPos());
+		}
 
 		// Check collision between:
 		// player & zombies
@@ -211,7 +222,11 @@ void Game::run()
 			// Render
 			graphics.fillBackground();
 			map.draw(graphics);
-			zombie.draw(graphics);
+
+			for (auto& zombie : zombies){
+				zombie->draw(graphics);
+			}
+
 			player.draw(graphics);
 
 			// Display
@@ -220,6 +235,11 @@ void Game::run()
 		}
 
 		SDL_Delay(10);
+	}
+
+	// Destroy Zombies
+	for (auto& zombie : zombies){
+		delete zombie;
 	}
 }
 
