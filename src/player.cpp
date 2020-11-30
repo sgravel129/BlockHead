@@ -80,4 +80,3 @@ void Player::draw(Graphics &graphics){
     sprite->change_src(anims[angle][currAnim]);
     sprite->draw(graphics, int(SCREEN_WIDTH/2) - int(PLAYER_WIDTH/2), int(SCREEN_HEIGHT/2) - int(PLAYER_HEIGHT/2));
 }
-
