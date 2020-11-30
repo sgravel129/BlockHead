@@ -15,7 +15,7 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
 {
     Log::verbose("Player\t| Called");
 
-    pos = Point{200, 200};
+    pos = Point{int(SCREEN_WIDTH/2) - int(PLAYER_WIDTH/2), int(SCREEN_HEIGHT/2) - int(PLAYER_HEIGHT/2)};
 
     moveSpeed = 3;
     angle = 0; // starting direction
@@ -65,6 +65,7 @@ void Player::update(Input input){
     {
         if (Animation::getTicks() % int(20 / moveSpeed) == 0) {
             currAnim = (currAnim + 1) % MOVE_ANIMS;
+            // Log::verbose(pos.to_string());
         }
     }
     if( input.wasKeyReleased(SDL_SCANCODE_W) ||

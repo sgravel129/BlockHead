@@ -10,7 +10,7 @@ private:
     Sprite *sprite;
     std::vector<std::vector<SDL_Rect>> anims;
     int currAnim;
-    Point pos;
+    Point pos, rPos; // map position & render position
     int angle; // for sprite info
     int health;
     int moveSpeed;

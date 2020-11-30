@@ -21,6 +21,7 @@ Zombie::~Zombie()
 Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale)
 {
     pos = Point{Util::randInt(0, SCREEN_WIDTH), Util::randInt(0, SCREEN_HEIGHT)};
+    rPos = pos;
     angle = 0; // starting direction
     currAnim = 0;
     moveSpeed = 1;
@@ -38,43 +39,47 @@ Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float 
 void Zombie::update(Point delta)
 {
     // Do path finding. Euclidian Distance
-    pos = pos - delta;
+    rPos = rPos - delta; // delta caused by player movement
+    Point prevPos = pos;
 
     static const int DEADBAND = 5;
     static const Point target = Point{int(SCREEN_WIDTH/2) - int(PLAYER_WIDTH/2), int(SCREEN_HEIGHT/2) - int(PLAYER_HEIGHT/2)};
-    if ((pos.y - target.y) > DEADBAND)
+    if ((rPos.y - target.y) > DEADBAND)
     {
         // need to move UP
         pos.y -= moveSpeed;
         angle = 3;
     }
-    else if ((pos.y - target.y) < DEADBAND)
+    else if ((rPos.y - target.y) < DEADBAND)
     {
         // need to move DOWN
         pos.y += moveSpeed;
         angle = 0;
     }
-    if ((pos.x - target.x) < DEADBAND)
+    if ((rPos.x - target.x) < DEADBAND)
     {
         // need to move LEFT
         pos.x += moveSpeed;
         angle = 2;
     }
-    else if ((pos.x - target.x) > DEADBAND)
+    else if ((rPos.x - target.x) > DEADBAND)
     {
         // need to move RIGHT
         pos.x -= moveSpeed;
         angle = 1;
     }
 
+    rPos = rPos + (pos - prevPos); // delta caused by zombie movement
+
 
     if (Animation::getTicks() % int(20 / moveSpeed) == 0) {
         currAnim = (currAnim + 1) % MOVE_ANIMS;
+        // Log::verbose(pos.to_string());
     }
 }
 
 void Zombie::draw(Graphics &graphics)
 {
     sprite->change_src(anims[angle][currAnim]);
-    sprite->draw(graphics, pos.x, pos.y);
+    sprite->draw(graphics, rPos.x, rPos.y);
 }
