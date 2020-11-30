@@ -31,7 +31,8 @@ Zombie::~Zombie()
 
 Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale, Point playerPos)
 {
-    renderPos = Point{Util::randInt(0, SCREEN_WIDTH), Util::randInt(0, SCREEN_HEIGHT)};
+    //renderPos = Point{Util::randInt(0, SCREEN_WIDTH), Util::randInt(0, SCREEN_HEIGHT)};
+    renderPos = Point{ 1000, 1000 };
     angle = 0; // starting direction
     currAnim = 0;
     moveSpeed = 1;

@@ -15,7 +15,7 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
 {
     Log::verbose("Player\t| Called");
 
-    pos = Point{200, 200};
+    pos = Point{600,375};
 
     moveSpeed = 3;
     angle = 0; // starting direction
