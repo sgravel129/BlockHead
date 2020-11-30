@@ -16,6 +16,7 @@ private:
     std::vector<SDL_Rect> _tileProps;
     std::string _spriteSheet;
     Point _size;
+    std::vector<std::vector<bool>> _collisionM;
 
 public:
     Map();
