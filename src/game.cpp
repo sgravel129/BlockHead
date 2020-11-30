@@ -245,7 +245,7 @@ void Game::run()
 				for (auto& zombie : zombies){
 					delete zombie;
 				}
-				winner_menu();
+				again_menu();
 				return;
 			}
 		}
