@@ -148,3 +148,12 @@ void Map::draw(Graphics& graphics)
         tile->draw(graphics);
     }
 }
+
+std::vector<SDL_Rect> Map::getDestRects(){
+    std::vector<SDL_Rect> rects;
+    for (auto& tile : _tiles)
+    {
+        rects.push_back(tile->getDestRect());
+    }
+    return rects;
+}

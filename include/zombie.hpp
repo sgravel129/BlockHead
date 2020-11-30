@@ -25,4 +25,5 @@ public:
     ~Zombie();
     void update(Point delta);
     void draw(Graphics &graphics);
+    SDL_Rect getDestRect();
 };

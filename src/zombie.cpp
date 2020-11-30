@@ -83,3 +83,8 @@ void Zombie::draw(Graphics &graphics)
     sprite->change_src(anims[angle][currAnim]);
     sprite->draw(graphics, rPos.x, rPos.y);
 }
+
+SDL_Rect Zombie::getDestRect(){
+    Point dim = sprite->getDim();
+    return SDL_Rect{rPos.x, rPos.y, dim.x, dim.y};
+}

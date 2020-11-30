@@ -86,7 +86,6 @@ std::vector<SDL_Rect> Player::getDestRects(){
     std::vector<SDL_Rect> rects;
     // Player
     Point dim = sprite->getDim();
-    Log::error(dim.to_string());
     rects.push_back(SDL_Rect{RPOS.x, RPOS.y, dim.x, dim.y});
     // Weapon
     // Bullets
