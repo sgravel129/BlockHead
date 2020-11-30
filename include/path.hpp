@@ -124,6 +124,8 @@ struct neighbor {
 
 typedef std::vector<std::vector<neighbor> > adjacency_list_t;
 
-Point mapToTPos(const Point& p, const Point&, const float);
+Point playerToTPos(const Point& p, const Point&, const float);
+Point zombieToTPos(const Point& p, const Point&, const float);
+
 Cluster findParentCluster(const Point&);
 void printMAP();

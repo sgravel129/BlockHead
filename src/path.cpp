@@ -691,13 +691,13 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
 // can change values here if we want middle of sprite to be center of collision, or feet!
 Point playerToTPos(const Point& p, const Point& size, const float scale) {
     double x = (static_cast<double>(p.x)+size.x * scale / 2) / static_cast<double>(TLENGTH);
-    double y = (static_cast<double>(p.y)+ size.y * scale * 0.75) / static_cast<double>(TLENGTH); 
+    double y = (static_cast<double>(p.y)+ size.y * scale * 0.85) / static_cast<double>(TLENGTH); 
     return { static_cast<int>(floor(x)), static_cast<int>(floor(y)) };
 }
 
 Point zombieToTPos(const Point& p, const Point& size, const float scale) {
     double x = (static_cast<double>(p.x) + size.x * scale / 2) / static_cast<double>(TLENGTH);
-    double y = (static_cast<double>(p.y) + size.y * scale) / static_cast<double>(TLENGTH);
+    double y = (static_cast<double>(p.y) + size.y * scale*0.95) / static_cast<double>(TLENGTH);
     return { static_cast<int>(floor(x)), static_cast<int>(floor(y)) };
 }
 

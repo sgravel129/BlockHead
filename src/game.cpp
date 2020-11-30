@@ -185,7 +185,7 @@ void Game::run()
 	}
 	if (!isGrassland){
 		map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-		map.loadMapFile(graphics, "res/maps/graveyard/graveyard3.map");
+		map.loadMapFile(graphics, "res/maps/graveyard/graveyard.map");
 		//map.loadMapFile(graphics, "res/maps/test2.map");
 	}
 
@@ -207,8 +207,8 @@ void Game::run()
 		player.update(input);
 		map.update(player.getDeltaPos());
 		
-		//pathCheck(zombie, player);
-		printPos(zombie, player);
+		pathCheck(zombie, player);
+		//printPos(zombie, player);
 
 		zombie.update(player.getDeltaPos(), player.getPos());
 		//zombie.update(player.getDeltaPos());

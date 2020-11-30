@@ -16,7 +16,7 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
     Log::verbose("Player\t| Called");
 
     //pos = Point{525,180};
-    pos = Point{ 575,270 };
+    pos = Point{ 575,250 };
 
     _w = w; _h = h; _scale = scale;
     moveSpeed = 3;

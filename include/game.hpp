@@ -73,3 +73,4 @@ private:
 	// End of custom classes
 };
 
+void printPos(const Zombie& zombie, const Player& player);

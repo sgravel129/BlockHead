@@ -42,7 +42,7 @@ Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float 
     
     _scale = scale; _w = w; _h = h;
     pos = renderPos + playerP - target;
-    pos = { pos.x + int(w * scale / 2), pos.y + int(h * scale / 2) };
+    //pos = { pos.x + int(w * scale / 2), pos.y + int(h * scale / 2) };
 
     sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
     anims.resize( NUM_DIR, std::vector<SDL_Rect>( MOVE_ANIMS ) );
@@ -60,7 +60,7 @@ void Zombie::update(Point delta, Point playerPos)
     
     
     pos = renderPos + playerPos - target;
-    pos = { pos.x + int(_w * _scale / 2), pos.y + int(_h * _scale / 2) };
+    //pos = { pos.x + int(_w * _scale / 2), pos.y + int(_h * _scale / 2) };
     prevPos = Point{ pos.x, pos.y };
     // Do path finding. Euclidian Distance
     renderPos = renderPos - delta;
@@ -138,6 +138,6 @@ void Zombie::setPath(const std::vector<int>& path) { _pathToPlayer = path; }
 // can change values here if we want middle of sprite to be center of collision, or feet!
 Point Zombie::posToTile(const Point& p) {
     double x = (static_cast<double>(p.x) + _w * _scale / 2) / static_cast<double>(TLENGTH);
-    double y = (static_cast<double>(p.y) + _h * _scale * 0.9) / static_cast<double>(TLENGTH);
+    double y = (static_cast<double>(p.y) + _h * _scale * 0.95) / static_cast<double>(TLENGTH);
     return { static_cast<int>(floor(x)), static_cast<int>(floor(y)) };
 }
