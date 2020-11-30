@@ -217,7 +217,7 @@ void Game::run()
 		// Update
 		if (Mix_PlayingMusic() == 0)
 			Mix_PlayMusic(loopMusic, -1);
-		
+
 		handleUserInput();
 		Animation::updateTicks();
 		player.update(input);
@@ -254,7 +254,7 @@ void Game::run()
 		{
 			if (SDL_HasIntersection(&playerRects[0], &mapRect) == SDL_TRUE)
 			{
-				Log::verbose("Collision Detected: Map");
+				// Log::verbose("Collision Detected: Map");
 				player.update(player.getDeltaPos());
 				map.update(player.getDeltaPos());
 				for (auto& zombie : zombies){
