@@ -11,8 +11,7 @@
 #include "map.hpp"
 #include "path.hpp"
 
-// TODO: Framerate bug
-// TODO: Removed default constructors?
+#define NUM_ZOMBIES 5
 
 Game::Game()
 		:	graphics(GAME_NAME, SCREEN_WIDTH, SCREEN_HEIGHT),
@@ -173,10 +172,21 @@ bool Game::running()
 
 void Game::run()
 {
+
 	//Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
 	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.07F);
 	//Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 4.0F, player.getPos());
-	Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 3.0F, player.getPos());
+
+
+	// Create Zombies
+	Log::verbose("Creating zombies");
+	std::vector<Zombie*> zombies;
+	for (int i = 0; i < NUM_ZOMBIES; i++)
+	{
+		zombies.push_back(new Zombie(graphics, "res/zombie.png", 30, 32, 3.0F, player.getPos()));
+	}
+
+	// Create Map
 	Map map = Map(Point{10, 10});
 
 	if (isGrassland){
@@ -206,12 +216,13 @@ void Game::run()
 		Animation::updateTicks();
 		player.update(input);
 		map.update(player.getDeltaPos());
-		
-		pathCheck(zombie, player);
-		//printPos(zombie, player);
 
-		zombie.update(player.getDeltaPos(), player.getPos());
-		//zombie.update(player.getDeltaPos());
+
+		for (auto& zombie : zombies){
+			pathCheck(*zombie, player);
+			zombie->update(player.getDeltaPos(), player.getPos());
+		}
+
 
 		// Check collision between:
 		// player & zombies
@@ -223,7 +234,11 @@ void Game::run()
 			// Render
 			graphics.fillBackground();
 			map.draw(graphics);
-			zombie.draw(graphics);
+
+			for (auto& zombie : zombies){
+				zombie->draw(graphics);
+			}
+
 			player.draw(graphics);
 
 			// Display
@@ -232,6 +247,11 @@ void Game::run()
 		}
 
 		SDL_Delay(10);
+	}
+
+	// Destroy Zombies
+	for (auto& zombie : zombies){
+		delete zombie;
 	}
 }
 
@@ -248,7 +268,7 @@ void Game::pathCheck(Zombie& zombie, const Player& player) {
 	Point playerP = playerToTPos(player.getPos(), player.getSize(), player.getScale());
 
 	Point zombiePR = zombieToTPos(zombie.getRenderPos(), zombie.getSize(), zombie.getScale());
-	Log::verbose("Player pos:" + playerP.to_string());
+	//Log::verbose("Player pos:" + playerP.to_string());
 	//Log::verbose("Zombie pos:" + zombieP.to_string());
 	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
 	

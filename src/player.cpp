@@ -18,6 +18,7 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
     //pos = Point{525,180};
     pos = Point{ 575,250 };
 
+
     _w = w; _h = h; _scale = scale;
     moveSpeed = 3;
     angle = 0; // starting direction
@@ -67,6 +68,7 @@ void Player::update(Input input){
     {
         if (Animation::getTicks() % int(20 / moveSpeed) == 0) {
             currAnim = (currAnim + 1) % MOVE_ANIMS;
+            // Log::verbose(pos.to_string());
         }
     }
     if( input.wasKeyReleased(SDL_SCANCODE_W) ||

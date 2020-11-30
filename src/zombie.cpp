@@ -31,17 +31,25 @@ Zombie::~Zombie()
 
 Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale, Point playerP)
 {
+
    
    
     //renderPos = Point{Util::randInt(0, SCREEN_WIDTH), Util::randInt(0, SCREEN_HEIGHT)};
     //renderPos = Point{ 200, 200 };
-    renderPos = Point{ 575,270 };
+    //renderPos = Point{ 575,270 };
+    
+    // Making sure we are not adding a zombie outside the map
+    do {
+        renderPos = Point{ Util::randInt(-100, SCREEN_WIDTH), Util::randInt(-100, SCREEN_HEIGHT) };
+        pos = renderPos + playerP - target;
+    } while (pos.x < 0 || pos.y < 0);
+    
     angle = 0; // starting direction
     currAnim = 0;
     moveSpeed = 1;
     
     _scale = scale; _w = w; _h = h;
-    pos = renderPos + playerP - target;
+    
     //pos = { pos.x + int(w * scale / 2), pos.y + int(h * scale / 2) };
 
     sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
@@ -98,28 +106,30 @@ void Zombie::update(Point delta, Point playerPos)
         pos.y -= moveSpeed;
         angle = 3;
     }
-    else if ((pos.y - target.y) < DEADBAND)
+    else if ((rPos.y - target.y) < DEADBAND)
     {
         // need to move DOWN
         pos.y += moveSpeed;
         angle = 0;
     }
-    if ((pos.x - target.x) < DEADBAND)
+    if ((rPos.x - target.x) < DEADBAND)
     {
         // need to move LEFT
         pos.x += moveSpeed;
         angle = 2;
     }
-    else if ((pos.x - target.x) > DEADBAND)
+    else if ((rPos.x - target.x) > DEADBAND)
     {
         // need to move RIGHT
         pos.x -= moveSpeed;
         angle = 1;
     }
+<<<<<<< HEAD
     */
 
     if (Animation::getTicks() % int(20 / moveSpeed) == 0) {
         currAnim = (currAnim + 1) % MOVE_ANIMS;
+        // Log::verbose(pos.to_string());
     }
     
 }
