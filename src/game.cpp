@@ -120,6 +120,41 @@ bool Game::menu(const std::string &background_path, const std::string &play_butt
 	return isRunning;
 }
 
+bool Game::intro_menu(const std::string &background_path)
+{
+	Sprite background(graphics, background_path, {0, 0, 1819, 1155}, 0.6f);
+
+	unsigned int last = SDL_GetTicks();
+	unsigned int current;
+
+	graphics.setRenderColor(Color("FFFFFF"));
+
+	while (isRunning)
+	{
+		current = SDL_GetTicks();
+
+		// Update
+		handleUserInput();
+		if (input.wasKeyPressed(SDL_SCANCODE_RETURN))
+			break;
+
+		if (current - last >= (1000 / framerate))
+		{
+			// Render
+			graphics.fillBackground();
+			background.draw(graphics, 80, 0);
+
+			// Display
+			graphics.flip();
+			last = current;
+		}
+
+		SDL_Delay(10);
+	}
+
+	return isRunning;
+}
+
 bool Game::start_menu() {
 	return menu("res/assets/open_page.png", "res/assets/start_button.png", "res/assets/quit_button.png");
 }
@@ -130,6 +165,10 @@ bool Game::again_menu() {
 
 bool Game::winner_menu() {
 	return menu("res/assets/winner.png", "res/assets/nextlevel_button.png", "res/assets/quit_button.png");
+}
+
+bool Game::intro_menu() {
+	return intro_menu("res/assets/intro.png");
 }
 
 bool Game::map_selector_menu() {

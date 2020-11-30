@@ -16,6 +16,7 @@ public:
 	bool again_menu();
 	bool winner_menu();
 	bool map_selector_menu();
+	bool intro_menu();
 
 	/*
 		Destroy current renderer and render, unload textures from GPU
@@ -41,6 +42,8 @@ private:
 	bool menu(const std::string &background_path, const std::string &exit_button, const std::string &play_button);
 
 	bool map_selector(const std::string &graveyard_map_btn_path, const std::string &grassland_map_btn_path, const std::string &graveyard_1, const std::string &grassland_2);
+
+	bool intro_menu(const std::string &background_path);
 
 
 	/*
