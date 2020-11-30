@@ -74,7 +74,7 @@ void Zombie::update(Point delta)
 
     if (Animation::getTicks() % int(20 / moveSpeed) == 0) {
         currAnim = (currAnim + 1) % MOVE_ANIMS;
-        // Log::verbose(pos.to_string());
+        // Log::verbose(std::to_string((pos.x / 75)) + " " + std::to_string((pos.y / 75)));
     }
 }
 
