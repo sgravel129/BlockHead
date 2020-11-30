@@ -15,8 +15,9 @@ Player::Player(Graphics &graphics, const std::string &path,int w, int h, float s
 {
     Log::verbose("Player\t| Called");
 
-    pos = Point{600,375};
+    pos = Point{525,180};
 
+    _w = w; _h = h; _scale = scale;
     moveSpeed = 3;
     angle = 0; // starting direction
     sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);

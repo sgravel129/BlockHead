@@ -16,6 +16,10 @@ private:
     int angle;  // for the sprite sheet and shooting aim -> map to 6 cardinal points (make cardinal direction class)
     int health; // will need a numerical value assignmnet within TBD
     int moveSpeed;
+    float _scale;
+    int _w;
+    int _h;
+    
     //int _weapon;      // will depend on the weapon class
     //int _weaponL;     // list of owned weapons, same as above ^^
     //int _powerUp;     // active powerUp, depends on powerUp class
@@ -30,4 +34,6 @@ public:
     Point getDeltaPos() { return pos - prevPos; }
     Point getPos() const { return pos; }
     Point getPrevPos() const { return prevPos; }
+    Point getSize() const { return Point{ _w, _h }; }
+    float getScale() const { return _scale; }
 };

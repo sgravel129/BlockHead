@@ -15,9 +15,9 @@ const int dir = 8;  // number of possible directions to go in
 const int dx[dir] = { 1, 1, 0, -1, -1, -1, 0, 1 };              // dx and dy representing 8 cardinal directions, starting East then proceeding clockwise
 const int dy[dir] = { 0, 1, 1, 1, 0, -1, -1, -1 };
 
-static const Point target = Point{ int(SCREEN_WIDTH / 2) - int(PLAYER_WIDTH / 2), int(SCREEN_HEIGHT / 2) - int(PLAYER_HEIGHT / 2) };
-static const int DEADBAND = 5;
 
+static const int DEADBAND = 5;
+static const Point target = Point{ int(SCREEN_WIDTH / 2) - int(PLAYER_WIDTH / 2), int(SCREEN_HEIGHT / 2) - int(PLAYER_HEIGHT / 2) };
 
 Zombie::Zombie()
 {
@@ -29,14 +29,19 @@ Zombie::~Zombie()
     delete sprite;
 }
 
-Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale, Point playerPos)
+Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale, Point playerP)
 {
+   
+   
     //renderPos = Point{Util::randInt(0, SCREEN_WIDTH), Util::randInt(0, SCREEN_HEIGHT)};
     renderPos = Point{ 1000, 1000 };
     angle = 0; // starting direction
     currAnim = 0;
     moveSpeed = 1;
-    pos = renderPos + playerPos - target;
+    
+    _scale = scale; _w = w; _h = h;
+    pos = renderPos + playerP - target;
+    pos = { pos.x + int(w * scale / 2), pos.y + int(h * scale / 2) };
 
     sprite = new Sprite(graphics, path, SDL_Rect{0, 0, w, h}, scale);
     anims.resize( NUM_DIR, std::vector<SDL_Rect>( MOVE_ANIMS ) );
@@ -50,10 +55,11 @@ Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float 
 }
 void Zombie::update(Point delta, Point playerPos)
 {
-    
+    //playerPos = Point {playerPos.x+}
     
     
     pos = renderPos + playerPos - target;
+    pos = { pos.x + int(_w * _scale / 2), pos.y + int(_h * _scale / 2) };
     prevPos = Point{ pos.x, pos.y };
     // Do path finding. Euclidian Distance
     renderPos = renderPos - delta;
@@ -81,7 +87,7 @@ void Zombie::update(Point delta, Point playerPos)
     }
 
 
-    if (mapToPos(pos) != mapToPos(prevPos))   // when crossed over a full tile, pop the first element of path array
+    if (posToTile(pos) != posToTile(prevPos))   // when crossed over a full tile, pop the first element of path array
         _pathToPlayer.erase(_pathToPlayer.begin());     
     
     /*
@@ -125,8 +131,12 @@ void Zombie::draw(Graphics &graphics)
 
 void Zombie::setPath(const std::vector<int>& path) { _pathToPlayer = path; }
 
-Point mapToPos(const Point& p) {
-    double x = static_cast<double>(p.x) / static_cast<double>(TLENGTH);
-    double y = static_cast<double>(p.y) / static_cast<double>(TLENGTH);
+
+// VERY IMPORTANT FUNCTION
+// translates sprite pixel position (which is typically top left corner) to tile position
+// can change values here if we want middle of sprite to be center of collision, or feet!
+Point Zombie::posToTile(const Point& p) {
+    double x = (static_cast<double>(p.x) + _w * _scale / 2) / static_cast<double>(TLENGTH);
+    double y = (static_cast<double>(p.y) + _h * _scale * 0.9) / static_cast<double>(TLENGTH);
     return { static_cast<int>(round(x)), static_cast<int>(round(y)) };
 }

@@ -35,6 +35,7 @@ public:
 		Renders the sprite to screen
 	 */
 	void draw(Graphics &graphics, int x, int y);
+	
 
 private:
 	float _scale;

@@ -241,10 +241,10 @@ void Game::setFramerate(int framerate)
 
 
 void Game::pathCheck(Zombie& zombie, const Player& player) {
-	Point zombieP = mapToTPos(zombie.getPos());
-	Point playerP = mapToTPos(player.getPos());
+	Point zombieP = mapToTPos(zombie.getPos(), zombie.getSize(), zombie.getScale());
+	Point playerP = mapToTPos(player.getPos(), player.getSize(), player.getScale());
 
-	Point zombiePR = mapToTPos(zombie.getRenderPos());
+	Point zombiePR = mapToTPos(zombie.getRenderPos(), zombie.getSize(), zombie.getScale());
 	Log::verbose("Player pos:" + playerP.to_string());
 	//Log::verbose("Zombie pos:" + zombieP.to_string());
 	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
@@ -261,7 +261,7 @@ void Game::pathCheck(Zombie& zombie, const Player& player) {
 
 	// check if player changed cluster
 	// if so, recalculate cluster path
-	else if (findParentCluster(playerP).clusterPos == findParentCluster(mapToTPos(player.getPrevPos())).clusterPos)
+	else if (findParentCluster(playerP).clusterPos == findParentCluster(mapToTPos(player.getPrevPos(), player.getSize(), player.getScale())).clusterPos)
 		zombie.setPath(searchForPath(zombieP, playerP));
 	
 }

@@ -686,10 +686,12 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
 
 }
 
-
-Point mapToTPos(const Point& p) {
-    double x = static_cast<double>(p.x) / static_cast<double>(TLENGTH);
-    double y = static_cast<double>(p.y) / static_cast<double>(TLENGTH);
+// VERY IMPORTANT FUNCTION
+// translates sprite pixel position (which is typically top left corner) to tile position
+// can change values here if we want middle of sprite to be center of collision, or feet!
+Point mapToTPos(const Point& p, const Point& size, const float scale) {
+    double x = (static_cast<double>(p.x)+size.x * scale / 2) / static_cast<double>(TLENGTH);
+    double y = (static_cast<double>(p.y)+ size.y * scale * 0.9) / static_cast<double>(TLENGTH); 
     return { static_cast<int>(round(x)), static_cast<int>(round(y)) };
 }
 
