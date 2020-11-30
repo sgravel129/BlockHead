@@ -173,8 +173,10 @@ bool Game::running()
 
 void Game::run()
 {
-	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
-	Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 4.0F, player.getPos());
+	//Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
+	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.07F);
+	//Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 4.0F, player.getPos());
+	Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 3.0F, player.getPos());
 	Map map = Map(Point{10, 10});
 
 	if (isGrassland){
@@ -183,7 +185,7 @@ void Game::run()
 	}
 	if (!isGrassland){
 		map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-		map.loadMapFile(graphics, "res/maps/graveyard/graveyard.map");
+		map.loadMapFile(graphics, "res/maps/graveyard/graveyard3.map");
 		//map.loadMapFile(graphics, "res/maps/test2.map");
 	}
 
@@ -205,7 +207,8 @@ void Game::run()
 		player.update(input);
 		map.update(player.getDeltaPos());
 		
-		pathCheck(zombie, player);
+		//pathCheck(zombie, player);
+		printPos(zombie, player);
 
 		zombie.update(player.getDeltaPos(), player.getPos());
 		//zombie.update(player.getDeltaPos());
@@ -241,10 +244,10 @@ void Game::setFramerate(int framerate)
 
 
 void Game::pathCheck(Zombie& zombie, const Player& player) {
-	Point zombieP = mapToTPos(zombie.getPos(), zombie.getSize(), zombie.getScale());
-	Point playerP = mapToTPos(player.getPos(), player.getSize(), player.getScale());
+	Point zombieP = zombieToTPos(zombie.getPos(), zombie.getSize(), zombie.getScale());
+	Point playerP = playerToTPos(player.getPos(), player.getSize(), player.getScale());
 
-	Point zombiePR = mapToTPos(zombie.getRenderPos(), zombie.getSize(), zombie.getScale());
+	Point zombiePR = zombieToTPos(zombie.getRenderPos(), zombie.getSize(), zombie.getScale());
 	Log::verbose("Player pos:" + playerP.to_string());
 	//Log::verbose("Zombie pos:" + zombieP.to_string());
 	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
@@ -261,7 +264,17 @@ void Game::pathCheck(Zombie& zombie, const Player& player) {
 
 	// check if player changed cluster
 	// if so, recalculate cluster path
-	else if (findParentCluster(playerP).clusterPos == findParentCluster(mapToTPos(player.getPrevPos(), player.getSize(), player.getScale())).clusterPos)
+	else if (findParentCluster(playerP).clusterPos == findParentCluster(playerToTPos(player.getPrevPos(), player.getSize(), player.getScale())).clusterPos)
 		zombie.setPath(searchForPath(zombieP, playerP));
 	
+}
+
+void printPos(const Zombie& zombie, const Player& player) {
+	Point zombieP = zombieToTPos(zombie.getPos(), zombie.getSize(), zombie.getScale());
+	Point playerP = playerToTPos(player.getPos(), player.getSize(), player.getScale());
+
+	Point zombiePR = zombieToTPos(zombie.getRenderPos(), zombie.getSize(), zombie.getScale());
+	Log::verbose("Player pos:" + playerP.to_string());
+	Log::verbose("Zombie pos:" + zombieP.to_string());
+	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
 }

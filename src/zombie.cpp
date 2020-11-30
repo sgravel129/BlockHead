@@ -34,7 +34,8 @@ Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float 
    
    
     //renderPos = Point{Util::randInt(0, SCREEN_WIDTH), Util::randInt(0, SCREEN_HEIGHT)};
-    renderPos = Point{ 1000, 1000 };
+    //renderPos = Point{ 200, 200 };
+    renderPos = Point{ 575,270 };
     angle = 0; // starting direction
     currAnim = 0;
     moveSpeed = 1;
@@ -74,7 +75,7 @@ void Zombie::update(Point delta, Point playerPos)
         else if (_pathToPlayer[0] == 2) angle = 0;
         else angle = 3;
     }
-
+    /*
     if (abs(playerPos.x - pos.x) < DEADBAND && abs(playerPos.y - pos.y) < DEADBAND) {
         if (pos.y < playerPos.y)
             angle = 0;
@@ -85,7 +86,7 @@ void Zombie::update(Point delta, Point playerPos)
         else
             angle = 1;
     }
-
+    */
 
     if (posToTile(pos) != posToTile(prevPos))   // when crossed over a full tile, pop the first element of path array
         _pathToPlayer.erase(_pathToPlayer.begin());     
@@ -138,5 +139,5 @@ void Zombie::setPath(const std::vector<int>& path) { _pathToPlayer = path; }
 Point Zombie::posToTile(const Point& p) {
     double x = (static_cast<double>(p.x) + _w * _scale / 2) / static_cast<double>(TLENGTH);
     double y = (static_cast<double>(p.y) + _h * _scale * 0.9) / static_cast<double>(TLENGTH);
-    return { static_cast<int>(round(x)), static_cast<int>(round(y)) };
+    return { static_cast<int>(floor(x)), static_cast<int>(floor(y)) };
 }
