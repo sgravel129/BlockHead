@@ -4,7 +4,16 @@
 
 #include <string>
 
-class Graphics;
+struct Point
+{
+	int x;
+	int y;
+
+	Point operator -(const Point& b);
+	Point operator +(const Point& b);
+	std::string to_string();
+};
+
 
 class Sprite
 {

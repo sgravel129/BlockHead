@@ -7,18 +7,22 @@
 #include <fstream>
 #include <string>
 
+//TODO add accessors;
+
 class Map
 {
 private:
     std::vector<MapTile *> _tiles;
     std::vector<SDL_Rect> _tileProps;
+    std::string _spriteSheet;
     Point _size;
 
 public:
     Map();
     Map(Point size);
     ~Map();
-    void loadTileProps(const std::string &propfile);
-    void loadMapFile(Graphics &graphics, const std::string &mapfile, const std::string &spriteSheet);
+    void loadTextures(const std::string &spriteSheet, const std::string &spritesProps);
+    void loadMapFile(Graphics &graphics, const std::string &mapfile);
+    void update(Point delta);
     void draw(Graphics &graphics);
 };

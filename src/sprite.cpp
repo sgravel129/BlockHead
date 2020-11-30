@@ -6,6 +6,16 @@
 #include <iostream>
 #include <algorithm>
 
+Point Point::operator -(const Point& b) {
+    return Point{this->x - b.x, this->y - b.y};
+}
+Point Point::operator +(const Point& b) {
+	return Point{this->x + b.x, this->y + b.y};
+}
+std::string Point::to_string() {
+	return "(" + std::to_string(this->x) + "," + std::to_string(this->y) + ")";
+}
+
 Sprite::Sprite()
 {
 }
@@ -13,7 +23,7 @@ Sprite::Sprite()
 Sprite::~Sprite()
 {
 	// Log::debug("~Sprite\t| Called");
-	Log::debug("~Sprite\t| Destroy Texture");
+	Log::destruct("Sprite\t| Destroy Texture");
 	SDL_DestroyTexture(_spriteSheet);
 }
 
