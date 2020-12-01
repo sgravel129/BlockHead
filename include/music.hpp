@@ -18,5 +18,10 @@ bool initMusic();
 bool loadMedia();
 void close();
 
-extern Mix_Music* introMusic;
-extern Mix_Music* loopMusic;
+extern Mix_Music* gIntroMusic;
+extern Mix_Music* gLoopMusic;
+extern Mix_Music* menuMusic;
+extern Mix_Music* gameoverMusic;
+extern Mix_Music* wIntroMusic;
+extern Mix_Music* wLoopMusic;
+

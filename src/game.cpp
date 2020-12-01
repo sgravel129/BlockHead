@@ -13,8 +13,12 @@
 
 #define NUM_ZOMBIES 5
 
-Mix_Music* introMusic = NULL;
-Mix_Music* loopMusic = NULL;
+Mix_Music* gIntroMusic = NULL;
+Mix_Music* gLoopMusic = NULL;
+Mix_Music* menuMusic = NULL;
+Mix_Music* gameoverMusic = NULL;
+Mix_Music* wIntroMusic = NULL;
+Mix_Music* wLoopMusic = NULL;
 
 
 
@@ -52,7 +56,8 @@ bool Game::map_selector(const std::string &graveyard_map_btn_path, const std::st
 	while (isRunning)
 	{
 		current = SDL_GetTicks();
-
+		if (Mix_PlayingMusic() == 0)
+			Mix_PlayMusic(menuMusic, -1);
 		handleUserInput();
 
 		if (input.wasKeyPressed(SDL_SCANCODE_2)){
@@ -88,11 +93,12 @@ bool Game::menu(const std::string &background_path, const std::string &play_butt
 	unsigned int current;
 
 	graphics.setRenderColor(Color("FFFFFF"));
-
 	while (isRunning)
 	{
+		
 		current = SDL_GetTicks();
-
+		
+		
 		// Update
 		handleUserInput();
 		if (input.wasKeyPressed(SDL_SCANCODE_Y))
@@ -121,14 +127,19 @@ bool Game::menu(const std::string &background_path, const std::string &play_butt
 }
 
 bool Game::start_menu() {
+	initMusic();
+	loadMedia();
+	Mix_PlayMusic(menuMusic, -1);
 	return menu("res/assets/open_page.png", "res/assets/start_button.png", "res/assets/quit_button.png");
 }
 
 bool Game::again_menu() {
+	Mix_PlayMusic(gameoverMusic, -1);
 	return menu("res/assets/game_over.png", "res/assets/playagain_button.png", "res/assets/quit_button.png");
 }
 
 bool Game::winner_menu() {
+	Mix_PlayMusic(wIntroMusic, 0);
 	return menu("res/assets/winner.png", "res/assets/nextlevel_button.png", "res/assets/quit_button.png");
 }
 
@@ -177,6 +188,7 @@ bool Game::running()
 
 void Game::run()
 {
+	Mix_HaltMusic();
 	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
 
 	// Create Zombies
@@ -199,9 +211,8 @@ void Game::run()
 		map.loadMapFile(graphics, "res/maps/test.map");
 	}
 
-	initMusic();
-	loadMedia();
-	Mix_PlayMusic(introMusic, 0);
+	
+	Mix_PlayMusic(gIntroMusic, 0);
 
 	unsigned int last = SDL_GetTicks();
 	unsigned int current;
@@ -216,7 +227,7 @@ void Game::run()
 
 		// Update
 		if (Mix_PlayingMusic() == 0)
-			Mix_PlayMusic(loopMusic, -1);
+			Mix_PlayMusic(gLoopMusic, -1);
 
 		handleUserInput();
 		Animation::updateTicks();
