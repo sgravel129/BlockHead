@@ -254,8 +254,7 @@ void Game::run()
 
 	while (isRunning)
 	{
-		// time counting stuff with chrono to start counting
-		time_t start,end;
+		time_t start,end;																	// time counting stuff with chrono to start counting
 		time (&start);
 
 		current = SDL_GetTicks();
@@ -293,6 +292,8 @@ void Game::run()
 				}
 				time (&end);
 				double dif = difftime (end,start);
+				printf ("Start time is %.2lf seconds.", start );								//Start time in console! 
+				printf ("End time is %.2lf seconds.", end );									//End time in console! 
 				printf ("Elasped time is %.2lf seconds.", dif );								//Elapŝed time in console! aka the score
 
 				again_menu();
