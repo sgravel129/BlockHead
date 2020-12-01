@@ -240,7 +240,7 @@ void Game::run()
 		for (auto& zombie : zombies){
 			if(((current%500)/mod) == k)		// Every zombie updates its path twice per second
 				pathCheck(*zombie, player);
-			
+
 			zombie->update(player.getDeltaPos(), player.getPos());
 			k++;
 		}
@@ -255,7 +255,7 @@ void Game::run()
 		}
 		// player & zombies
 		// zombies wrt each other
-		
+
 		for (auto& zombieRect : zombieRects)
 		{
 			if (SDL_HasIntersection(&playerRects[0], &zombieRect) == SDL_TRUE)
@@ -271,7 +271,7 @@ void Game::run()
 				*/
 			}
 		}
-		
+
 		// player & map
 		for (auto& mapRect : mapRects)
 		{
@@ -284,7 +284,7 @@ void Game::run()
 					zombie->updateCamera(player.getDeltaPos());
 				}
 				break;	// NO NEED TO CHECK COLLISION WITH FURTHER OBJECTS
-				
+
 
 			}
 		}
@@ -333,28 +333,28 @@ void Game::pathCheck(Zombie& zombie, const Player& player) {
 	//Log::verbose("Player pos:" + playerP.to_string());
 	//Log::verbose("Zombie pos:" + zombieP.to_string());
 	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
-	
+
 	// if zombie about to suicide, bring him back inside map
 	if (zombieP.x < 0) {
-		if (zombieP.y < static_cast<__int32>(NUM_TILE_Y) / 2)
+		if (zombieP.y < static_cast<int32_t>(NUM_TILE_Y) / 2)
 			zombie.setPath({ 1, 1, 1 });
 		else
 			zombie.setPath({ 7, 7, 7 });
 	}
 	else if (zombieP.x >= NUM_TILE_X) {
-		if (zombieP.y < static_cast<__int32>(NUM_TILE_Y) / 2)
+		if (zombieP.y < static_cast<int32_t>(NUM_TILE_Y) / 2)
 			zombie.setPath({ 3, 3, 3 });
 		else
 			zombie.setPath({ 5, 5, 5 });
 	}
 	else if (zombieP.y < 0) {
-		if (zombieP.x < static_cast<__int32>(NUM_TILE_X) / 2)
+		if (zombieP.x < static_cast<int32_t>(NUM_TILE_X) / 2)
 			zombie.setPath({ 1, 1, 1 });
 		else
 			zombie.setPath({ 3, 3, 3 });
 	}
 	else if (zombieP.y >= NUM_TILE_Y) {
-		if (zombieP.x < static_cast<__int32>(NUM_TILE_X) / 2)
+		if (zombieP.x < static_cast<int32_t>(NUM_TILE_X) / 2)
 			zombie.setPath({ 7, 7, 7 });
 		else
 			zombie.setPath({ 5, 5, 5 });
@@ -375,7 +375,7 @@ void Game::pathCheck(Zombie& zombie, const Player& player) {
 	// if so, recalculate cluster path
 	else if (findParentCluster(playerP).clusterPos == findParentCluster(playerToTPos(player.getPrevPos(), player.getSize(), player.getScale())).clusterPos)
 		zombie.setPath(searchForPath(zombieP, playerP));
-	
+
 }
 
 void printPos(const Zombie& zombie, const Player& player) {

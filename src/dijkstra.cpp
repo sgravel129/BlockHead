@@ -12,7 +12,7 @@ std::vector<int> graphPathToIntPath(const std::vector<Vertex*>& graphPath) {
     Vertex* v1, * v2;
     int k;
     for (int i = 0; i < graphPath.size() - 1; i++) {
-        v1 = graphPath[i]; v2 = graphPath[static_cast<__int64>(i) + 1];
+        v1 = graphPath[i]; v2 = graphPath[static_cast<int64_t>(i) + 1];
         for (int j = 0; j < v1->adjList.size(); j++) {
             if (v1->adjList[j] == v2) {
                 tempPath = v1->adjEdges[j]->path;

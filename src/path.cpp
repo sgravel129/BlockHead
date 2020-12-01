@@ -57,7 +57,7 @@ PathTile* getPathTileFromPoint(const Point& p) {
 }
 /*
 MapTile* getMapTileFromPoint(const Point& p) {
-    
+
     return new MapTile;  // dummy return for now
 }
 */
@@ -73,10 +73,10 @@ PathTile::PathTile(const Point& p, Path_Hierarchy* parentH, const int level, con
 PathTile::PathTile(const Point& p, const bool trav, Path_Hierarchy* parentH) : PathTile(p, trav, parentH, 0, 0) {}
 PathTile::PathTile(const Point& p, const bool trav, Path_Hierarchy* parentH, const int level, const int priority) {
     _mapRelPos = p;
-    _clusterRelPos = { _mapRelPos.x % static_cast<__int32>(CLUSTER_TLENGTH), _mapRelPos.y % static_cast<__int32>(CLUSTER_TLENGTH) };
+    _clusterRelPos = { _mapRelPos.x % static_cast<int32_t>(CLUSTER_TLENGTH), _mapRelPos.y % static_cast<int32_t>(CLUSTER_TLENGTH) };
     _traversable = trav;
     _level = level;
-    _priority = priority;    
+    _priority = priority;
     _parentH = parentH;
     _parentC = findParentCluster(_mapRelPos);
     true;
@@ -149,14 +149,14 @@ std::vector<int> pathFind(const Point startP, const Point finishP, const int cNu
             open_nodes_map[x][y] = 0;
         }
     }
-    
-    
-    
+
+
+
     // create the start node and push into list of open nodes
     Point p = { xStart + c.tilePos.x, yStart + c.tilePos.y };
     //tempMT = getMapTileFromPoint({ xStart + clusterP.x, yStart + clusterP.y });
     n0 = new PathTile(p, GP->map_hierarchy, 0, 0);
-    
+
     // Check if start or goal tile is traversable;
     if (!n0->get_traversable()) return {};
     p = { xFinish + c.tilePos.x, yFinish + c.tilePos.y };
@@ -327,7 +327,7 @@ std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster& c1, const Cluster& c2
     if (adjOrientation) {   // Cluster 1 on top of Cluster 2
         p1.x = k + c1.tilePos.x; p1.y = c2.tilePos.y - 1;
         p2.x = k + c1.tilePos.x; p2.y = c2.tilePos.y;
-        // From the Heap       
+        // From the Heap
         return std::make_pair(getPathTileFromPoint(p1), getPathTileFromPoint(p2));
     }
     else {                  // Cluster 1 on left of Cluster 2
@@ -341,12 +341,12 @@ std::pair<PathTile*, PathTile*> getAdjTiles(const Cluster& c1, const Cluster& c2
 
 // Accessors
 //std::vector<std::pair<PathTile, PathTile>> Path_Hierarchy::get_transitionS() { return _transitionS; }
-std::pair<PathTile, PathTile> Path_Hierarchy::get_transition(const int transNum) { 
+std::pair<PathTile, PathTile> Path_Hierarchy::get_transition(const int transNum) {
     return std::make_pair(*_transitionS[transNum].first, *_transitionS[transNum].second); }
 std::vector<Cluster> Path_Hierarchy::get_clusterS() {return _clusterS;}
 Cluster Path_Hierarchy::get_cluster(const Point p) {
-    Cluster c = _clusterS[p.y * CLUSTER_XNUM + static_cast<__int64>(p.x)];
-        return _clusterS[p.y * CLUSTER_XNUM + static_cast<__int64>(p.x)];
+    Cluster c = _clusterS[p.y * CLUSTER_XNUM + static_cast<int64_t>(p.x)];
+        return _clusterS[p.y * CLUSTER_XNUM + static_cast<int64_t>(p.x)];
 }
 Cluster Path_Hierarchy::get_cluster(const int cNum) { return _clusterS[cNum]; }
 int Path_Hierarchy::get_numTrans() { return _numTrans; }
@@ -366,13 +366,13 @@ bool Path_Hierarchy::getTransitionTileAddresses(const int transNum, PathTile*& t
 //////////////////////////////////////////////////////////////////////////
 // get cluster Point from Cluster Num
 Point getClusterPFromNum(const int clusterNum) {
-    int x = clusterNum % static_cast<__int32>(CLUSTER_XNUM);
-    int y = (clusterNum - x) / static_cast<__int32>(CLUSTER_XNUM);
+    int x = clusterNum % static_cast<int32_t>(CLUSTER_XNUM);
+    int y = (clusterNum - x) / static_cast<int32_t>(CLUSTER_XNUM);
     return { x, y };
 }
 // gets cluster index in _clusterS vector
 int getClusterNum(const Point& p) {
-    return(p.y*static_cast<__int32>(CLUSTER_XNUM) + p.x);
+    return(p.y*static_cast<int32_t>(CLUSTER_XNUM) + p.x);
 }
 
 // Function abstractMap
@@ -387,13 +387,13 @@ void abstractMap() {
             findTransitions(GP->map_hierarchy->get_cluster({ i,j }), GP->map_hierarchy->get_cluster({ i, j + 1 }));
         }
     }
-    
+
     for(int i = 0; i < CLUSTER_XNUM - 1; i++) {     // checking all laterally adjacent clusters
         for(int j = 0; j < CLUSTER_YNUM; j++) {
             findTransitions(GP->map_hierarchy->get_cluster({ i,j }), GP->map_hierarchy->get_cluster({ i + 1, j }));
         }
     }
-    
+
 }
 
 // Function findTransitions
@@ -403,18 +403,18 @@ void findTransitions(const Cluster& c1, const Cluster& c2) {
     std::vector<std::vector<bool>> m = GP->_collisionM;
     std::pair<PathTile*, PathTile*> adjTiles;
     PathTile* l1, * l2;
-    
-    bool adjOrientation(c1.clusterPos.x == c2.clusterPos.x);    // True if c1 on top of c2, False if c1 left of c2 
+
+    bool adjOrientation(c1.clusterPos.x == c2.clusterPos.x);    // True if c1 on top of c2, False if c1 left of c2
 
     bool validEnt(false), currEnt(false);
     int entStart(0), entEnd(0);
-    
+
 
     for(int i = 0; i <  CLUSTER_TLENGTH; i++) {
         adjTiles = getAdjTiles(c1, c2, i, adjOrientation);
         l1 = adjTiles.first;
         l2 = adjTiles.second;
-        
+
         currEnt = (l1->get_traversable() && l2->get_traversable());
         if(currEnt && !validEnt) {  // starting a new entrance
             entStart = i;
@@ -424,22 +424,22 @@ void findTransitions(const Cluster& c1, const Cluster& c2) {
             entEnd = i-1;
             validEnt = false;
             if (entStart == entEnd) {  // if single-tile entrance, define one transition point
-                
+
                 GP->map_hierarchy->addTransition(getAdjTiles(c1, c2, entStart, adjOrientation));
             }
             else if(entEnd - entStart < MIN_ENTRANCE_LENGTH) {  // if small entrance, define one transition point in middle
-                
+
                 GP->map_hierarchy->addTransition(getAdjTiles(c1, c2, entStart + static_cast<int>((entEnd-entStart)/2), adjOrientation));
             }
             else {      // otherwise define multiple transition points
                 for(int k = entStart; k < entEnd+1; k += TRANSITION_INTERVAL)
-                    
+
                     GP->map_hierarchy->addTransition(getAdjTiles(c1, c2, k, adjOrientation));
             }
-        
+
         }
 
-    }   
+    }
 }
 
 
@@ -494,19 +494,19 @@ void buildGraph() {
 }
 
 void buildGraphPaths() {
-    
+
     int V = GP->map_graph->getVNum();   // get number of vertices
-    
+
     GP->map_graph->setWeightedAdj();   // encapsulates weightedAdj  inside abstract_graph
     GP->map_graph->setNeighborSet();
 
-    
+
 
     std::vector<std::vector<double>> distances;
     std::vector<double>* min_distance = new std::vector<double>(V);
     std::vector<int> previous(V);
 
-    
+
     std::vector<std::vector<std::vector<int>*>*>* paths = new std::vector<std::vector<std::vector<int>*>*>(V);
     std::vector<std::vector<int>*>* pathsFromSrc;
 
@@ -521,7 +521,7 @@ void buildGraphPaths() {
     }
     GP->map_graph->setPaths(paths);
     GP->map_graph->setDistances(distances);
-    
+
     // cleanup
     pathsFromSrc = nullptr;
     paths = nullptr;
@@ -557,8 +557,8 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
             if (GP->map_graph->getEdge(startV, goalV, tempEdge))
                 return tempEdge.path;
         }
-        intPath = pathFind({ startP.x % static_cast<__int32>(CLUSTER_TLENGTH), startP.y % static_cast<__int32>(CLUSTER_TLENGTH) },
-            { goalP.x % static_cast<__int32>(CLUSTER_TLENGTH), goalP.y % static_cast<__int32>(CLUSTER_TLENGTH) }, cNum1);
+        intPath = pathFind({ startP.x % static_cast<int32_t>(CLUSTER_TLENGTH), startP.y % static_cast<int32_t>(CLUSTER_TLENGTH) },
+            { goalP.x % static_cast<int32_t>(CLUSTER_TLENGTH), goalP.y % static_cast<int32_t>(CLUSTER_TLENGTH) }, cNum1);
         if (intPath.size() > 0)
             return intPath;
     }
@@ -573,7 +573,7 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
 
     // Connecting start and goal to cluster border transitions, and finding shortest path index
     if (!GP->map_graph->getVertexCopy(startP, startV)) {
-        Point sP = { startP.x % static_cast<__int32>(CLUSTER_TLENGTH), startP.y % static_cast<__int32>(CLUSTER_TLENGTH) };
+        Point sP = { startP.x % static_cast<int32_t>(CLUSTER_TLENGTH), startP.y % static_cast<int32_t>(CLUSTER_TLENGTH) };
         for (int i = 0; i < startTransitionNum; i++) {
             if (!GP->map_graph->getVertexCopy(i, cNum1, transV)) {
                 startToTransPaths.push_back({});
@@ -589,7 +589,7 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
     }
 
     if (!GP->map_graph->getVertexCopy(goalP, goalV)) {
-        Point gP = { goalP.x % static_cast<__int32>(CLUSTER_TLENGTH), goalP.y % static_cast<__int32>(CLUSTER_TLENGTH) };
+        Point gP = { goalP.x % static_cast<int32_t>(CLUSTER_TLENGTH), goalP.y % static_cast<int32_t>(CLUSTER_TLENGTH) };
         for (int i = 0; i < goalTransitionNum; i++) {
             if (!GP->map_graph->getVertexCopy(i, cNum2, transV)) {
                 goalToTransPaths.push_back({});
@@ -691,7 +691,7 @@ std::vector<int> searchForPath(const Point& startP, const Point& goalP) {
 // can change values here if we want middle of sprite to be center of collision, or feet!
 Point playerToTPos(const Point& p, const Point& size, const float scale) {
     double x = (static_cast<double>(p.x)+size.x * scale / 2) / static_cast<double>(TLENGTH);
-    double y = (static_cast<double>(p.y)+ size.y * scale * 0.85) / static_cast<double>(TLENGTH); 
+    double y = (static_cast<double>(p.y)+ size.y * scale * 0.85) / static_cast<double>(TLENGTH);
     return { static_cast<int>(floor(x)), static_cast<int>(floor(y)) };
 }
 
@@ -704,7 +704,7 @@ Point zombieToTPos(const Point& p, const Point& size, const float scale) {
 
 // Called by constructor, finds parent cluster from tile point
 Cluster findParentCluster(const Point& mapRelPos) {
-    Point p = { mapRelPos.x / static_cast<__int32>(CLUSTER_TLENGTH) , mapRelPos.y / static_cast<__int32>(CLUSTER_TLENGTH) };
+    Point p = { mapRelPos.x / static_cast<int32_t>(CLUSTER_TLENGTH) , mapRelPos.y / static_cast<int32_t>(CLUSTER_TLENGTH) };
     return GP->map_hierarchy->get_cluster(p);
 }
 

@@ -41,11 +41,11 @@ std::vector<std::vector<bool>> dummyMap() {
 	int randInt;
 	for (int i = 0; i < X_MAX / X_STEP; i++) {
 		for (int j = 0; j < Y_MAX / Y_STEP; j++) {
-			
+
 			randInt = rand() % 100;
 			if (randInt < 80)  m[i].push_back(true);
 			else m[i].push_back(false);
-			
+
 			//m[i].push_back(true);
 		}
 	}
@@ -160,7 +160,7 @@ void testAstar(const Point& p1, const Point& p2, const int cNum) {
 
 void testGraph() {
 	cout << "Checking a random edge in our graph..." << endl;
-	int cNum = rand() % static_cast<__int32>(CLUSTER_XNUM * CLUSTER_YNUM);
+	int cNum = rand() % static_cast<int32_t>(CLUSTER_XNUM * CLUSTER_YNUM);
 	int vCNum = GP->map_graph->getVCNum(cNum);
 	Vertex v1, v2;
 	Edge e;
@@ -187,7 +187,7 @@ void testDijkstra() {
 	std::vector<int> previous(V);
 	int src = 0;
 	DijkstraComputePaths(src, GP->map_graph->get_neighborSet(), min_distance, previous);
-	
+
 	std::vector<std::vector<int>*> paths;
 	for(int i = 0; i < V; i++) paths.push_back(DijkstraGetShortestPathTo(i, previous));
 
@@ -228,7 +228,7 @@ void testFindPath() {
 	for (int i = 0; i < dirPath.size(); i++) {
 		if (i % 15 == 0) cout << endl;
 		cout << dirPath[i] << " ";
-		
+
 	}
 }
 
@@ -238,13 +238,13 @@ void printPoint(const Point& p) {
 
 void testMain() {
 	clock_t begin, end;
-	
+
 	srand(time(NULL));
 	GP->setGlobals(dummyPathHierarchy(), dummyGraph(), dummyMap());
 	GlobalPathVars* lmao = GP;
 
 	//preprocessing();
-	
+
 
 	// testing A star aglo
 	//Point p1 = { 0,0 }, p2 = { 7,7 };
@@ -252,9 +252,9 @@ void testMain() {
 	//printMap(clusterP);
 	//testAstar(p1, p2, getClusterNum(clusterP));
 	//cout << endl << endl;
-	
+
 	//testTile();
-	
+
 	//testGraph();
 	//begin = clock();
 	//testDijkstra();
