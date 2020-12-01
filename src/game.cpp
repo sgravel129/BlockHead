@@ -202,8 +202,8 @@ void Game::run()
 	}
 	if (!isGrassland){
 		map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-		//map.loadMapFile(graphics, "res/maps/graveyard/graveyard.map");
-		map.loadMapFile(graphics, "res/maps/test2.map");
+		map.loadMapFile(graphics, "res/maps/graveyard/graveyard.map");
+		//map.loadMapFile(graphics, "res/maps/test2.map");
 	}
 
 
@@ -253,6 +253,7 @@ void Game::run()
 		}
 		// player & zombies
 		// zombies wrt each other
+		/*
 		for (auto& zombieRect : zombieRects)
 		{
 			if (SDL_HasIntersection(&playerRects[0], &zombieRect) == SDL_TRUE)
@@ -266,17 +267,20 @@ void Game::run()
 				return;
 			}
 		}
+		*/
 		// player & map
 		for (auto& mapRect : mapRects)
 		{
 			if (SDL_HasIntersection(&playerRects[0], &mapRect) == SDL_TRUE)
 			{
-				// Log::verbose("Collision Detected: Map");
+				Log::verbose("Collision Detected: Map");
 				player.update(player.getDeltaPos());
 				map.update(player.getDeltaPos());
 				for (auto& zombie : zombies){
 					zombie->updateCamera(player.getDeltaPos());
 				}
+				break;	// NO NEED TO CHECK COLLISION WITH FURTHER OBJECTS
+				
 
 			}
 		}

@@ -83,6 +83,7 @@ void Player::update(Point delta){
     prevPos = Point{pos.x, pos.y};
     pos.x = pos.x - delta.x;
     pos.y = pos.y - delta.y;
+    
 }
 
 void Player::draw(Graphics &graphics){
@@ -90,6 +91,7 @@ void Player::draw(Graphics &graphics){
     sprite->draw(graphics, RPOS.x, RPOS.y);
 }
 
+// Only putting collision on the player's lower half
 std::vector<SDL_Rect> Player::getDestRects(){
     std::vector<SDL_Rect> rects;
     // Player
@@ -97,8 +99,8 @@ std::vector<SDL_Rect> Player::getDestRects(){
 
     //rects.push_back(SDL_Rect{RPOS.x, RPOS.y, dim.x, dim.y});
     double x = static_cast<double>(RPOS.x) + static_cast<double>(dim.x) * 0.1;
-    double y = static_cast<double>(RPOS.y) + static_cast<double>(dim.y) * 0.65;
-    double w = static_cast<double>(dim.x) * 0.8; double h = static_cast<double>(dim.y) * 0.9;
+    double y = static_cast<double>(RPOS.y) + static_cast<double>(dim.y) * 0.60;
+    double w = static_cast<double>(dim.x) * 0.8; double h = static_cast<double>(dim.y) * 0.35;
     rects.push_back(SDL_Rect{ int(x), int(y), int(w), int(h) });
     // Weapon
     // Bullets
