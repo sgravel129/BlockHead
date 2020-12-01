@@ -14,6 +14,8 @@
 
 
 #define NUM_ZOMBIES 5
+#define NUM_TILE_X 40
+#define NUM_TILE_Y 24
 
 Mix_Music* introMusic = NULL;
 Mix_Music* loopMusic = NULL;
@@ -332,9 +334,36 @@ void Game::pathCheck(Zombie& zombie, const Player& player) {
 	//Log::verbose("Zombie pos:" + zombieP.to_string());
 	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
 	
+	// if zombie about to suicide, bring him back inside map
+	if (zombieP.x < 0) {
+		if (zombieP.y < static_cast<__int32>(NUM_TILE_Y) / 2)
+			zombie.setPath({ 1, 1, 1 });
+		else
+			zombie.setPath({ 7, 7, 7 });
+	}
+	else if (zombieP.x >= NUM_TILE_X) {
+		if (zombieP.y < static_cast<__int32>(NUM_TILE_Y) / 2)
+			zombie.setPath({ 3, 3, 3 });
+		else
+			zombie.setPath({ 5, 5, 5 });
+	}
+	else if (zombieP.y < 0) {
+		if (zombieP.x < static_cast<__int32>(NUM_TILE_X) / 2)
+			zombie.setPath({ 1, 1, 1 });
+		else
+			zombie.setPath({ 3, 3, 3 });
+	}
+	else if (zombieP.y >= NUM_TILE_Y) {
+		if (zombieP.x < static_cast<__int32>(NUM_TILE_X) / 2)
+			zombie.setPath({ 7, 7, 7 });
+		else
+			zombie.setPath({ 5, 5, 5 });
+	}
+
+
 	// if zombie path variable empty, update path
 // (also takes care of new zombie, which is initialized with empty path)
-	if (zombie.getPath().empty())
+	else if (zombie.getPath().empty())
 		zombie.setPath(searchForPath(zombieP, playerP));
 
 	// check if player and zombie in same cluster
