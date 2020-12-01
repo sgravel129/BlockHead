@@ -172,6 +172,10 @@ Point Zombie::posToTile(const Point& p) {
 
 SDL_Rect Zombie::getDestRect(){
     Point dim = sprite->getDim();
-    return SDL_Rect{rPos.x, rPos.y, dim.x, dim.y};
+    //return SDL_Rect{rPos.x, rPos.y, dim.x, dim.y};
+    double x = static_cast<double>(rPos.x) + double(6) * _scale;
+    double y = static_cast<double>(rPos.y) + double(14) * _scale;
+    double w = double(21) * _scale; double h = double(6) * _scale;
+    return SDL_Rect{ int(x), int(y), int(w), int(h) };
 }
 

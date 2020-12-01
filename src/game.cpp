@@ -253,21 +253,23 @@ void Game::run()
 		}
 		// player & zombies
 		// zombies wrt each other
-		/*
+		
 		for (auto& zombieRect : zombieRects)
 		{
 			if (SDL_HasIntersection(&playerRects[0], &zombieRect) == SDL_TRUE)
 			{
-				// Log::verbose("Hit Detected: Game Over");
+				Log::verbose("Hit Detected: Game Over");
 				// Destroy Zombies
+				/*
 				for (auto& zombie : zombies){
 					delete zombie;
 				}
 				winner_menu();
 				return;
+				*/
 			}
 		}
-		*/
+		
 		// player & map
 		for (auto& mapRect : mapRects)
 		{
