@@ -11,8 +11,8 @@ MapTile::~MapTile()
 }
 
 // Accessors
-Point MapTile::getPos() { return _location; }
-bool MapTile::getCollision() { return _hasCollision; }
+Point MapTile::getPos() const { return _location; }
+bool MapTile::getCollision() const { return _hasCollision; }
 
 MapTile::MapTile(Graphics &graphics, const std::string &path, SDL_Rect src, float scale, bool hasCollision, Point location){
     _sprite = new Sprite(graphics, path, src, scale);
@@ -28,7 +28,12 @@ void MapTile::draw(Graphics &graphics)
     _sprite->draw(graphics, rPos.x, rPos.y);
 }
 
+
+// Only putting collision on lower part of game objects (will look more natural given the "top down" view)
 SDL_Rect MapTile::getDestRect(){
     Point dim = _sprite->getDim();
-    return SDL_Rect{rPos.x, rPos.y, dim.x, dim.y};
+    double x = static_cast<double>(rPos.x) + static_cast<double>(dim.x) * 0.2;
+    double y = static_cast<double>(rPos.y) + static_cast<double>(dim.y) * 0.5;
+    double w = static_cast<double>(dim.x) * 0.6; double h = static_cast<double>(dim.y) * 0.3;
+    return SDL_Rect{int(x), int(y), int(w), int(h)};
 }

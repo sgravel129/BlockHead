@@ -3,9 +3,11 @@
 using namespace std;
 
 bool Log::_isDebugMode = true;
-string Log::_debugClasses[] = {
+
+string Log::_debugClasses[1] = {
 	// "map"
 };
+
 bool Log::_isVerboseMode = true;
 bool Log::_showDestructors = false;
 

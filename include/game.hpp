@@ -2,6 +2,8 @@
 
 #include "graphics.hpp"
 #include "input.hpp"
+#include "player.hpp"
+#include "zombie.hpp"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -60,6 +62,7 @@ private:
 		Update all game objects
 	 */
 
+	void pathCheck(Zombie&, const Player&);
 	void handleCollisions();
 	int framerate;
 	bool isRunning;
@@ -72,3 +75,5 @@ private:
 	// Custom game classes
 	// End of custom classes
 };
+
+void printPos(const Zombie& zombie, const Player& player);

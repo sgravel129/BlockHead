@@ -1,4 +1,6 @@
 #include "game.hpp"
+#include "testPath.hpp"
+
 
 #include <iostream>
 
@@ -12,11 +14,14 @@ int main(int argc, char **argv)
         framerate = atoi(argv[2]);
     }
 
+    //testMain();
+
     try
     {
         Game game;
 
         game.setFramerate(framerate);
+
 
         game.start_menu();
         game.intro_menu();
@@ -31,6 +36,6 @@ int main(int argc, char **argv)
         std::cerr << err.what() << std::endl;
     }
 
-
+    
     return 0;
 }

@@ -15,6 +15,8 @@ struct Point
 };
 std::string to_string(SDL_Rect);
 
+bool operator==(const Point&, const Point&);
+bool operator!=(const Point&, const Point&);
 
 class Sprite
 {
@@ -35,6 +37,7 @@ public:
 		Renders the sprite to screen
 	 */
 	void draw(Graphics &graphics, int x, int y);
+	
 
 private:
 	float _scale;

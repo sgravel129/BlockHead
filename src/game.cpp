@@ -9,12 +9,13 @@
 #include "player.hpp"
 #include "zombie.hpp"
 #include "map.hpp"
+#include "path.hpp"
 #include "music.hpp"
 
-#include <time.h>
-#include <stdio.h>
 
 #define NUM_ZOMBIES 5
+#define NUM_TILE_X 40
+#define NUM_TILE_Y 24
 
 Mix_Music* gIntroMusic = NULL;
 Mix_Music* gLoopMusic = NULL;
@@ -233,12 +234,17 @@ void Game::run()
 	Mix_HaltMusic();
 	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
 
+	//Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
+	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.07F);
+	//Zombie zombie = Zombie(graphics, "res/zombie.png", 30, 32, 4.0F, player.getPos());
+
+
 	// Create Zombies
 	Log::verbose("Creating zombies");
 	std::vector<Zombie*> zombies;
 	for (int i = 0; i < NUM_ZOMBIES; i++)
 	{
-		zombies.push_back(new Zombie(graphics, "res/zombie.png", 30, 32, 4.0F));
+		zombies.push_back(new Zombie(graphics, "res/zombie.png", 30, 32, 3.0F, player.getPos()));
 	}
 
 	// Create Map
@@ -250,11 +256,18 @@ void Game::run()
 	}
 	if (!isGrassland){
 		map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-		map.loadMapFile(graphics, "res/maps/test.map");
+		map.loadMapFile(graphics, "res/maps/graveyard/graveyard.map");
+		//map.loadMapFile(graphics, "res/maps/test2.map");
 	}
 
-	
+
+	// Path Abstraction
+	pathPreprocessing(5 * 3, map);
+	// Music
+	initMusic();
+	loadMedia();
 	Mix_PlayMusic(gIntroMusic, 0);
+
 
 	unsigned int last = SDL_GetTicks();
 	unsigned int current;
@@ -262,14 +275,13 @@ void Game::run()
 	graphics.setRenderColor(Color("65846c"));
 
 
-
+	int k, mod = 500 / zombies.size();;
 	while (isRunning)
 	{
 		time_t start,end;																	// time counting stuff with chrono to start counting
 		time (&start);
 
 		current = SDL_GetTicks();
-
 		// Update
 		if (Mix_PlayingMusic() == 0)
 			Mix_PlayMusic(gLoopMusic, -1);
@@ -279,9 +291,15 @@ void Game::run()
 		player.update(input);
 		map.update(player.getDeltaPos());
 
+		k = 0;
 		for (auto& zombie : zombies){
-			zombie->update(player.getDeltaPos());
+			if(((current%500)/mod) == k)		// Every zombie updates its path twice per second
+				pathCheck(*zombie, player);
+
+			zombie->update(player.getDeltaPos(), player.getPos());
+			k++;
 		}
+
 
 		// Check collision between:
 		std::vector<SDL_Rect> playerRects = player.getDestRects();
@@ -292,31 +310,37 @@ void Game::run()
 		}
 		// player & zombies
 		// zombies wrt each other
+
 		for (auto& zombieRect : zombieRects)
 		{
 			if (SDL_HasIntersection(&playerRects[0], &zombieRect) == SDL_TRUE)
 			{
-				// Log::verbose("Hit Detected: Game Over");
+				Log::verbose("Hit Detected: Game Over");
 				// Destroy Zombies
+				/*
 				for (auto& zombie : zombies){
 					delete zombie;
 				}
 				Mix_HaltMusic();
 				again_menu();
 				return;
+				*/
 			}
 		}
+
 		// player & map
 		for (auto& mapRect : mapRects)
 		{
 			if (SDL_HasIntersection(&playerRects[0], &mapRect) == SDL_TRUE)
 			{
-				// Log::verbose("Collision Detected: Map");
+				Log::verbose("Collision Detected: Map");
 				player.update(player.getDeltaPos());
 				map.update(player.getDeltaPos());
 				for (auto& zombie : zombies){
 					zombie->updateCamera(player.getDeltaPos());
 				}
+				break;	// NO NEED TO CHECK COLLISION WITH FURTHER OBJECTS
+
 
 			}
 		}
@@ -354,4 +378,68 @@ void Game::run()
 void Game::setFramerate(int framerate)
 {
 	this->framerate = framerate;
+}
+
+
+void Game::pathCheck(Zombie& zombie, const Player& player) {
+	Point zombieP = zombieToTPos(zombie.getPos(), zombie.getSize(), zombie.getScale());
+	Point playerP = playerToTPos(player.getPos(), player.getSize(), player.getScale());
+
+	Point zombiePR = zombieToTPos(zombie.getRPos(), zombie.getSize(), zombie.getScale());
+	//Log::verbose("Player pos:" + playerP.to_string());
+	//Log::verbose("Zombie pos:" + zombieP.to_string());
+	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
+
+	// if zombie about to suicide, bring him back inside map
+	if (zombieP.x < 0) {
+		if (zombieP.y < static_cast<int32_t>(NUM_TILE_Y) / 2)
+			zombie.setPath({ 1, 1, 1 });
+		else
+			zombie.setPath({ 7, 7, 7 });
+	}
+	else if (zombieP.x >= NUM_TILE_X) {
+		if (zombieP.y < static_cast<int32_t>(NUM_TILE_Y) / 2)
+			zombie.setPath({ 3, 3, 3 });
+		else
+			zombie.setPath({ 5, 5, 5 });
+	}
+	else if (zombieP.y < 0) {
+		if (zombieP.x < static_cast<int32_t>(NUM_TILE_X) / 2)
+			zombie.setPath({ 1, 1, 1 });
+		else
+			zombie.setPath({ 3, 3, 3 });
+	}
+	else if (zombieP.y >= NUM_TILE_Y) {
+		if (zombieP.x < static_cast<int32_t>(NUM_TILE_X) / 2)
+			zombie.setPath({ 7, 7, 7 });
+		else
+			zombie.setPath({ 5, 5, 5 });
+	}
+
+
+	// if zombie path variable empty, update path
+// (also takes care of new zombie, which is initialized with empty path)
+	else if (zombie.getPath().empty())
+		zombie.setPath(searchForPath(zombieP, playerP));
+
+	// check if player and zombie in same cluster
+	// if so update path
+	else if (findParentCluster(zombieP).clusterPos == findParentCluster(playerP).clusterPos)
+		zombie.setPath(searchForPath(zombieP, playerP));
+
+	// check if player changed cluster
+	// if so, recalculate cluster path
+	else if (findParentCluster(playerP).clusterPos == findParentCluster(playerToTPos(player.getPrevPos(), player.getSize(), player.getScale())).clusterPos)
+		zombie.setPath(searchForPath(zombieP, playerP));
+
+}
+
+void printPos(const Zombie& zombie, const Player& player) {
+	Point zombieP = zombieToTPos(zombie.getPos(), zombie.getSize(), zombie.getScale());
+	Point playerP = playerToTPos(player.getPos(), player.getSize(), player.getScale());
+
+	Point zombiePR = zombieToTPos(zombie.getPos(), zombie.getSize(), zombie.getScale());
+	Log::verbose("Player pos:" + playerP.to_string());
+	Log::verbose("Zombie pos:" + zombieP.to_string());
+	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
 }
