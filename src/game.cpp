@@ -12,6 +12,7 @@
 #include "path.hpp"
 #include "music.hpp"
 
+
 #define NUM_ZOMBIES 5
 
 Mix_Music* introMusic = NULL;
@@ -220,11 +221,10 @@ void Game::run()
 	graphics.setRenderColor(Color("65846c"));
 
 
-
+	int k;
 	while (isRunning)
 	{
 		current = SDL_GetTicks();
-
 		// Update
 		if (Mix_PlayingMusic() == 0)
 			Mix_PlayMusic(loopMusic, -1);
@@ -234,10 +234,14 @@ void Game::run()
 		player.update(input);
 		map.update(player.getDeltaPos());
 
-
+		k = 0;
+		int mod = 500 / zombies.size();
 		for (auto& zombie : zombies){
-			pathCheck(*zombie, player);
+			if(((current%500)/mod) == k)		// Every zombie updates its path twice per second
+				pathCheck(*zombie, player);
+			
 			zombie->update(player.getDeltaPos(), player.getPos());
+			k++;
 		}
 
 
