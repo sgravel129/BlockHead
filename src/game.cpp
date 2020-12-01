@@ -99,10 +99,10 @@ bool Game::menu(const std::string &background_path, const std::string &play_butt
 	graphics.setRenderColor(Color("FFFFFF"));
 	while (isRunning)
 	{
-		
+
 		current = SDL_GetTicks();
-		
-		
+
+
 		// Update
 		handleUserInput();
 		if (input.wasKeyPressed(SDL_SCANCODE_Y))
@@ -232,7 +232,7 @@ bool Game::running()
 void Game::run()
 {
 	Mix_HaltMusic();
-	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
+	// Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
 
 	//Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.10F);
 	Player player = Player(graphics, "res/robot_sprites.png", 1953, 2192, 0.07F);
@@ -256,7 +256,7 @@ void Game::run()
 	}
 	if (!isGrassland){
 		map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-		map.loadMapFile(graphics, "res/maps/graveyard/graveyard.map");
+		map.loadMapFile(graphics, "res/maps/test.map");
 		//map.loadMapFile(graphics, "res/maps/test2.map");
 	}
 
@@ -317,14 +317,14 @@ void Game::run()
 			{
 				Log::verbose("Hit Detected: Game Over");
 				// Destroy Zombies
-				/*
+
 				for (auto& zombie : zombies){
 					delete zombie;
 				}
 				Mix_HaltMusic();
 				again_menu();
 				return;
-				*/
+
 			}
 		}
 
