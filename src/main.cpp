@@ -19,6 +19,7 @@ int main(int argc, char **argv)
         game.setFramerate(framerate);
 
         game.start_menu();
+        game.intro_menu();
         while (game.running()){
             game.map_selector_menu();
             game.run();

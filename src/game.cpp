@@ -11,11 +11,13 @@
 #include "map.hpp"
 #include "music.hpp"
 
+#include <time.h>
+#include <stdio.h>
+
 #define NUM_ZOMBIES 5
 
 Mix_Music* introMusic = NULL;
 Mix_Music* loopMusic = NULL;
-
 
 
 Game::Game()
@@ -33,6 +35,7 @@ Game::~Game()
 {
 	Log::destruct("Game\t| Called ");
 }
+
 
 bool Game::map_selector(const std::string &graveyard_map_btn_path, const std::string &grassland_map_btn_path, const std::string &graveyard_1, const std::string &grassland_2)
 {
@@ -120,6 +123,41 @@ bool Game::menu(const std::string &background_path, const std::string &play_butt
 	return isRunning;
 }
 
+bool Game::intro_menu(const std::string &background_path)
+{
+	Sprite background(graphics, background_path, {0, 0, 1819, 1155}, 0.6f);
+
+	unsigned int last = SDL_GetTicks();
+	unsigned int current;
+
+	graphics.setRenderColor(Color("FFFFFF"));
+
+	while (isRunning)
+	{
+		current = SDL_GetTicks();
+
+		// Update
+		handleUserInput();
+		if (input.wasKeyPressed(SDL_SCANCODE_RETURN))
+			break;
+
+		if (current - last >= (1000 / framerate))
+		{
+			// Render
+			graphics.fillBackground();
+			background.draw(graphics, 80, 0);
+
+			// Display
+			graphics.flip();
+			last = current;
+		}
+
+		SDL_Delay(10);
+	}
+
+	return isRunning;
+}
+
 bool Game::start_menu() {
 	return menu("res/assets/open_page.png", "res/assets/start_button.png", "res/assets/quit_button.png");
 }
@@ -130,6 +168,10 @@ bool Game::again_menu() {
 
 bool Game::winner_menu() {
 	return menu("res/assets/winner.png", "res/assets/nextlevel_button.png", "res/assets/quit_button.png");
+}
+
+bool Game::intro_menu() {
+	return intro_menu("res/assets/intro.png");
 }
 
 bool Game::map_selector_menu() {
@@ -212,6 +254,9 @@ void Game::run()
 
 	while (isRunning)
 	{
+		time_t start,end;																	// time counting stuff with chrono to start counting
+		time (&start);
+
 		current = SDL_GetTicks();
 
 		// Update
@@ -245,7 +290,13 @@ void Game::run()
 				for (auto& zombie : zombies){
 					delete zombie;
 				}
-				winner_menu();
+				time (&end);
+				double dif = difftime (end,start);
+				printf ("Start time is %.2lf seconds.", start );								//Start time in console! 
+				printf ("End time is %.2lf seconds.", end );									//End time in console! 
+				printf ("Elasped time is %.2lf seconds.", dif );								//Elapŝed time in console! aka the score
+
+				again_menu();
 				return;
 			}
 		}
