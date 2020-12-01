@@ -11,11 +11,13 @@
 #include "map.hpp"
 #include "music.hpp"
 
+#include <time.h>
+#include <stdio.h>
+
 #define NUM_ZOMBIES 5
 
 Mix_Music* introMusic = NULL;
 Mix_Music* loopMusic = NULL;
-
 
 
 Game::Game()
@@ -33,6 +35,7 @@ Game::~Game()
 {
 	Log::destruct("Game\t| Called ");
 }
+
 
 bool Game::map_selector(const std::string &graveyard_map_btn_path, const std::string &grassland_map_btn_path, const std::string &graveyard_1, const std::string &grassland_2)
 {
@@ -251,6 +254,10 @@ void Game::run()
 
 	while (isRunning)
 	{
+		// time counting stuff with chrono to start counting
+		time_t start,end;
+		time (&start);
+
 		current = SDL_GetTicks();
 
 		// Update
@@ -284,6 +291,10 @@ void Game::run()
 				for (auto& zombie : zombies){
 					delete zombie;
 				}
+				time (&end);
+				double dif = difftime (end,start);
+				printf ("Elasped time is %.2lf seconds.", dif );								//Elapŝed time in console! aka the score
+
 				again_menu();
 				return;
 			}
