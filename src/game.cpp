@@ -202,8 +202,8 @@ void Game::run()
 	}
 	if (!isGrassland){
 		map.loadTextures("res/maps/graveyard/graveyard.png", "res/maps/graveyard/graveyard.sprites");
-		map.loadMapFile(graphics, "res/maps/graveyard/graveyard.map");
-		//map.loadMapFile(graphics, "res/maps/test2.map");
+		//map.loadMapFile(graphics, "res/maps/graveyard/graveyard.map");
+		map.loadMapFile(graphics, "res/maps/test2.map");
 	}
 
 

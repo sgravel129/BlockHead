@@ -94,8 +94,14 @@ std::vector<SDL_Rect> Player::getDestRects(){
     std::vector<SDL_Rect> rects;
     // Player
     Point dim = sprite->getDim();
-    rects.push_back(SDL_Rect{RPOS.x, RPOS.y, dim.x, dim.y});
+
+    //rects.push_back(SDL_Rect{RPOS.x, RPOS.y, dim.x, dim.y});
+    double x = static_cast<double>(RPOS.x) + static_cast<double>(dim.x) * 0.1;
+    double y = static_cast<double>(RPOS.y) + static_cast<double>(dim.y) * 0.65;
+    double w = static_cast<double>(dim.x) * 0.8; double h = static_cast<double>(dim.y) * 0.9;
+    rects.push_back(SDL_Rect{ int(x), int(y), int(w), int(h) });
     // Weapon
     // Bullets
     return rects;
 }
+
