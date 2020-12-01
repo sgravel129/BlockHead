@@ -221,7 +221,7 @@ void Game::run()
 	graphics.setRenderColor(Color("65846c"));
 
 
-	int k;
+	int k, mod = 500 / zombies.size();;
 	while (isRunning)
 	{
 		current = SDL_GetTicks();
@@ -235,7 +235,6 @@ void Game::run()
 		map.update(player.getDeltaPos());
 
 		k = 0;
-		int mod = 500 / zombies.size();
 		for (auto& zombie : zombies){
 			if(((current%500)/mod) == k)		// Every zombie updates its path twice per second
 				pathCheck(*zombie, player);
