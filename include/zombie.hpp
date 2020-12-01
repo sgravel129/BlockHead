@@ -10,7 +10,7 @@ private:
     Sprite *sprite;
     std::vector<std::vector<SDL_Rect>> anims;
     int currAnim;
-    Point renderPos;
+    Point rPos;
     Point pos, prevPos;
     int angle; // for sprite info
     int health;
@@ -26,16 +26,19 @@ public:
     Zombie();
     Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale, Point playerP);
     ~Zombie();
+
     void update(Point delta, Point playerPos);
+    void updateCamera(Point delta);
     void draw(Graphics &graphics);
     void setPath(const std::vector<int>&);
     Point getPos() const { return pos; }
-    Point getRenderPos() const { return renderPos; }
+    Point getRPos() const { return rPos; }
     std::vector<int> getPath() const { return _pathToPlayer; }
 
     Point getSize() const { return Point{ _w, _h }; }
     float getScale() const { return _scale; }
     Point posToTile(const Point&);
-    };
+    SDL_Rect getDestRect();
+ };
 
-Point mapToPos(const Point&, const Point&, const float);
+

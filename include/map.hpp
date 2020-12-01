@@ -29,4 +29,5 @@ public:
 
     std::vector<std::vector<bool>> getColM() const { return _collisionM; };
 
+    std::vector<SDL_Rect> getDestRects();
 };

@@ -18,6 +18,11 @@ std::string Point::to_string() {
 	return "(" + std::to_string(this->x) + "," + std::to_string(this->y) + ")";
 }
 
+std::string to_string(SDL_Rect rect) {
+	return "(" + std::to_string(rect.x) + "," + std::to_string(rect.y) +  "," +
+		std::to_string(rect.w) + "," + std::to_string(rect.h) +")";
+}
+
 Sprite::Sprite()
 {
 }
@@ -54,6 +59,12 @@ void Sprite::change_src(SDL_Rect src)
 {
 	_srcRect = src;
 }
+
+Point Sprite::getDim()
+{
+	return Point{Util::scale(_srcRect.w, _scale), Util::scale(_srcRect.h, _scale)};
+}
+
 void Sprite::change_scale(float scale)
 {
 	_scale = scale;

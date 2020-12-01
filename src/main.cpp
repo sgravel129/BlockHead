@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 
 
         game.start_menu();
-        if (game.running()){
+        while (game.running()){
             game.map_selector_menu();
             game.run();
         }

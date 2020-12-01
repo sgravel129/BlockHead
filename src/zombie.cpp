@@ -29,10 +29,7 @@ Zombie::~Zombie()
     delete sprite;
 }
 
-Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale, Point playerP)
-{
-
-   
+Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float scale, Point playerP) { 
    
     //renderPos = Point{Util::randInt(0, SCREEN_WIDTH), Util::randInt(0, SCREEN_HEIGHT)};
     //renderPos = Point{ 200, 200 };
@@ -40,10 +37,26 @@ Zombie::Zombie(Graphics &graphics, const std::string &path, int w, int h, float 
     
     // Making sure we are not adding a zombie outside the map
     do {
-        renderPos = Point{ Util::randInt(-100, SCREEN_WIDTH), Util::randInt(-100, SCREEN_HEIGHT) };
-        pos = renderPos + playerP - target;
-    } while (pos.x < 0 || pos.y < 0);
+        int screenDir = Util::randInt(0, 3);
+        switch (screenDir)
+        {
+        case 0:
+            rPos = Point{ Util::randInt(25, 150), Util::randInt(0, SCREEN_HEIGHT + 100) };
+            break;
+        case 1:
+            rPos = Point{ Util::randInt(SCREEN_WIDTH + 20, SCREEN_WIDTH + 150), Util::randInt(25, SCREEN_HEIGHT + 100) };
+            break;
+        case 2:
+            rPos = Point{ Util::randInt(25, SCREEN_WIDTH + 100), Util::randInt(25, 150) };
+            break;
+        case 4:
+            rPos = Point{ Util::randInt(25, SCREEN_WIDTH + 100), Util::randInt(SCREEN_HEIGHT + 20, SCREEN_HEIGHT + 150) };
+            break;
+        }
+        pos = rPos + playerP - target;
+    } while (pos.x <= 0 || pos.y <= 0);
     
+
     angle = 0; // starting direction
     currAnim = 0;
     moveSpeed = 1;
@@ -67,17 +80,17 @@ void Zombie::update(Point delta, Point playerPos)
     //playerPos = Point {playerPos.x+}
     
     
-    pos = renderPos + playerPos - target;
+    pos = rPos + playerPos - target;
     //pos = { pos.x + int(_w * _scale / 2), pos.y + int(_h * _scale / 2) };
-    prevPos = Point{ pos.x, pos.y };
-    // Do path finding. Euclidian Distance
-    renderPos = renderPos - delta;
+    
+    updateCamera(delta); // delta caused by player movement
+    Point prevPos = pos;
 
 
     
     if (!_pathToPlayer.empty()) {
-        renderPos.x += dx[_pathToPlayer[0]] * moveSpeed;
-        renderPos.y += dy[_pathToPlayer[0]] * moveSpeed;
+        rPos.x += dx[_pathToPlayer[0]] * moveSpeed;
+        rPos.y += dy[_pathToPlayer[0]] * moveSpeed;
         if (_pathToPlayer[0] == 0 || _pathToPlayer[0] == 1 || _pathToPlayer[0] == 7) angle = 2;
         else if (_pathToPlayer[0] == 4 || _pathToPlayer[0] == 5 || _pathToPlayer[0] == 3) angle = 1;
         else if (_pathToPlayer[0] == 2) angle = 0;
@@ -129,15 +142,20 @@ void Zombie::update(Point delta, Point playerPos)
 
     if (Animation::getTicks() % int(20 / moveSpeed) == 0) {
         currAnim = (currAnim + 1) % MOVE_ANIMS;
-        // Log::verbose(pos.to_string());
+        // Log::verbose(std::to_string((pos.x / 75)) + " " + std::to_string((pos.y / 75)));
     }
     
+}
+
+void Zombie::updateCamera(Point delta)
+{
+    rPos = rPos - delta; // delta caused by player movement
 }
 
 void Zombie::draw(Graphics &graphics)
 {
     sprite->change_src(anims[angle][currAnim]);
-    sprite->draw(graphics, renderPos.x, renderPos.y);
+    sprite->draw(graphics, rPos.x, rPos.y);
 }
 
 void Zombie::setPath(const std::vector<int>& path) { _pathToPlayer = path; }
@@ -151,3 +169,9 @@ Point Zombie::posToTile(const Point& p) {
     double y = (static_cast<double>(p.y) + _h * _scale * 0.95) / static_cast<double>(TLENGTH);
     return { static_cast<int>(floor(x)), static_cast<int>(floor(y)) };
 }
+
+SDL_Rect Zombie::getDestRect(){
+    Point dim = sprite->getDim();
+    return SDL_Rect{rPos.x, rPos.y, dim.x, dim.y};
+}
+

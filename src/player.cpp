@@ -3,9 +3,9 @@
 #include "animation.hpp"
 #include "constants.hpp"
 
-// TODO: Migrate to point system.
 const int MOVE_ANIMS = 3;
 const int NUM_DIR = 4;
+const Point RPOS = Point{int(SCREEN_WIDTH/2) - int(PLAYER_WIDTH/2), int(SCREEN_HEIGHT/2) - int(PLAYER_HEIGHT/2)};
 
 Player::Player()
 {
@@ -40,7 +40,6 @@ Player::~Player()
     delete sprite;
 }
 
-int counter = 0;
 void Player::update(Input input){
     prevPos = Point{pos.x, pos.y};
 
@@ -80,7 +79,23 @@ void Player::update(Input input){
     }
 }
 
+void Player::update(Point delta){
+    prevPos = Point{pos.x, pos.y};
+    pos.x = pos.x - delta.x;
+    pos.y = pos.y - delta.y;
+}
+
 void Player::draw(Graphics &graphics){
     sprite->change_src(anims[angle][currAnim]);
-    sprite->draw(graphics, int(SCREEN_WIDTH/2) - int(PLAYER_WIDTH/2), int(SCREEN_HEIGHT/2) - int(PLAYER_HEIGHT/2));
+    sprite->draw(graphics, RPOS.x, RPOS.y);
+}
+
+std::vector<SDL_Rect> Player::getDestRects(){
+    std::vector<SDL_Rect> rects;
+    // Player
+    Point dim = sprite->getDim();
+    rects.push_back(SDL_Rect{RPOS.x, RPOS.y, dim.x, dim.y});
+    // Weapon
+    // Bullets
+    return rects;
 }

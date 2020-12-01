@@ -228,7 +228,7 @@ void Game::run()
 		// Update
 		if (Mix_PlayingMusic() == 0)
 			Mix_PlayMusic(loopMusic, -1);
-		
+
 		handleUserInput();
 		Animation::updateTicks();
 		player.update(input);
@@ -245,9 +245,43 @@ void Game::run()
 
 
 		// Check collision between:
+		std::vector<SDL_Rect> playerRects = player.getDestRects();
+		std::vector<SDL_Rect> mapRects = map.getDestRects();
+		std::vector<SDL_Rect> zombieRects;
+		for (auto& zombie : zombies){
+			zombieRects.push_back(zombie->getDestRect());
+		}
 		// player & zombies
+		// zombies wrt each other
+		for (auto& zombieRect : zombieRects)
+		{
+			if (SDL_HasIntersection(&playerRects[0], &zombieRect) == SDL_TRUE)
+			{
+				// Log::verbose("Hit Detected: Game Over");
+				// Destroy Zombies
+				for (auto& zombie : zombies){
+					delete zombie;
+				}
+				winner_menu();
+				return;
+			}
+		}
 		// player & map
+		for (auto& mapRect : mapRects)
+		{
+			if (SDL_HasIntersection(&playerRects[0], &mapRect) == SDL_TRUE)
+			{
+				// Log::verbose("Collision Detected: Map");
+				player.update(player.getDeltaPos());
+				map.update(player.getDeltaPos());
+				for (auto& zombie : zombies){
+					zombie->updateCamera(player.getDeltaPos());
+				}
+
+			}
+		}
 		// bullets & zombies
+
 
 		if (current - last >= (1000 / framerate))
 		{
@@ -277,7 +311,6 @@ void Game::run()
 }
 
 // Getters and Setters
-
 void Game::setFramerate(int framerate)
 {
 	this->framerate = framerate;
@@ -288,7 +321,7 @@ void Game::pathCheck(Zombie& zombie, const Player& player) {
 	Point zombieP = zombieToTPos(zombie.getPos(), zombie.getSize(), zombie.getScale());
 	Point playerP = playerToTPos(player.getPos(), player.getSize(), player.getScale());
 
-	Point zombiePR = zombieToTPos(zombie.getRenderPos(), zombie.getSize(), zombie.getScale());
+	Point zombiePR = zombieToTPos(zombie.getRPos(), zombie.getSize(), zombie.getScale());
 	//Log::verbose("Player pos:" + playerP.to_string());
 	//Log::verbose("Zombie pos:" + zombieP.to_string());
 	//Log::verbose("Zombie render pos:" + zombiePR.to_string());
@@ -314,7 +347,7 @@ void printPos(const Zombie& zombie, const Player& player) {
 	Point zombieP = zombieToTPos(zombie.getPos(), zombie.getSize(), zombie.getScale());
 	Point playerP = playerToTPos(player.getPos(), player.getSize(), player.getScale());
 
-	Point zombiePR = zombieToTPos(zombie.getRenderPos(), zombie.getSize(), zombie.getScale());
+	Point zombiePR = zombieToTPos(zombie.getPos(), zombie.getSize(), zombie.getScale());
 	Log::verbose("Player pos:" + playerP.to_string());
 	Log::verbose("Zombie pos:" + zombieP.to_string());
 	//Log::verbose("Zombie render pos:" + zombiePR.to_string());

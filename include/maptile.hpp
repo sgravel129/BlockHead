@@ -8,7 +8,7 @@ class MapTile
 private:
     Sprite *_sprite;
     bool _hasCollision;
-    Point _location;
+    Point _location, rPos;
 
 public:
     MapTile();
@@ -19,6 +19,8 @@ public:
     void draw(Graphics &graphics);
 
     // Accessors
+
     Point getPos() const;
     bool getCollision() const;
+    SDL_Rect getDestRect();
 };

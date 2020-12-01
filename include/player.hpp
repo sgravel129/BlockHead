@@ -28,6 +28,7 @@ public:
     Player(Graphics &graphics, const std::string &path, int w, int h, float scale);
     ~Player();
     void update(Input input);
+    void update(Point delta);
     void draw(Graphics &graphics);
     int getX() { return pos.x; }
     int getY() { return pos.y; }
@@ -36,4 +37,5 @@ public:
     Point getPrevPos() const { return prevPos; }
     Point getSize() const { return Point{ _w, _h }; }
     float getScale() const { return _scale; }
+    std::vector<SDL_Rect> getDestRects();
 };

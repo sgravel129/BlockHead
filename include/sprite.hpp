@@ -13,6 +13,7 @@ struct Point
 	Point operator +(const Point& b);
 	std::string to_string();
 };
+std::string to_string(SDL_Rect);
 
 bool operator==(const Point&, const Point&);
 bool operator!=(const Point&, const Point&);
@@ -30,6 +31,7 @@ public:
 	 */
 	void change_src(SDL_Rect src);
 	void change_scale(float scale);
+	Point getDim();
 
 	/*
 		Renders the sprite to screen
